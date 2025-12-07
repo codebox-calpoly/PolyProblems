@@ -11,7 +11,7 @@ Short paragraph description
 ### Team
 
 - [First Last](https://www.linkedin.com/) - Project Manager
-- [First Last](https://www.linkedin.com/) - Tech Lead
+- [Peter Chinh](www.linkedin.com/in/peterchinh) - Tech Lead
 - [First Last](https://www.linkedin.com/) - Tech Lead
 - [First Last](https://www.linkedin.com/) - Designer
 - [First Last](https://www.linkedin.com/) - Developer
