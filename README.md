@@ -12,7 +12,7 @@ Short paragraph description
 
 - [First Last](https://www.linkedin.com/) - Project Manager
 - [Peter Chinh](www.linkedin.com/in/peterchinh) - Tech Lead
-- [First Last](https://www.linkedin.com/) - Tech Lead
+- [Namish Mannepalli](www.linkedin.com/in/namish-mannepalli) - Tech Lead
 - [First Last](https://www.linkedin.com/) - Designer
 - [First Last](https://www.linkedin.com/) - Developer
 
