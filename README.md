@@ -10,9 +10,9 @@ Short paragraph description
 
 ### Team
 
-- [First Last](https://www.linkedin.com/) - Project Manager
-- [Peter Chinh](www.linkedin.com/in/peterchinh) - Tech Lead
-- [First Last](https://www.linkedin.com/) - Tech Lead
+- [Harry Obraztsov]( https://www.linkedin.com/in/harry-obraztsov) - Project Manager
+- [Peter Chinh](https://www.linkedin.com/in/peterchinh) - Tech Lead
+- [Namish Mannepalli](https://www.linkedin.com/in/namish-mannepalli) - Tech Lead
 - [First Last](https://www.linkedin.com/) - Designer
 - [First Last](https://www.linkedin.com/) - Developer
 
