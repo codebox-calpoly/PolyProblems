@@ -15,6 +15,7 @@ Short paragraph description
 - [First Last](https://www.linkedin.com/) - Tech Lead
 - [First Last](https://www.linkedin.com/) - Designer
 - [Arin Johar](https://www.linkedin.com/in/arin-johar/) - Developer
+- [Chloe Low](https://www.linkedin.com/in/chloe-low-12a883389/) - Developer
 
 ## Contributing
 
