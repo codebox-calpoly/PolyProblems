@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   Image,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   useColorScheme,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "./constants/theme";
 import { profileReports, profileUser } from "./data/profileData";
@@ -31,7 +31,7 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <View style={styles.avatarRing}>
             <Image
-              source={{ uri: "https://i.pravatar.cc/300" }}
+              source={{ uri: "https://i.pravatar.cc/300" }} 
               style={styles.avatar}
             />
           </View>
