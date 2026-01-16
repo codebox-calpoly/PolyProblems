@@ -6,6 +6,7 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import ReportCard from '@/components/ui/ReportCard';
 
 export default function HomeScreen() {
   return (
@@ -20,6 +21,21 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
+      </ThemedView>
+       <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Report Cards</ThemedText>
+        <ReportCard 
+          title="Before You Continue" 
+          onViewPress={() => console.log('Before You Continue pressed')}
+        />
+        <ReportCard 
+          title="Emergency Report" 
+          onViewPress={() => console.log('Emergency Report pressed')}
+        />
+        <ReportCard 
+          title="Incident Report" 
+          onViewPress={() => console.log('Incident Report pressed')}
+        />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
