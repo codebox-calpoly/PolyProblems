@@ -1,6 +1,5 @@
-// components/ui/ReportCard.tsx
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Image } from 'react-native';
 
 interface ReportCardProps {
   title: string;
@@ -67,7 +66,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
                   <Text style={styles.bullet}>• Disclosure is required by court order</Text>
                 </View>
                 <Text style={styles.sectionText}>
-                  Submitted reports may become part of a student's educational record and may be reviewed by OSRR.
+                  Submitted reports may become part of a student&apos;s educational record and may be reviewed by OSRR.
                 </Text>
               </View>
 
@@ -102,7 +101,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
               <View style={[styles.checkboxBox, dontShowAgain && styles.checkboxChecked]}>
                 {dontShowAgain && <Text style={styles.checkmark}>✓</Text>}
               </View>
-              <Text style={styles.checkboxLabel}>Don't show this again</Text>
+              <Text style={styles.checkboxLabel}>Don&apos;t show this again</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -115,13 +114,40 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
               <Text style={styles.reportButtonText}>Report an Issue</Text>
             </TouchableOpacity>
 
-            <View style={styles.bottomBorder} />
+            <View style={styles.bottomBorder}>
+              <View style={styles.navBar}>
+                <TouchableOpacity style={styles.navItem}>
+                  <Image 
+                    source={require('../../assets/images/feed.png')}
+                    style={styles.navIconImage}
+                  />
+                  <Text style={styles.navLabel}>Feed</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.navItem}>
+                  <Image 
+                    source={require('../../assets/images/report.png')}
+                    style={styles.navIconImage}
+                  />
+                  <Text style={styles.navLabel}>Report</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.navItem}>
+                  <Image 
+                    source={require('../../assets/images/profile.png')}
+                    style={styles.navIconImage}
+                  />
+                  <Text style={styles.navLabel}>Profile</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
     </>
   );
 };
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
@@ -171,15 +197,14 @@ const styles = StyleSheet.create({
   modalContent: {
     width: 393,
     alignSelf: 'center',
-    paddingTop: 60,
+    paddingTop: 40,
     paddingBottom: 40,
   },
   titleContainer: {
     width: 318,
     height: 39,
-    marginTop: -30,
     marginLeft: 28,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   modalTitle: {
     fontSize: 32,
@@ -188,63 +213,61 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 39,
     fontFamily: 'OpenRunde-Semibold',
-    
   },
   contentBlock: {
     width: 327,
-    height: 558,
-    position: 'absolute',
-    top: 92,
-    left: 28,
+    marginLeft: 28,
+    paddingBottom: 20,
+    marginTop: -10,
   },
   description: {
-    fontSize: 12,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
     color: '#000000',
-    marginBottom: 20,
+    marginBottom: 12,
     fontFamily: 'OpenRunde-Regular',
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#000000',
-    marginBottom: 6,
+    marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
   sectionText: {
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 20,
     color: '#000000',
-    marginBottom: 6,
+    marginBottom: 4,
     fontFamily: 'OpenRunde-Regular',
   },
   bulletList: {
     marginLeft: 4,
-    marginVertical: 6,
+    marginVertical: 4,
   },
   bullet: {
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 20,
     color: '#000000',
-    marginBottom: 3,
+    marginBottom: 2,
     fontFamily: 'OpenRunde-Regular',
   },
   contactText: {
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 20,
     color: '#000000',
-    marginBottom: 24,
+    marginBottom: 16,
     fontFamily: 'OpenRunde-Regular',
   },
   footer: {
-    marginTop: 50,
+    marginTop: 8,
   },
   readyText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: '#000000',
     marginBottom: 4,
@@ -252,23 +275,20 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenRunde-Regular',
   },
   continueText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#000000',
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
   actionSection: {
     width: '100%',
-    position: "absolute",
-    top: 720,
-    left:35,
   },
   checkbox: {
     flexDirection: 'row',
     alignItems: 'center',
     position: 'absolute',
     top: 697,
-    left: 40
+    left: 40,
   },
   checkboxBox: {
     width: 20,
@@ -303,7 +323,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     top: 748,
-    left: 35
+    left: 35,
   },
   reportButtonText: {
     color: '#FFFFFF',
@@ -315,13 +335,35 @@ const styles = StyleSheet.create({
   },
   bottomBorder: {
     width: 393,
-    height:68,
+    height: 68,
     backgroundColor: '#174735',
-    position:'absolute',
-    top: 869, 
+    position: 'absolute',
+    top: 869,
     left: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  navBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 60,
+  },
+  navItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navIconImage: {
+    width: 24,
+    height: 24,
+    marginBottom: 4,
+  },
+  navLabel: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontFamily: 'OpenRunde-Regular',
   }
-  
 });
 
 export default ReportCard;
