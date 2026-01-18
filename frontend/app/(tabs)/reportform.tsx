@@ -15,7 +15,7 @@ export default function ReportForm() {
   const [notes, setNotes] = useState('');
 
   const handleBackNavigation = () => {
-    console.log("Navigating back to Reporting Issues...");
+    console.log("Back to Reporting Form");
   };
 
   return (
@@ -154,6 +154,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E0E0E0',
     borderStyle: 'solid',
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
@@ -165,6 +166,7 @@ const styles = StyleSheet.create({
   },
   browseButton: {
     backgroundColor: '#2D4635',
+    borderRadius: 25,
     paddingHorizontal: 28,
     paddingVertical: 10,
   },
@@ -174,6 +176,7 @@ const styles = StyleSheet.create({
   },
 
   mapWrapper: {
+    borderRadius: 20,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#EEE',
@@ -184,18 +187,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  expandButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: '#2D4635',
-    padding: 6,
-  },
 
   locationBar: {
     backgroundColor: '#2D4635',
     padding: 14,
   },
+
   locationBarText: {
     color: 'white',
     fontSize: 15,
@@ -205,6 +202,7 @@ const styles = StyleSheet.create({
   textArea: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    borderRadius: 20,
     padding: 18,
     height: 120,
     fontSize: 16,
@@ -228,6 +226,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 12,
     borderWidth: 1,
+    borderRadius: 30,
     borderColor: '#E0E0E0',
     backgroundColor: '#fff',
   },
@@ -246,6 +245,7 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: '#2D4635',
     paddingVertical: 18,
+    borderRadius: 35,
     alignItems: 'center',
     marginTop: 10,
     ...Platform.select({
