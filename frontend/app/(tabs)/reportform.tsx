@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   headerIcon: {
     position: 'absolute',
     bottom: 10,
-    right: 20,
+    right: 21,
   },
   headerTitleText: {
     fontFamily: Fonts.rounded,
