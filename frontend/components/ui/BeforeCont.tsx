@@ -121,23 +121,29 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
                     source={require('../../assets/images/feed.png')}
                     style={styles.navIconImage}
                   />
-                  <Text style={styles.navLabel}>Feed</Text>
+                  <Text style={styles.feedLabel}>Feed</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.navItem}>
-                  <Image 
-                    source={require('../../assets/images/report.png')}
-                    style={styles.navIconImage}
-                  />
+                  <View style={styles.reportIconContainer}>
+                    <Image 
+                      source={require('../../assets/images/reportBorder.png')}
+                      style={styles.reportBorderImage}
+                    />
+                    <Image 
+                      source={require('../../assets/images/report.png')}
+                      style={styles.reportIcon}
+                    />
+                  </View>
                   <Text style={styles.navLabel}>Report</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.navItem}>
                   <Image 
                     source={require('../../assets/images/profile.png')}
-                    style={styles.navIconImage}
+                    style={styles.profileIconImage}
                   />
-                  <Text style={styles.navLabel}>Profile</Text>
+                  <Text style={styles.profileLabel}>Profile</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -196,14 +202,15 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: 393,
+    height: '100%',
     alignSelf: 'center',
-    paddingTop: 40,
-    paddingBottom: 40,
+    position: 'relative',
   },
   titleContainer: {
     width: 318,
     height: 39,
     marginLeft: 28,
+    marginTop: 40,
     marginBottom: 20,
   },
   modalTitle: {
@@ -216,9 +223,10 @@ const styles = StyleSheet.create({
   },
   contentBlock: {
     width: 327,
-    marginLeft: 28,
-    paddingBottom: 20,
-    marginTop: -10,
+    height: 558,
+    position: 'absolute',
+    top: 92,
+    left: 28,
   },
   description: {
     fontSize: 13,
@@ -335,34 +343,75 @@ const styles = StyleSheet.create({
   },
   bottomBorder: {
     width: 393,
-    height: 68,
-    backgroundColor: '#174735',
+    height: 97,
+    backgroundColor: '#F8F8F8',
     position: 'absolute',
-    top: 869,
+    bottom: 0,
     left: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 60,
+    paddingHorizontal: 65,
+    paddingTop: 9,
   },
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  reportIconContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 63,
+    height: 63,
+  },
+  reportBorderImage: {
+    position: 'absolute',
+    width: 63,
+    height: 63,
+  },
+  reportIcon: {
+    width: 32.5,
+    height: 32,
+  },
   navIconImage: {
     width: 24,
     height: 24,
-    marginBottom: 4,
+  },
+  profileIconImage: {
+    width: 18,
+    height: 24,
+  },
+  feedLabel: {
+    width: 31,
+    height: 16,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#A2A2A2',
+    fontFamily: 'OpenRunde-Semibold',
+    lineHeight: 13,
+    letterSpacing: 0,
+    marginTop: 3,
+  },
+  profileLabel: {
+    width: 41,
+    height: 16,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#A2A2A2',
+    fontFamily: 'OpenRunde-Semibold',
+    lineHeight: 13,
+    letterSpacing: 0,
+    marginTop: 3,
   },
   navLabel: {
     fontSize: 13,
     color: '#FFFFFF',
     fontFamily: 'OpenRunde-Regular',
+    marginTop: 4,
   }
 });
 
