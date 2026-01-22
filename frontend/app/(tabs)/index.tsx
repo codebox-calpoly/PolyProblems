@@ -31,7 +31,6 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       
-      {/* Rest of your original Step 2 and Step 3 code here... */}
     </ParallaxScrollView>
   );
 }
