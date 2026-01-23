@@ -17,8 +17,8 @@ export function ImageUploadBox() {
     }
 
     let result = useCamera 
-      ? await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 1 })
-      : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 1 });
+      ? await ImagePicker.launchCameraAsync({ allowsMultipleSelection: true, quality: 1 })
+      : await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, quality: 1 });
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
