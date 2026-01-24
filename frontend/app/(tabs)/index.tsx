@@ -6,6 +6,7 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import BeforeCont from '@/components/ui/BeforeCont';
 
 export default function HomeScreen() {
   const router = useRouter();
