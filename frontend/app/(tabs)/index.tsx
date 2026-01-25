@@ -12,11 +12,6 @@ import BeforeCont from '@/components/ui/BeforeCont';
 export default function HomeScreen() {
   const [showBeforeCont, setShowBeforeCont] = useState(false);
 
-  // If BeforeCont is visible, show it instead of the home screen
-  if (showBeforeCont) {
-    return <BeforeCont onClose={() => setShowBeforeCont(false)} />;
-  }
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
