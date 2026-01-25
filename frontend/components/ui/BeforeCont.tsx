@@ -36,7 +36,7 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
         presentationStyle="pageSheet"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
+        <ScrollView style={styles.modalContainer} contentContainerStyle={styles.scrollContent}>
           <View style={styles.modalContent}>
             <View style={styles.titleContainer}>
               <Text style={styles.modalTitle}>Before You Continue</Text>
@@ -93,62 +93,30 @@ const ReportCard: React.FC<ReportCardProps> = ({ title, onViewPress }) => {
               </View>
             </View>
 
-            <TouchableOpacity 
-              style={styles.checkbox}
-              onPress={() => setDontShowAgain(!dontShowAgain)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.checkboxBox, dontShowAgain && styles.checkboxChecked]}>
-                {dontShowAgain && <Text style={styles.checkmark}>✓</Text>}
-              </View>
-              <Text style={styles.checkboxLabel}>Don&apos;t show this again</Text>
-            </TouchableOpacity>
+            <View style={styles.actionSection}>
+              <TouchableOpacity 
+                style={styles.checkbox}
+                onPress={() => setDontShowAgain(!dontShowAgain)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.checkboxBox, dontShowAgain && styles.checkboxChecked]}>
+                  {dontShowAgain && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.checkboxLabel}>Don&apos;t show this again</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.reportButton}
-              activeOpacity={0.8}
-              onPress={() => {
-                console.log('Report an Issue pressed');
-              }}
-            >
-              <Text style={styles.reportButtonText}>Report an Issue</Text>
-            </TouchableOpacity>
-
-            <View style={styles.bottomBorder}>
-              <View style={styles.navBar}>
-                <TouchableOpacity style={styles.navItem}>
-                  <Image 
-                    source={require('../../assets/images/feed.png')}
-                    style={styles.navIconImage}
-                  />
-                  <Text style={styles.feedLabel}>Feed</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.navItem}>
-                  <View style={styles.reportIconContainer}>
-                    <Image 
-                      source={require('../../assets/images/reportBorder.png')}
-                      style={styles.reportBorderImage}
-                    />
-                    <Image 
-                      source={require('../../assets/images/report.png')}
-                      style={styles.reportIcon}
-                    />
-                  </View>
-                  <Text style={styles.navLabel}>Report</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity style={styles.navItem}>
-                  <Image 
-                    source={require('../../assets/images/profile.png')}
-                    style={styles.profileIconImage}
-                  />
-                  <Text style={styles.profileLabel}>Profile</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity 
+                style={styles.reportButton}
+                activeOpacity={0.8}
+                onPress={() => {
+                  console.log('Report an Issue pressed');
+                }}
+              >
+                <Text style={styles.reportButtonText}>Report an Issue</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </ScrollView>
       </Modal>
     </>
   );
@@ -195,23 +163,21 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    alignItems: 'center',
   },
-  modalScroll: {
-    width: 393,
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingBottom: 40,
   },
   modalContent: {
-    width: 393,
-    height: '100%',
-    alignSelf: 'center',
-    position: 'relative',
+    width: '100%',
+    maxWidth: 600,
+    paddingHorizontal: 28,
+    paddingTop: 40,
   },
   titleContainer: {
-    width: 318,
-    height: 39,
-    marginLeft: 28,
-    marginTop: 40,
     marginBottom: 20,
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 32,
@@ -222,11 +188,7 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenRunde-Semibold',
   },
   contentBlock: {
-    width: 327,
-    height: 558,
-    position: 'absolute',
-    top: 92,
-    left: 28,
+    marginBottom: 32,
   },
   description: {
     fontSize: 13,
@@ -290,13 +252,13 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     width: '100%',
+    alignItems: 'center',
   },
   checkbox: {
     flexDirection: 'row',
     alignItems: 'center',
-    position: 'absolute',
-    top: 697,
-    left: 40,
+    marginBottom: 20,
+    alignSelf: 'flex-start',
   },
   checkboxBox: {
     width: 20,
@@ -324,14 +286,12 @@ const styles = StyleSheet.create({
   },
   reportButton: {
     backgroundColor: '#2d5744',
-    width: 324,
+    width: '100%',
+    maxWidth: 324,
     height: 49,
     borderRadius: 31,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    top: 748,
-    left: 35,
   },
   reportButtonText: {
     color: '#FFFFFF',
@@ -341,78 +301,6 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     letterSpacing: 0,
   },
-  bottomBorder: {
-    width: 393,
-    height: 97,
-    backgroundColor: '#F8F8F8',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-  },
-  navBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 65,
-    paddingTop: 9,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  reportIconContainer: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 63,
-    height: 63,
-  },
-  reportBorderImage: {
-    position: 'absolute',
-    width: 63,
-    height: 63,
-  },
-  reportIcon: {
-    width: 32.5,
-    height: 32,
-  },
-  navIconImage: {
-    width: 24,
-    height: 24,
-  },
-  profileIconImage: {
-    width: 18,
-    height: 24,
-  },
-  feedLabel: {
-    width: 31,
-    height: 16,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#A2A2A2',
-    fontFamily: 'OpenRunde-Semibold',
-    lineHeight: 13,
-    letterSpacing: 0,
-    marginTop: 3,
-  },
-  profileLabel: {
-    width: 41,
-    height: 16,
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#A2A2A2',
-    fontFamily: 'OpenRunde-Semibold',
-    lineHeight: 13,
-    letterSpacing: 0,
-    marginTop: 3,
-  },
-  navLabel: {
-    fontSize: 13,
-    color: '#FFFFFF',
-    fontFamily: 'OpenRunde-Regular',
-    marginTop: 4,
-  }
 });
 
 export default ReportCard;
