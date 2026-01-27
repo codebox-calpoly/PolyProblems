@@ -1,75 +1,111 @@
+import { StyleSheet, Pressable, View } from "react-native";
 
-import { Platform, StyleSheet, TextInput, Pressable, View } from "react-native";
+import Dot from "@/assets/images/dot.svg";
+import DotActive from "@/assets/images/dot-active.svg";
+import LandingLogo from "@/assets/images/landinglogo.svg";
 
-import ParallaxScrollView from "@/components/parallax-scroll-view";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 
+import { useThemeColor } from "@/hooks/use-theme-color";
+
 export default function HomeScreen() {
+  const tintColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "text");
+  const inactiveDotColor = useThemeColor({}, "tabIconDefault");
+  const backgroundColor = useThemeColor({}, "background");
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#fff", dark: "#fff" }}
-      headerImage={<View style={{ height: 0 }} />}
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to Poly Problems</ThemedText>
+    <ThemedView style={[styles.container, { backgroundColor }]}>
+      <ThemedView style={styles.header}>
+        <LandingLogo />
+        <ThemedText type="title" style={{ color: textColor }}>
+          {" "}
+          Poly Problems{" "}
+        </ThemedText>
       </ThemedView>
+
+      <View style={{ flex: 1 }} />
 
       <ThemedView style={styles.descriptionContainer}>
-        <ThemedText style={styles.descriptionText} type="subtitle">Join other students working to keep Cal Poly running its best. Sign up or log in to share issues and find quick fixes around campus. </ThemedText>
+        <ThemedText
+          style={[styles.descriptionText, { color: textColor }]}
+          type="subtitle"
+        >
+          Review and manage reported campus issues.
+        </ThemedText>
       </ThemedView>
 
-      <ThemedView>
-        <TextInput
-        placeholder="johndoe@example.com"
-        placeholderTextColor="#999"
-        style={styles.input}
-        />
-      </ThemedView>
+      <View style={styles.dots}>
+        <DotActive width={8} height={8} fill={tintColor} />
+        <Dot width={8} height={8} fill={inactiveDotColor} />
+        <Dot width={8} height={8} fill={inactiveDotColor} />
+      </View>
 
-      <Pressable style={styles.button}>
-        <ThemedText style={styles.buttonText}>Continue</ThemedText>
+      <Pressable style={[styles.button, { backgroundColor: tintColor }]}>
+        <ThemedText style={styles.buttonText}>Get Started</ThemedText>
       </Pressable>
 
-    </ParallaxScrollView>
+      <ThemedView>
+        <ThemedText
+          style={[styles.signInText, { color: textColor }]}
+          type="subtitle">
+          Already have an account? {" "}
+        
+          <ThemedText style={styles.signInLink} onPress={() => {}}>Sign in</ThemedText>
+
+        </ThemedText>
+      </ThemedView>
+
+      <View style={{ height: 60 }} />
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    alignItems: "center",
+  },
+  header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  descriptionContainer: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: '#444',
-    marginBottom: 5,
+    flex: 1,
   },
   descriptionText: {
-    fontSize: 15,
-    fontWeight: "400",
-  },
-  input: {
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    paddingHorizontal: 20,
-    fontSize: 16,
-    backgroundColor: "#fff",
+    fontSize: 25,
+    fontWeight: 500,
+    textAlign: "center",
+    marginBottom: 15,
   },
   button: {
+    marginTop: 40,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: "#1f4d3a",
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 110,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "400",
+  },
+  dots: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 20,
+  },
+  signInText: {
+    marginTop: 5,
+    fontSize: 13,
+    fontWeight: 200,
+    textAlign: "center",
+  },
+  signInLink: {
+    fontWeight: 600,
+    fontSize: 13,
+    textDecorationLine: "underline",
   },
 });
