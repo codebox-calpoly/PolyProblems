@@ -7,7 +7,7 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
-import BeforeCont from '@/components/ui/BeforeCont';
+import {BeforeCont} from '@/components/ui/BeforeCont';
 
 export default function HomeScreen() {
   const [showBeforeCont, setShowBeforeCont] = useState(false);
@@ -29,7 +29,6 @@ export default function HomeScreen() {
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          {/* Button to navigate to BeforeCont - when clicked, immediately shows BeforeCont page */}
           <Pressable onPress={() => setShowBeforeCont(true)}>
             <ThemedText type="link"> View Continue Page</ThemedText>
           </Pressable>
