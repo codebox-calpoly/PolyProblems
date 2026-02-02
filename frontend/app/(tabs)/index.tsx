@@ -1,14 +1,16 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet, Pressable } from 'react-native';
+import { useState } from 'react';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link, useRouter } from 'expo-router'; // Added useRouter
+import { Link } from 'expo-router';
+import {BeforeCont} from '@/components/ui/BeforeCont';
 
 export default function HomeScreen() {
-  const router = useRouter();
+  const [showBeforeCont, setShowBeforeCont] = useState(false);
 
   return (
     <ParallaxScrollView
@@ -23,14 +25,15 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
       </ThemedView>
-
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
+          <Pressable onPress={() => setShowBeforeCont(true)}>
+            <ThemedText type="link"> View Continue Page</ThemedText>
+          </Pressable>
         </ThemedText>
       </ThemedView>
-      
     </ParallaxScrollView>
   );
 }
@@ -52,11 +55,4 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
-  reportButton: {
-    backgroundColor: '#2D4335',
-    padding: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  }
 });

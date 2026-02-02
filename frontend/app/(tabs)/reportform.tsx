@@ -6,18 +6,33 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { ImageUploadBox } from '@/components/ImageUploadBox';
+import { BeforeCont } from '@/components/ui/BeforeCont';
 
 const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
 
 export default function ReportForm() {
   // Added colorScheme hook as requested
   const colorScheme = useColorScheme();
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
+
+  const handleCloseDisclaimer = (dontShowAgain: boolean) => {
+    setShowDisclaimer(false);
+  };
 
   const handleBackNavigation = () => {
     console.log("Back to Reporting Form");
   };
+  if (showDisclaimer) {
+    return (
+      <BeforeCont
+        visible={showDisclaimer}
+        onClose={handleCloseDisclaimer}
+        setDisclaimer={setShowDisclaimer}
+      />
+    );
+  }
 
   return (
     <ThemedView style={styles.screenContainer}>
