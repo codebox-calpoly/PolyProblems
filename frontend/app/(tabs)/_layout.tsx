@@ -54,6 +54,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
         }}
       />
+      <Tabs.Screen
+      name="BeforeCont"
+      options={{
+        title: 'Report',
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name="doc.text.fill" color={color} />
+      }}
+      />
     </Tabs>
   );
 }
