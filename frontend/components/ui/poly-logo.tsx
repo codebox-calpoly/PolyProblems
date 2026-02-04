@@ -23,7 +23,7 @@ export default function PolyLogo({
 
     return (
     <ThemedView style={styles.header}>
-        <LandingLogo />
+        <LandingLogo color={finalColor} />
         <ThemedText type="title" style={{ color: finalColor }}>
           Poly Problems
         </ThemedText>
