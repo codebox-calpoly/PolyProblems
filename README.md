@@ -18,6 +18,7 @@ Short paragraph description
 - [Chloe Low](https://www.linkedin.com/in/chloe-low-12a883389/) - Developer
 - [Scott Eisenberg](https://www.linkedin.com/in/scott-eisenberg2/) - Developer
 - [Mason Lewis](https://www.linkedin.com/in/masonclewis/) - Developer
+- [Emi Okumoto](https://www.linkedin.com/in/emiokumoto/) - Developer
 
 ## Contributing
 
