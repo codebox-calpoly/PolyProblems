@@ -2,7 +2,7 @@ import { StyleSheet, Pressable, View } from "react-native";
 
 import Dot from "@/assets/images/dot.svg";
 import DotActive from "@/assets/images/dot-active.svg";
-import LandingLogo from "@/assets/images/landinglogo.svg";
+import PolyLogo from "@/components/ui/poly-logo";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -17,13 +17,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
-      <ThemedView style={styles.header}>
-        <LandingLogo />
-        <ThemedText type="title" style={{ color: textColor }}>
-          {" "}
-          Poly Problems{" "}
-        </ThemedText>
-      </ThemedView>
+      <PolyLogo />
 
       <View style={{ flex: 1 }} />
 
@@ -80,7 +74,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    marginTop: 40,
+    marginTop: 30,
     height: 52,
     borderRadius: 30,
     justifyContent: "center",
@@ -95,7 +89,6 @@ const styles = StyleSheet.create({
   dots: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 20,
   },
   signInText: {
     marginTop: 5,
