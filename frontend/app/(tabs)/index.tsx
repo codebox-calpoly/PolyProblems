@@ -1,114 +1,108 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet, Pressable, View } from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
-import ReportCard from '@/components/ui/ReportCard';
+import Dot from "@/assets/images/dot.svg";
+import DotActive from "@/assets/images/dot-active.svg";
+import PolyLogo from "@/components/ui/poly-logo";
+
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Report Cards</ThemedText>
-        <ReportCard 
-          title="Before You Continue" 
-          onViewPress={() => console.log('Before You Continue pressed')}
-        />
-        <ReportCard 
-          title="Emergency Report" 
-          onViewPress={() => console.log('Emergency Report pressed')}
-        />
-        <ReportCard 
-          title="Incident Report" 
-          onViewPress={() => console.log('Incident Report pressed')}
-        />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const tintColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "text");
+  const inactiveDotColor = useThemeColor({}, "tabIconDefault");
+  const backgroundColor = useThemeColor({}, "background");
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+  return (
+    <ThemedView style={[styles.container, { backgroundColor }]}>
+      <PolyLogo />
+
+      <View style={{ flex: 1 }} />
+
+      <ThemedView style={styles.descriptionContainer}>
+        <ThemedText
+          style={[styles.descriptionText, { color: textColor }]}
+          type="subtitle"
+        >
+          Review and manage reported campus issues.
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+
+      <View style={styles.dots}>
+        <DotActive width={8} height={8} fill={tintColor} />
+        <Dot width={8} height={8} fill={inactiveDotColor} />
+        <Dot width={8} height={8} fill={inactiveDotColor} />
+      </View>
+
+      <Pressable style={[styles.button, { backgroundColor: tintColor }]}>
+        <ThemedText style={styles.buttonText}>Get Started</ThemedText>
+      </Pressable>
+
+      <ThemedView>
+        <ThemedText
+          style={[styles.signInText, { color: textColor }]}
+          type="subtitle">
+          Already have an account? {" "}
+        
+          <ThemedText style={styles.signInLink} onPress={() => {}}>Sign in</ThemedText>
+
         </ThemedText>
       </ThemedView>
-    </ParallaxScrollView>
+
+      <View style={{ height: 60 }} />
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    alignItems: "center",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+  },
+    descriptionContainer: {
+      paddingHorizontal: 20,
+      marginBottom:20,
+    },
+  descriptionText: {
+    fontSize: 25,
+    fontWeight: 500,
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  button: {
+    marginTop: 30,
+    height: 52,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 110,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "400",
+  },
+  dots: {
+    flexDirection: "row",
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  signInText: {
+    marginTop: 5,
+    fontSize: 13,
+    fontWeight: 200,
+    textAlign: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  signInLink: {
+    fontWeight: 600,
+    fontSize: 13,
+    textDecorationLine: "underline",
   },
 });
