@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
+import { sessionStorage } from '@/utils/sessionStorage';
 
 interface BeforeContProps {
   visible: boolean;
@@ -7,15 +8,25 @@ interface BeforeContProps {
   setDisclaimer: (value: boolean) => void;
 }
 
+const STORAGE_KEY = 'disclaimer_dont_show_again';
+
 export const BeforeCont: React.FC<BeforeContProps> = ({ visible, onClose, setDisclaimer }) => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  const handleContinue = () => {
+    if (dontShowAgain) {
+      sessionStorage.setItem(STORAGE_KEY, 'true');
+    }
+    setDisclaimer(false);
+    onClose(dontShowAgain);
+  };
 
   return (
     <Modal
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={() => onClose(dontShowAgain)}
+      onRequestClose={handleContinue}
     >
       <ScrollView style={styles.modalContainer} contentContainerStyle={styles.scrollContent}>
         <View style={styles.modalContent}>
@@ -89,10 +100,7 @@ export const BeforeCont: React.FC<BeforeContProps> = ({ visible, onClose, setDis
             <TouchableOpacity 
               style={styles.reportButton}
               activeOpacity={0.8}
-              onPress={() => {
-                setDisclaimer(false);
-                onClose(dontShowAgain);
-              }}
+              onPress={handleContinue}
             >
               <Text style={styles.reportButtonText}>Report an Issue</Text>
             </TouchableOpacity>
@@ -106,7 +114,7 @@ export const BeforeCont: React.FC<BeforeContProps> = ({ visible, onClose, setDis
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1a1a1a',
   },
   scrollContent: {
     flexGrow: 1,
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#000000',
+    color: '#FFFFFF',
     textAlign: 'center',
     lineHeight: 39,
     fontFamily: 'OpenRunde-Semibold',
@@ -137,7 +145,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#000000',
+    color: '#E5E5E5',
     marginBottom: 12,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -147,7 +155,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#000000',
+    color: '#FFFFFF',
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
@@ -155,7 +163,7 @@ const styles = StyleSheet.create({
   sectionText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: '#E5E5E5',
     marginBottom: 4,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -166,14 +174,14 @@ const styles = StyleSheet.create({
   bullet: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: '#E5E5E5',
     marginBottom: 2,
     fontFamily: 'OpenRunde-Regular',
   },
   contactText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: '#E5E5E5',
     marginBottom: 16,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -183,14 +191,14 @@ const styles = StyleSheet.create({
   readyText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#000000',
+    color: '#FFFFFF',
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
   continueText: {
     fontSize: 13,
-    color: '#000000',
+    color: '#E5E5E5',
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -209,14 +217,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: '#4B5563',
     marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#2d5744',
-    borderColor: '#2d5744',
+    backgroundColor: '#3d7a5a',
+    borderColor: '#3d7a5a',
   },
   checkmark: {
     color: '#FFFFFF',
@@ -225,11 +233,11 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 18,
-    color: '#000000',
+    color: '#FFFFFF',
     fontFamily: 'OpenRunde-Regular',
   },
   reportButton: {
-    backgroundColor: '#2d5744',
+    backgroundColor: '#3d7a5a',
     width: '100%',
     maxWidth: 324,
     height: 49,
