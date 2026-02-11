@@ -1,66 +1,119 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { View, StyleSheet, Image, Platform } from 'react-native';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  
+  // Design constants based on your screenshots
+  const activeColor = '#000000'; 
+  const inactiveColor = '#A1A1A1'; 
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tabIconSelected,
-        tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"].tint,
-        },
+        tabBarActiveTintColor: activeColor,
+        tabBarInactiveTintColor: inactiveColor,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 0,
+          elevation: 0, 
+          height: Platform.OS === 'ios' ? 90 : 75,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+        },
+        tabBarLabelStyle: {
+          fontWeight: '700',
+          fontSize: 12,
+        },
       }}>
+      
+      {/* 1. FEED PAGE */}
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Feed',
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons 
+              name={focused ? "view-dashboard" : "view-dashboard-outline"} 
+              size={28} 
+              color={focused ? activeColor : inactiveColor} 
+            />
+          ),
         }}
       />
+
+      {/* 2. REPORT FORM (Layered PNG Assets) */}
       <Tabs.Screen
-        name="explore"
+        name="reportform"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '', 
+          tabBarIcon: () => (
+            <View style={styles.megaphoneContainer}>
+              {/* The Circular Green Border Background */}
+              <Image 
+                source={require('../../assets/images/reportBorder.png')} 
+                style={styles.borderImage}
+                resizeMode="contain"
+              />
+              {/* The Megaphone Icon sitting on top */}
+              <Image 
+                source={require('../../assets/images/report.png')} 
+                style={styles.mainIcon}
+                resizeMode="contain"
+              />
+            </View>
+          ),
         }}
       />
+
+      {/* 3. PROFILE PAGE */}
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <Ionicons 
+              name={focused ? "person" : "person-outline"} 
+              size={28} 
+              color={focused ? activeColor : inactiveColor} 
+            />
+          ),
         }}
       />
-      <Tabs.Screen
-        name="camera"
-        options={{
-          title: 'Camera',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="camera.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-      name="BeforeCont"
-      options={{
-        title: 'Report',
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="doc.text.fill" color={color} />
-      }}
-      />
+
+      {/* Hidden Screens */}
+      <Tabs.Screen name="explore" options={{ href: null }} />
+      <Tabs.Screen name="camera" options={{ href: null }} />
+      <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="BeforeCont" options={{ href: null }} />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  megaphoneContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Lifts the button so it sits higher than the taskbar line
+    marginTop: Platform.OS === 'ios' ? -30 : -25,
+    width: 70,
+    height: 70,
+  },
+  borderImage: {
+    position: 'absolute',
+    width: 65,
+    height: 65,
+  },
+  mainIcon: {
+    width: 30,
+    height: 30,
+    // Note: If your report.png is already white, you can remove tintColor
+    tintColor: 'white', 
+  },
+});
