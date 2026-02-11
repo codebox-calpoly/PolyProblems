@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, useColorScheme } from 'react-native';
 import { sessionStorage } from '@/utils/sessionStorage';
+import {Colors} from '@/constants/theme';
 
 interface BeforeContProps {
   visible: boolean;
@@ -12,6 +13,9 @@ const STORAGE_KEY = 'disclaimer_dont_show_again';
 
 export const BeforeCont: React.FC<BeforeContProps> = ({ visible, onClose, setDisclaimer }) => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const scheme = useColorScheme();
+  const theme = scheme === "dark" ? Colors.dark : Colors.light;
+  const styles = beforeContStyles(theme);
 
   const handleContinue = () => {
     if (dontShowAgain) {
@@ -111,10 +115,15 @@ export const BeforeCont: React.FC<BeforeContProps> = ({ visible, onClose, setDis
   );
 };
 
-const styles = StyleSheet.create({
+const beforeContStyles = (theme: {
+  background: string;
+  text: string;
+  tint: string;
+  icon: string;
+}) => StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: theme.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -134,7 +143,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.text,
     textAlign: 'center',
     lineHeight: 39,
     fontFamily: 'OpenRunde-Semibold',
@@ -145,7 +154,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#E5E5E5',
+    color: theme.icon,
     marginBottom: 12,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -155,7 +164,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
@@ -163,7 +172,7 @@ const styles = StyleSheet.create({
   sectionText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#E5E5E5',
+    color: theme.icon,
     marginBottom: 4,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -174,14 +183,14 @@ const styles = StyleSheet.create({
   bullet: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#E5E5E5',
+    color: theme.icon,
     marginBottom: 2,
     fontFamily: 'OpenRunde-Regular',
   },
   contactText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#E5E5E5',
+    color: theme.icon,
     marginBottom: 16,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -191,14 +200,14 @@ const styles = StyleSheet.create({
   readyText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
   continueText: {
     fontSize: 13,
-    color: '#E5E5E5',
+    color: theme.icon,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -217,14 +226,14 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#4B5563',
+    borderColor: theme.icon,
     marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#3d7a5a',
-    borderColor: '#3d7a5a',
+    backgroundColor: theme.tint,
+    borderColor: theme.tint,
   },
   checkmark: {
     color: '#FFFFFF',
@@ -233,11 +242,11 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 18,
-    color: '#FFFFFF',
+    color: theme.text,
     fontFamily: 'OpenRunde-Regular',
   },
   reportButton: {
-    backgroundColor: '#3d7a5a',
+    backgroundColor: theme.tint,
     width: '100%',
     maxWidth: 324,
     height: 49,
