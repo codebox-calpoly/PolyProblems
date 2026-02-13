@@ -154,7 +154,7 @@ const beforeContStyles = (theme: {
   description: {
     fontSize: 13,
     lineHeight: 18,
-    color: theme.icon,
+    color: theme.text,
     marginBottom: 12,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -172,7 +172,7 @@ const beforeContStyles = (theme: {
   sectionText: {
     fontSize: 13,
     lineHeight: 20,
-    color: theme.icon,
+    color: theme.text,
     marginBottom: 4,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -183,14 +183,14 @@ const beforeContStyles = (theme: {
   bullet: {
     fontSize: 13,
     lineHeight: 20,
-    color: theme.icon,
+    color: theme.text,
     marginBottom: 2,
     fontFamily: 'OpenRunde-Regular',
   },
   contactText: {
     fontSize: 13,
     lineHeight: 20,
-    color: theme.icon,
+    color: theme.text,
     marginBottom: 16,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -207,7 +207,7 @@ const beforeContStyles = (theme: {
   },
   continueText: {
     fontSize: 13,
-    color: theme.icon,
+    color: theme.text,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -226,7 +226,7 @@ const beforeContStyles = (theme: {
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: theme.icon,
+    borderColor: theme.text,
     marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
