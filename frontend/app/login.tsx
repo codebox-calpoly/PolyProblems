@@ -14,6 +14,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import {supabase} from '@/lib/supabase';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -38,9 +39,9 @@ export default function LoginScreen() {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email');
+    const calPolyEmailRegex = /^[^\s@]+@calpoly\.edu$/i;
+    if (!calPolyEmailRegex.test(email)) {
+      setError('Please enter a valid Cal Poly email (@calpoly.edu)');
       return;
     }
 
