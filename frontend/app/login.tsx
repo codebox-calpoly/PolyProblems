@@ -135,7 +135,7 @@ export default function LoginScreen() {
                         borderColor: borderColor,
                       },
                     ]}
-                    placeholder="johndoe@example.com"
+                    placeholder="johndoe@calpoly.edu"
                     placeholderTextColor={isDark ? '#888888' : '#999999'}
                     value={email}
                     onChangeText={setEmail}
