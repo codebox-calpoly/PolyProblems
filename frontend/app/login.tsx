@@ -56,6 +56,7 @@ export default function LoginScreen() {
           shouldCreateUser: true,
         },
       });
+      
 
       if (error) throw error;
 
@@ -171,11 +172,8 @@ export default function LoginScreen() {
                 <Text style={styles.errorText}>{error}</Text>
               </View>
             ) : null}
-
             {/* Form */}
             {screen === 'email' ? (
-              <>
-                {/* Email Input */}
                 <View style={styles.inputGroup}>
                   <Text style={[styles.label, { color: textColor }]}>Your Cal Poly email</Text>
                   <TextInput
@@ -197,7 +195,6 @@ export default function LoginScreen() {
                     autoComplete="email"
                   />
                 </View>
-              </>
             ) : (
               <>
                 {/* OTP Input */}
