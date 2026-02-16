@@ -12,9 +12,8 @@ export default function TabLayout() {
   
   const activeColor = Colors[colorScheme].tabIconSelected; 
   const inactiveColor = Colors[colorScheme].tabIconDefault; 
-  const backgroundColor = Colors[colorScheme].background; 
+  const navBackgroundColor = Colors[colorScheme].tabBarBackground;
 
-  // Responsive sizing constants
   const isWeb = Platform.OS === 'web';
   const barHeight = isWeb ? 100 : (Platform.OS === 'ios' ? 90 : 75);
   const iconSize = isWeb ? 32 : 26;
@@ -29,20 +28,24 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarLabelPosition: 'below-icon',
         tabBarStyle: {
-          backgroundColor: backgroundColor,
+          backgroundColor: navBackgroundColor,
           borderTopWidth: 0,
           elevation: 0, 
           height: barHeight,
-          paddingBottom: isWeb ? 15 : (Platform.OS === 'ios' ? 30 : 12),
+          // Reduced padding to allow content to sit lower
+          paddingBottom: isWeb ? 5 : (Platform.OS === 'ios' ? 20 : 5),
         },
         tabBarLabelStyle: {
           fontWeight: '700',
           fontSize: fontSize,
-          marginTop: isWeb ? 6 : 4, 
+          marginBottom: isWeb ? 10 : 0, // Keeps text from floating too high
         },
+        tabBarIconStyle: {
+          // Increased margin to push Feed/Profile icons down further
+          marginTop: isWeb ? 15 : 12, 
+        }
       }}>
       
-      {/* 1. FEED PAGE */}
       <Tabs.Screen
         name="index"
         options={{
@@ -57,7 +60,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* 2. REPORT FORM */}
       <Tabs.Screen
         name="reportform"
         options={{
@@ -79,7 +81,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* 3. PROFILE PAGE */}
       <Tabs.Screen
         name="profile"
         options={{
@@ -94,7 +95,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Hidden Screens */}
       <Tabs.Screen name="explore" options={{ href: null }} />
       <Tabs.Screen name="camera" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
@@ -107,14 +107,15 @@ const styles = StyleSheet.create({
   megaphoneContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Platform.OS === 'ios' ? -5 : 0, 
+    // Pushing the middle button down further
+    marginTop: Platform.OS === 'ios' ? 20 : 25, 
     width: 70,
     height: 70,
   },
   megaphoneWeb: {
     width: 85,
     height: 85,
-    marginTop: 0,
+    marginTop: 20,
   },
   borderImage: {
     position: 'absolute',
