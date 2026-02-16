@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   Linking,
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -20,6 +21,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [screen, setScreen] = useState('email'); // 'email' or 'password'
@@ -48,42 +50,63 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // TODO: Replace with actual authentication API call to verify email
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Email verified:', { email });
-      setScreen('password');
-    } catch (err) {
-      setError('Failed to continue. Please try again.');
-      console.error('Login error:', err);
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.toLowerCase().trim(),
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) throw error;
+
+      Alert.alert(
+        'Check your email',
+        `We sent a login code to ${email}. Please check your inbox.`,
+        [{ text: 'OK' }]
+      );
+      setScreen('otp');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send code. Please try again.');
+      console.error('OTP send error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmitPassword = async () => {
+  const handleVerifyOTP = async () => {
     setError('');
 
-    if (!password) {
-      setError('Please enter your password');
+    if (!otp.trim()) {
+      setError('Please enter the verification code');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (otp.length !== 6) {
+      setError('Please enter a valid 6-digit code');
       return;
     }
 
     setLoading(true);
 
     try {
-      // TODO: Replace with actual authentication API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Login successful:', { email, password });
-      // Navigate to main app
-      router.replace('/(tabs)');
-    } catch (err) {
-      setError('Login failed. Please try again.');
-      console.error('Login error:', err);
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.toLowerCase().trim(),
+        token: otp.trim(),
+        type: 'email',
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        console.log('Login successful:', data.user?.email);
+        // Navigate to main app
+        router.replace('/(tabs)');
+      } else {
+        setError('Invalid code. Please try again.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Verification failed. Please try again.');
+      console.error('OTP verify error:', err);
     } finally {
       setLoading(false);
     }
@@ -91,8 +114,30 @@ export default function LoginScreen() {
 
   const handleBackToEmail = () => {
     setScreen('email');
-    setPassword('');
+    setOtp('');
     setError('');
+  };
+
+  const handleResendCode = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.toLowerCase().trim(),
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) throw error;
+
+      Alert.alert('Code resent', 'Check your email for a new code.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend code.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -111,8 +156,14 @@ export default function LoginScreen() {
           <View style={styles.formSection}>
             {/* Header */}
             <Text style={[styles.title, { color: textColor }]}>
-              {screen === 'email' ? 'Enter your email address' : 'Enter your password'}
+              {screen === 'email' ? 'Enter your Cal Poly email' : 'Enter verification code'}
             </Text>
+
+            {screen === 'otp' && (
+              <Text style={[styles.title, { color: textColor}]}>
+                We sent a 6-digit code to {email}
+              </Text>
+            )}
 
             {/* Error Message */}
             {error ? (
@@ -126,7 +177,7 @@ export default function LoginScreen() {
               <>
                 {/* Email Input */}
                 <View style={styles.inputGroup}>
-                  <Text style={[styles.label, { color: textColor }]}>Your email</Text>
+                  <Text style={[styles.label, { color: textColor }]}>Your Cal Poly email</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -149,9 +200,9 @@ export default function LoginScreen() {
               </>
             ) : (
               <>
-                {/* Password Input */}
+                {/* OTP Input */}
                 <View style={styles.inputGroup}>
-                  <Text style={[styles.label, { color: textColor }]}>Password</Text>
+                  <Text style={[styles.label, { color: textColor }]}>Verification code</Text>
                   <TextInput
                     style={[
                       styles.input,
@@ -159,17 +210,27 @@ export default function LoginScreen() {
                         backgroundColor: inputBackground,
                         color: textColor,
                         borderColor: borderColor,
+                        textAlign: 'center',
+                        fontSize:24,
+                        letterSpacing: 8,
                       },
                     ]}
-                    placeholder="••••••••"
+                    placeholder="000000"
                     placeholderTextColor={isDark ? '#888888' : '#999999'}
-                    value={password}
-                    onChangeText={setPassword}
+                    value={otp}
+                    onChangeText={setOtp}
                     editable={!loading}
-                    secureTextEntry
-                    autoCapitalize="none"
+                    keyboardType = "number-pad"
+                    maxLength = {6}
+                    autoComplete = "one-time-code"
                   />
                 </View>
+                {/* Resend Code */}
+                <TouchableOpacity onPress = {handleResendCode} disabled = {loading}>
+                  <Text style = {[styles.resendButton, {color:textColor}]}>
+                    Didn&apos;t Receive a code? Resend
+                  </Text>
+                </TouchableOpacity>
 
                 {/* Back Button */}
                 <TouchableOpacity onPress={handleBackToEmail} disabled={loading}>
@@ -195,17 +256,17 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Continue/Sign In Button */}
+            {/* Continue/Verify Button */}
             <TouchableOpacity
               style={[styles.continueButton, loading && styles.continueButtonDisabled]}
-              onPress={screen === 'email' ? handleContinue : handleSubmitPassword}
+              onPress={screen === 'email' ? handleContinue : handleVerifyOTP}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
                 <Text style={styles.continueButtonText}>
-                  {screen === 'email' ? 'Continue' : 'Sign In'}
+                  {screen === 'email' ? 'Send Code' : 'Verify'}
                 </Text>
               )}
             </TouchableOpacity>
@@ -311,6 +372,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '500',
+  },
+  resendButton: {
+    marginTop: 8,
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
   footer: {
     flexDirection: 'row',
