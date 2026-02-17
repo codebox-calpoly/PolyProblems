@@ -38,8 +38,10 @@ export default function HomeScreen() {
         <Dot width={8} height={8} fill={inactiveDotColor} />
       </View>
 
-      <Pressable style={[styles.button, { backgroundColor: tintColor }]}>
-        <ThemedText style={styles.buttonText} onPress = {() => router.push("/login")}>Get Started</ThemedText>
+      <Pressable style={[styles.button, { backgroundColor: tintColor }]}
+        onPress = {() => router.push("/login")}
+      >
+        <ThemedText style={styles.buttonText}> Get Started</ThemedText>
       </Pressable>
 
       <ThemedView>
