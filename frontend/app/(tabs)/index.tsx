@@ -67,6 +67,10 @@ const styles = StyleSheet.create({
     gap: 8,
     flex: 1,
   },
+    descriptionContainer: {
+      paddingHorizontal: 20,
+      marginBottom:20,
+    },
   descriptionText: {
     fontSize: 25,
     fontWeight: 500,
