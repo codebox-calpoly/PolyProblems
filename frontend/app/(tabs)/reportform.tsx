@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { sessionStorage } from '@/utils/sessionStorage';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { ImageUploadBox } from '@/components/ImageUploadBox';
+import { BeforeCont } from '@/components/ui/BeforeCont';
 
 import { supabase } from '@/lib/supabase'; 
 
+
 const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
+const STORAGE_KEY = 'disclaimer_dont_show_again';
 
 export default function ReportForm() {
   const colorScheme = useColorScheme();
-  
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -85,11 +90,40 @@ export default function ReportForm() {
     } finally {
       setIsSubmitting(false);
     }
+  };  
+
+  useEffect(() => {
+    checkDisclaimerPreference();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      checkDisclaimerPreference();
+    }, [])
+  );
+
+  const checkDisclaimerPreference = () => {
+    const value = sessionStorage.getItem(STORAGE_KEY);
+    setShowDisclaimer(value !== 'true');
+  };
+
+  const handleCloseDisclaimer = (dontShowAgain: boolean) => {
+    setShowDisclaimer(false);
   };
 
   const handleBackNavigation = () => {
     console.log("Back to Reporting Form");
   };
+
+  if (showDisclaimer) {
+    return (
+      <BeforeCont
+        visible={showDisclaimer}
+        onClose={handleCloseDisclaimer}
+        setDisclaimer={setShowDisclaimer}
+      />
+    );
+  }
 
   return (
     <ThemedView style={styles.screenContainer}>
@@ -131,17 +165,14 @@ export default function ReportForm() {
           multiline
           value={notes}
           onChangeText={setNotes}
-          editable={!isSubmitting}
         />
 
-        {/* Label Selection */}
         <View style={styles.labelSection}>
           <ThemedText style={styles.labelTitle}>Select labels</ThemedText>
           <View style={styles.chipContainer}>
             {CATEGORIES.map((cat) => (
               <Pressable
                 key={cat}
-                disabled={isSubmitting}
                 onPress={() => setSelectedCategory(cat)}
                 style={[
                   styles.chip,
@@ -160,17 +191,8 @@ export default function ReportForm() {
           </View>
         </View>
 
-        {/* Submit Button */}
-        <Pressable 
-          style={[styles.continueButton, isSubmitting && { opacity: 0.7 }]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <ThemedText style={styles.continueText}>Continue</ThemedText>
-          )}
+        <Pressable style={styles.continueButton}>
+          <ThemedText style={styles.continueText}>Continue</ThemedText>
         </Pressable>
       </ScrollView>
     </ThemedView>
@@ -191,6 +213,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 5,
+  },
+  uploadText: {
+    color: '#888',
+    fontSize: 16,
+  },
+  browseButton: {
+    backgroundColor: '#2D4635',
+    borderRadius: 25,
+    paddingHorizontal: 28,
+    paddingVertical: 10,
+  },
+  browseButtonText: {
+    color: 'white',
+    fontWeight: '600',
   },
   sectionTitle: {
     fontSize: 34,
