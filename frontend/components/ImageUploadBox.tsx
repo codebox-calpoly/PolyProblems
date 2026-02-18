@@ -3,7 +3,11 @@ import { StyleSheet, Text, View, Pressable, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Feather } from '@expo/vector-icons';
 
-export function ImageUploadBox() {
+interface ImageUploadBoxProps {
+  onImagePicked: (uri: string | null) => void;
+}
+
+export function ImageUploadBox({ onImagePicked }: ImageUploadBoxProps) {
   const [image, setImage] = useState<string | null>(null);
 
   const pickImage = async (useCamera: boolean) => {
@@ -17,11 +21,13 @@ export function ImageUploadBox() {
     }
 
     let result = useCamera 
-      ? await ImagePicker.launchCameraAsync({ allowsMultipleSelection: true, quality: 1 })
-      : await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, quality: 1 });
+      ? await ImagePicker.launchCameraAsync({ quality: 1 })
+      : await ImagePicker.launchImageLibraryAsync({ quality: 1 });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const selectedUri = result.assets[0].uri;
+      setImage(selectedUri);
+      onImagePicked(selectedUri);
     }
   };
 
