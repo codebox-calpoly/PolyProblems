@@ -24,7 +24,7 @@ export function ImageUploadBox() {
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
-        allowsMultipleSelection: true,
+        allowsMultipleSelection: true, // Supports multi-upload
         quality: 1,
       });
     }
@@ -41,6 +41,7 @@ export function ImageUploadBox() {
 
   const handlePress = () => {
     if (Platform.OS === 'web') {
+      // Direct library pick for web to avoid Alert crash
       pickImage(false);
     } else {
       Alert.alert("Upload Image", "Choose a source", [
@@ -53,6 +54,7 @@ export function ImageUploadBox() {
 
   return (
     <View style={styles.container}>
+      {/* Organized Grid Display */}
       {images.length > 0 && (
         <View style={styles.grid}>
           {images.map((uri, index) => (
@@ -60,8 +62,7 @@ export function ImageUploadBox() {
               <Image 
                 source={{ uri }} 
                 style={styles.thumbnail} 
-                // FIX: "contain" ensures the full image is visible
-                resizeMode="contain" 
+                resizeMode="contain" // Ensures full image is visible
               />
               <Pressable style={styles.removeBadge} onPress={() => removeImage(index)}>
                 <Feather name="x" size={14} color="#fff" />
@@ -69,14 +70,16 @@ export function ImageUploadBox() {
             </View>
           ))}
           
+          {/* Dashboard "Plus" button synced to image dimensions */}
           {images.length < 5 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
-              <Feather name="plus" size={24} color="#999" />
+              <Feather name="plus" size={32} color="#999" />
             </Pressable>
           )}
         </View>
       )}
 
+      {/* Initial state: Large dashed box */}
       {images.length === 0 && (
         <Pressable style={styles.dashedBox} onPress={handlePress}>
           <View style={styles.inner}>
@@ -93,7 +96,10 @@ export function ImageUploadBox() {
 }
 
 const styles = StyleSheet.create({
-  container: { width: '100%', marginVertical: 10 },
+  container: { 
+    width: '100%', 
+    marginVertical: 10 
+  },
   dashedBox: {
     height: 180,
     borderWidth: 2,
@@ -106,13 +112,19 @@ const styles = StyleSheet.create({
   },
   inner: { alignItems: 'center' },
   text: { color: '#666', marginVertical: 8, fontSize: 16 },
-  button: { backgroundColor: '#2D4335', paddingHorizontal: 30, paddingVertical: 10, borderRadius: 25 },
+  button: { 
+    backgroundColor: '#2D4335', 
+    paddingHorizontal: 30, 
+    paddingVertical: 10, 
+    borderRadius: 25 
+  },
   buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   
+  // Grid Styles
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 12, // Matches the gaps in your screenshot
     backgroundColor: '#fff',
     padding: 12,
     borderRadius: 16,
@@ -121,11 +133,10 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     width: '30%', 
-    aspectRatio: 1,
-    borderRadius: 10,
+    aspectRatio: 1, // Ensures perfect square alignment
+    borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
-    // Added a light background so "contained" images look uniform
     backgroundColor: '#f9f9f9', 
     borderWidth: 1,
     borderColor: '#eee',
@@ -136,21 +147,22 @@ const styles = StyleSheet.create({
   },
   addMoreButton: {
     width: '30%',
-    aspectRatio: 1,
-    borderRadius: 10,
-    borderWidth: 1,
+    aspectRatio: 1, // Fix: Matches image height exactly
+    borderRadius: 16,
+    borderWidth: 2,
     borderColor: '#E0E0E0',
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   removeBadge: {
     position: 'absolute',
     top: 5,
     right: 5,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    borderRadius: 10,
-    padding: 2,
-    zIndex: 1, // Ensures the button stays on top
+    borderRadius: 12,
+    padding: 4,
+    zIndex: 1,
   }
 });
