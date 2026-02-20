@@ -1,15 +1,59 @@
 import { useColorScheme } from "react-native";
+import { useState, useEffect } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Image, StyleSheet } from "react-native";
 import { Colors } from "@/constants/theme";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ReportCard } from '@/components/reportCard';
+import { supabase } from '@/lib/supabase';
 
 export default function ProfileScreen() {
   const scheme = useColorScheme(); // "light" | "dark" | null
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = profileStyles(theme);
+  
+  const [profileUser, setProfileUser] = useState<any>(null);
+  const [profileReports, setProfileReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+  
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      
+      // Get current user session
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // TODO: Fetch user profile from Supabase profiles table
+        // For now, create a basic profile from auth data
+        setProfileUser({
+          username: user.email?.split('@')[0] || 'User',
+          memberSince: new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
+          commentsCount: 0,
+        });
+        
+        // TODO: Fetch reports from Supabase reports table
+        // const { data: reports } = await supabase
+        //   .from('reports')
+        //   .select('*')
+        //   .eq('user_id', user.id);
+        // setProfileReports(reports || []);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Calculate reportsCount dynamically based on actual reports
+  const reportsCount = profileReports.length;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -20,65 +64,50 @@ export default function ProfileScreen() {
           <Ionicons name="settings-outline" size={24} color={theme.tint} />
         </ThemedView>
 
-        {/* Profile header */}
-        <ThemedView style={styles.header}>
-          <ThemedView style={styles.avatarRing}>
-            <Image
-              source={{ uri: "https://i.pravatar.cc/300" }}
-              style={styles.avatar}
-            />
-          </ThemedView>
-
-          <ThemedText style={styles.username}>{profileUser.username}</ThemedText>
-          <ThemedText style={styles.subtle}>
-            Member since {profileUser.memberSince}
-          </ThemedText>
-          <ThemedText style={styles.subtle}>
-            {profileUser.reportsCount} Reports | {profileUser.commentsCount}{" "}
-            comments
-          </ThemedText>
-        </ThemedView>
-
-        {/* Reports */}
-        <ThemedView style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Reports</ThemedText>
-
-          {profileReports.map((report) => (
-            <ThemedView key={report.id} style={styles.card}>
-              <ThemedText style={styles.cardTitle}>{report.title}</ThemedText>
-
-              <ThemedView style={styles.cardFooter}>
-                <ThemedView style={styles.viewButton}>
-                  <ThemedText style={styles.viewButtonText}>View</ThemedText>
-                </ThemedView>
-
+        {loading ? (
+          <ThemedText style={styles.emptyMessage}>Loading profile...</ThemedText>
+        ) : !profileUser ? (
+          <ThemedText style={styles.emptyMessage}>No profile data found</ThemedText>
+        ) : (
+          <>
+            {/* Profile header */}
+            <ThemedView style={styles.header}>
+              <ThemedView style={styles.avatarRing}>
+                <Image
+                  source={{ uri: "https://i.pravatar.cc/300" }}
+                  style={styles.avatar}
+                />
               </ThemedView>
-            </ThemedView>
-          ))}
 
-        </ThemedView>
+              <ThemedText style={styles.username}>@{profileUser.username}</ThemedText>
+              <ThemedText style={styles.subtle}>
+                Member since {profileUser.memberSince}
+              </ThemedText>
+              <ThemedText style={styles.subtle}>
+                {reportsCount} Reports | {profileUser.commentsCount}{" "}
+                comments
+              </ThemedText>
+            </ThemedView>
+
+            {/* Reports */}
+            <ThemedView style={styles.section}>
+              <ThemedText style={styles.sectionTitle}>Reports</ThemedText>
+
+              {profileReports.length === 0 ? (
+                <ThemedText style={styles.emptyMessage}>No reports yet</ThemedText>
+              ) : (
+                profileReports.map((report) => (
+                  <ReportCard key={report.id} report={report} styles={styles} />
+                ))
+              )}
+
+            </ThemedView>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-{/* Hardcoded Profile Data */ }
-export type Report = {
-  id: string;
-  title: string;
-};
-
-export const profileUser = {
-  username: "@johndoe",
-  memberSince: "December 2025",
-  reportsCount: 2,
-  commentsCount: 4,
-};
-
-export const profileReports: Report[] = [
-  { id: "1", title: "Broken Laundry Machine in Cerro Vista 203" },
-  { id: "2", title: "Water Pressure Low in Tower 5 Showers" },
-];
 
 {/* Style Stuff */ }
 const profileStyles = (theme: {
@@ -170,6 +199,13 @@ const profileStyles = (theme: {
             color: "#ffffff",
             fontSize: 14,
             fontWeight: "700",
+        },
+
+        emptyMessage: {
+            fontSize: 14,
+            color: theme.icon,
+            textAlign: "center",
+            paddingVertical: 20,
         },
 
     });
