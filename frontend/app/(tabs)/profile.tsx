@@ -97,7 +97,7 @@ export default function ProfileScreen() {
                 <ThemedText style={styles.emptyMessage}>No reports yet</ThemedText>
               ) : (
                 profileReports.map((report) => (
-                  <ReportCard key={report.id} report={report} styles={styles} />
+                  <ReportCard key={report.id} report={report} />
                 ))
               )}
 
