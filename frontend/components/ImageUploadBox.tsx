@@ -71,7 +71,7 @@ export function ImageUploadBox() {
           ))}
           
           {/* Dashboard "Plus" button synced to image dimensions */}
-          {images.length < 5 && (
+          {images.length < 6 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
               <Feather name="plus" size={32} color="#999" />
             </Pressable>
