@@ -1,21 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { sessionStorage } from '@/utils/sessionStorage';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { ImageUploadBox } from '@/components/ImageUploadBox';
 import { BeforeCont } from '@/components/ui/BeforeCont';
+import { LocationTagging, LocationCoords } from '@/components/LocationTagging';
 
 const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
+const STORAGE_KEY = 'disclaimer_dont_show_again';
 
 export default function ReportForm() {
-  // Added colorScheme hook as requested
   const colorScheme = useColorScheme();
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
+  const [location, setLocation] = useState<LocationCoords | null>(null);
+
+  useEffect(() => {
+    checkDisclaimerPreference();
+  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      checkDisclaimerPreference();
+    }, [])
+  );
+
+  const checkDisclaimerPreference = () => {
+    const value = sessionStorage.getItem(STORAGE_KEY);
+    setShowDisclaimer(value !== 'true');
+  };
 
   const handleCloseDisclaimer = (dontShowAgain: boolean) => {
     setShowDisclaimer(false);
@@ -24,6 +43,7 @@ export default function ReportForm() {
   const handleBackNavigation = () => {
     console.log("Back to Reporting Form");
   };
+
   if (showDisclaimer) {
     return (
       <BeforeCont
@@ -36,7 +56,6 @@ export default function ReportForm() {
 
   return (
     <ThemedView style={styles.screenContainer}>
-      {/* Replaced ParallaxScrollView with regular ScrollView to match Figma */}
       <ScrollView contentContainerStyle={styles.container}>
         
         <Pressable 
@@ -55,12 +74,7 @@ export default function ReportForm() {
 
         <ImageUploadBox/>
         
-        <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder}> </View>
-          <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Choose a location</ThemedText>
-          </View>
-        </View>
+        <LocationTagging value={location} onChange={setLocation} />
 
         <TextInput
           style={[
@@ -115,7 +129,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 24,
-    paddingTop: 60, // Extra padding since the header is gone
+    paddingTop: 60,
     gap: 16,
   },
   backLink: {
@@ -138,37 +152,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
   },
-
   sectionTitle: {
     fontSize: 34,
     fontWeight: 'bold',
     marginBottom: 10,
     fontFamily: Fonts.rounded,
   },
-
-  mapWrapper: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#EEE',
-  },
-
-  mapPlaceholder: {
-    height: 140,
-    backgroundColor: '#F9F9F9',
-  },
-
-  locationBar: {
-    backgroundColor: '#2D4635',
-    padding: 14,
-  },
-
-  locationBarText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '500',
-  },
-
   textArea: {
     borderWidth: 1,
     borderRadius: 20,
@@ -177,42 +166,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlignVertical: 'top',
   },
-
   labelSection: {
     gap: 12,
   },
-
   labelTitle: {
     fontSize: 16,
     fontWeight: '600',
   },
-
   chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
   },
-
   chip: {
     paddingHorizontal: 22,
     paddingVertical: 12,
     borderWidth: 1,
     borderRadius: 30,
   },
-
   chipSelected: {
     backgroundColor: '#2D4635',
     borderColor: '#2D4635',
   },
-
   chipText: {
     fontWeight: '500',
   },
-
   chipTextSelected: {
     color: 'white',
   },
-
   continueButton: {
     backgroundColor: '#2D4635',
     paddingVertical: 18,
@@ -220,7 +201,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-
   continueText: {
     color: 'white',
     fontWeight: 'bold',
