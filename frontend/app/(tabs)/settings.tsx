@@ -34,7 +34,7 @@ const Settings = () => {
       {/* Header with decorative image */}
       <View style={styles.header}>
         <Image
-          source={require("../../assets/images/settings.svg")}
+          source={require("../../assets/images/settings.png")}
           style={styles.decorativeImage}
           resizeMode="contain"
         />
@@ -44,7 +44,7 @@ const Settings = () => {
       {/* Settings Options */}
       <View style={styles.optionsContainer}>
         <TouchableOpacity
-          style={[styles.optionButton, { backgroundColor: "#F5F5F5" }]}
+          style={[styles.optionButton, { backgroundColor: colors.icon }]}
           onPress={handleEditProfile}
           activeOpacity={0.7}
         >
@@ -53,7 +53,7 @@ const Settings = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionButton, { backgroundColor: "#F5F5F5" }]}
+          style={[styles.optionButton, { backgroundColor: colors.icon }]}
           onPress={handleNotifications}
           activeOpacity={0.7}
         >
