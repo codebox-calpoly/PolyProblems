@@ -44,7 +44,10 @@ const Settings = () => {
       {/* Settings Options */}
       <View style={styles.optionsContainer}>
         <TouchableOpacity
-          style={[styles.optionButton, { backgroundColor: colors.icon }]}
+          style={[
+            styles.optionButton,
+            { backgroundColor: colors.settingsButton },
+          ]}
           onPress={handleEditProfile}
           activeOpacity={0.7}
         >
@@ -53,7 +56,10 @@ const Settings = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.optionButton, { backgroundColor: colors.icon }]}
+          style={[
+            styles.optionButton,
+            { backgroundColor: colors.settingsButton },
+          ]}
           onPress={handleNotifications}
           activeOpacity={0.7}
         >
