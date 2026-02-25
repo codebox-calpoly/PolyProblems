@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.polyproblems.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -45,6 +46,12 @@
         {
           "photosPermission": "The app accesses your photos to let you share them.",
           "cameraPermission": "The app accesses your camera to let you take photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "PolyProblems uses your location to tag reports with where the issue occurred."
         }
       ]
     ],

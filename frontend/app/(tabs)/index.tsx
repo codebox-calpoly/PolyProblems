@@ -1,4 +1,5 @@
 import { StyleSheet, Pressable, View } from "react-native";
+import {useRouter} from "expo-router";
 
 import Dot from "@/assets/images/dot.svg";
 import DotActive from "@/assets/images/dot-active.svg";
@@ -10,6 +11,7 @@ import { ThemedView } from "@/components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const tintColor = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "text");
   const inactiveDotColor = useThemeColor({}, "tabIconDefault");
@@ -36,8 +38,10 @@ export default function HomeScreen() {
         <Dot width={8} height={8} fill={inactiveDotColor} />
       </View>
 
-      <Pressable style={[styles.button, { backgroundColor: tintColor }]}>
-        <ThemedText style={styles.buttonText}>Get Started</ThemedText>
+      <Pressable style={[styles.button, { backgroundColor: tintColor }]}
+        onPress = {() => router.push("/login")}
+      >
+        <ThemedText style={styles.buttonText}> Get Started</ThemedText>
       </Pressable>
 
       <ThemedView>
@@ -46,7 +50,7 @@ export default function HomeScreen() {
           type="subtitle">
           Already have an account? {" "}
         
-          <ThemedText style={styles.signInLink} onPress={() => {}}>Sign in</ThemedText>
+          <ThemedText style={styles.signInLink} onPress={() => router.push("/login")}>Sign in</ThemedText>
 
         </ThemedText>
       </ThemedView>

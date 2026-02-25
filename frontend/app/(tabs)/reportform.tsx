@@ -9,6 +9,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
 import { ImageUploadBox } from '@/components/ImageUploadBox';
 import { BeforeCont } from '@/components/ui/BeforeCont';
+import { LocationTagging, LocationCoords } from '@/components/LocationTagging';
 
 const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
 const STORAGE_KEY = 'disclaimer_dont_show_again';
@@ -18,6 +19,7 @@ export default function ReportForm() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
+  const [location, setLocation] = useState<LocationCoords | null>(null);
 
   useEffect(() => {
     checkDisclaimerPreference();
@@ -72,12 +74,7 @@ export default function ReportForm() {
 
         <ImageUploadBox/>
         
-        <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder}> </View>
-          <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Choose a location</ThemedText>
-          </View>
-        </View>
+        <LocationTagging value={location} onChange={setLocation} />
 
         <TextInput
           style={[
@@ -160,25 +157,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     fontFamily: Fonts.rounded,
-  },
-  mapWrapper: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#EEE',
-  },
-  mapPlaceholder: {
-    height: 140,
-    backgroundColor: '#F9F9F9',
-  },
-  locationBar: {
-    backgroundColor: '#2D4635',
-    padding: 14,
-  },
-  locationBarText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '500',
   },
   textArea: {
     borderWidth: 1,
