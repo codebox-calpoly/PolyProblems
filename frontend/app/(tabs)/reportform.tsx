@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert} from 'react-native';
+import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert,Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { sessionStorage } from '@/utils/sessionStorage';
 
 import { ThemedText } from '@/components/themed-text';
@@ -12,17 +13,25 @@ import { BeforeCont } from '@/components/ui/BeforeCont';
 
 import { supabase } from '@/lib/supabase'; 
 
-
 const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
 const STORAGE_KEY = 'disclaimer_dont_show_again';
 
 export default function ReportForm() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUris, setImageUris] = useState<string[]>([]); // Array for multiple photos
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const resetForm = () => {
+    setNotes('');
+    setImageUris([]);
+    setSelectedCategory('Facilities');
+    router.back();
+  };
 
   const handleSubmit = async () => {
     if (!notes.trim()) {
@@ -33,53 +42,59 @@ export default function ReportForm() {
     setIsSubmitting(true);
 
     try {
-      let uploadedPath = null;
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error("Please log in to submit a report.");
 
-      if (imageUri) {
-        const response = await fetch(imageUri);
-        
-        const arrayBuffer = await response.arrayBuffer();
-        
-        const fileExt = imageUri.split('.').pop()?.toLowerCase() ?? 'jpeg';
-        //do date.now and dash -> some form of counter. Help upload multiple images
-        //check if the current date /id is already exist. prevent duplication and race conditions
-        const fileName = `${Date.now()}.${fileExt}`; 
-        const filePath = `${fileName}`;
+      const username = user.user_metadata?.username || user.email?.split('@')[0] || 'user';
+      let uploadedPaths: string[] = [];
 
-        const { data: storageData, error: storageError } = await supabase.storage
-          .from('report-photos')
-          .upload(filePath, arrayBuffer, { // Pass the arrayBuffer here
-            contentType: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
-            upsert: false
-          });
+      // Upload Multiple Photos
+      if (imageUris.length > 0) {
+        for (const uri of imageUris) {
+          const response = await fetch(uri);
+          const arrayBuffer = await response.arrayBuffer();
+          const fileExt = uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
+          
+          const timestamp = Date.now();
+          const uniqueId = Math.random().toString(36).substring(7);
+          const fileName = `${username}-${timestamp}-${uniqueId}.${fileExt}`;
+          const filePath = `${user.id}/${fileName}`; 
 
-        if (storageError) throw storageError;
-        uploadedPath = storageData.path;
+          const { data: storageData, error: storageError } = await supabase.storage
+            .from('report-photos')
+            .upload(filePath, arrayBuffer, {
+              contentType: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
+              upsert: false
+            });
+
+          if (storageError) throw storageError;
+          uploadedPaths.push(storageData.path);
+        }
       }
 
+      // 3. Insert into DB (Matching your new SQL table columns)
       const { error: dbError } = await supabase
         .from('reports')
         .insert([
           {
+            user_id: user.id,
+            username: username,
             category: selectedCategory,
             description: notes,
-            image_path: uploadedPath,
-            location: null,
+            image_paths: uploadedPaths, 
+            location: null, 
             status: 'pending',
           },
         ]);
 
       if (dbError) throw dbError;
 
-      //when submitted/refresh on the image upload box
-      //navigate back to the profile page - after submitting the form
       Alert.alert("Success", "Your report has been submitted.", [
         { 
           text: "OK", 
           onPress: () => {
-            setNotes('');
-            setImageUri(null);
-            setSelectedCategory('Facilities');
+            resetForm();
+            router.replace('/(tabs)/profile');
           } 
         }
       ]);
@@ -92,63 +107,54 @@ export default function ReportForm() {
     }
   };  
 
-  useEffect(() => {
-    checkDisclaimerPreference();
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      checkDisclaimerPreference();
-    }, [])
-  );
+  useEffect(() => { checkDisclaimerPreference(); }, []);
+  useFocusEffect(React.useCallback(() => { checkDisclaimerPreference(); }, []));
 
   const checkDisclaimerPreference = () => {
     const value = sessionStorage.getItem(STORAGE_KEY);
-    setShowDisclaimer(value !== 'true');
-  };
-
-  const handleCloseDisclaimer = (dontShowAgain: boolean) => {
-    setShowDisclaimer(false);
-  };
-
-  const handleBackNavigation = () => {
-    console.log("Back to Reporting Form");
+    setShowDisclaimer(value === 'true' ? false : true);
   };
 
   if (showDisclaimer) {
-    return (
-      <BeforeCont
-        visible={showDisclaimer}
-        onClose={handleCloseDisclaimer}
-        setDisclaimer={setShowDisclaimer}
-      />
-    );
+    return <BeforeCont visible={showDisclaimer} onClose={() => setShowDisclaimer(false)} setDisclaimer={setShowDisclaimer} />;
   }
 
   return (
     <ThemedView style={styles.screenContainer}>
-      <ScrollView contentContainerStyle={styles.container}>
-        
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <Pressable 
-          onPress={handleBackNavigation} 
+          onPress={() => resetForm()} 
           style={({ pressed }) => [styles.backLink, { opacity: pressed ? 0.5 : 1 }]}
         >
-          <Ionicons 
-            name="arrow-back" 
-            size={18} 
-            color={Colors[colorScheme ?? "light"].text} 
-          />
+          <Ionicons name="arrow-back" size={18} color={Colors[colorScheme ?? "light"].text} />
           <ThemedText type="defaultSemiBold">Reporting Issues</ThemedText>
         </Pressable>
 
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
 
-        <ImageUploadBox onImagePicked={(uri: string) => setImageUri(uri)} />
+        <ImageUploadBox 
+          onImagesPicked={(uris: string[]) => setImageUris(uris)} 
+          key={imageUris.length === 0 ? 'empty' : 'loaded'}
+          multiple={true}
+        />
+
+        {/* Thumbnail Preview Area */}
+        {imageUris.length > 0 && (
+          <ScrollView horizontal style={styles.previewContainer}>
+            {imageUris.map((uri, idx) => (
+              <Image key={idx} source={{ uri }} style={styles.thumbnail} />
+            ))}
+          </ScrollView>
+        )}
         
         <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder}> </View>
+          <View style={styles.mapPlaceholder} /> 
           <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Choose a location</ThemedText>
+            <ThemedText style={styles.locationBarText}>Location (Optional)</ThemedText>
           </View>
         </View>
 
@@ -160,7 +166,7 @@ export default function ReportForm() {
               borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' 
             }
           ]}
-          placeholder="Comments / Notes"
+          placeholder="Describe the issue"
           placeholderTextColor="#999"
           multiline
           value={notes}
@@ -179,11 +185,7 @@ export default function ReportForm() {
                   selectedCategory === cat && styles.chipSelected,
                   { borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' }
                 ]}>
-                <ThemedText
-                  style={[
-                    styles.chipText,
-                    selectedCategory === cat && styles.chipTextSelected,
-                  ]}>
+                <ThemedText style={[styles.chipText, selectedCategory === cat && styles.chipTextSelected]}>
                   {cat}
                 </ThemedText>
               </Pressable>
@@ -191,8 +193,12 @@ export default function ReportForm() {
           </View>
         </View>
 
-        <Pressable style={styles.continueButton}>
-          <ThemedText style={styles.continueText}>Continue</ThemedText>
+        <Pressable 
+          style={[styles.continueButton, isSubmitting && { opacity: 0.7 }]} 
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? <ActivityIndicator color="white" /> : <ThemedText style={styles.continueText}>Submit Report</ThemedText>}
         </Pressable>
       </ScrollView>
     </ThemedView>
@@ -200,105 +206,100 @@ export default function ReportForm() {
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-  },
+  screenContainer: { flex: 1 },
   container: {
     padding: 24,
     paddingTop: 60,
+    paddingBottom: 10,
     gap: 16,
   },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 5,
-  },
-  uploadText: {
-    color: '#888',
-    fontSize: 16,
-  },
-  browseButton: {
-    backgroundColor: '#2D4635',
-    borderRadius: 25,
-    paddingHorizontal: 28,
-    paddingVertical: 10,
-  },
-  browseButtonText: {
-    color: 'white',
-    fontWeight: '600',
+  backLink: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8, 
+    marginBottom: 5 
   },
   sectionTitle: {
-    fontSize: 34,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginBottom: 10,
     fontFamily: Fonts.rounded,
+    marginBottom: 10,
   },
-  mapWrapper: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#EEE',
+  previewContainer: { 
+    flexDirection: 'row', 
+    marginBottom: 10 
   },
-  mapPlaceholder: {
-    height: 140,
-    backgroundColor: '#F9F9F9',
+  thumbnail: { 
+    width: 70, 
+    height: 70, 
+    borderRadius: 10, 
+    marginRight: 8 
   },
-  locationBar: {
-    backgroundColor: '#2D4635',
-    padding: 14,
+  mapWrapper: { 
+    borderRadius: 20, 
+    overflow: 'hidden', 
+    borderWidth: 1, 
+    borderColor: '#EEE' 
   },
-  locationBarText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '500',
+  mapPlaceholder: { 
+    height: 140, 
+    backgroundColor: '#F9F9F9' 
   },
-  textArea: {
-    borderWidth: 1,
-    borderRadius: 20,
-    padding: 18,
-    height: 120,
-    fontSize: 16,
-    textAlignVertical: 'top',
+  locationBar: { 
+    backgroundColor: '#2D4635', 
+    padding: 14 
   },
-  labelSection: {
-    gap: 12,
+  locationBarText: { 
+    color: 'white', 
+    fontSize: 15, 
+    fontWeight: '500' 
   },
-  labelTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  textArea: { 
+    borderWidth: 1, 
+    borderRadius: 20, 
+    padding: 18, 
+    height: 120, 
+    fontSize: 16, 
+    textAlignVertical: 'top' 
   },
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
+  labelSection: { 
+    gap: 12 
   },
-  chip: {
-    paddingHorizontal: 22,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderRadius: 30,
+  labelTitle: { 
+    fontSize: 16, 
+    fontWeight: '600' 
   },
-  chipSelected: {
-    backgroundColor: '#2D4635',
-    borderColor: '#2D4635',
+  chipContainer: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    gap: 10 
   },
-  chipText: {
-    fontWeight: '500',
+  chip: { 
+    paddingHorizontal: 22, 
+    paddingVertical: 12, 
+    borderWidth: 1, 
+    borderRadius: 30 
   },
-  chipTextSelected: {
-    color: 'white',
+  chipSelected: { 
+    backgroundColor: '#2D4635', 
+    borderColor: '#2D4635' 
   },
-  continueButton: {
-    backgroundColor: '#2D4635',
-    paddingVertical: 18,
-    borderRadius: 35,
-    alignItems: 'center',
-    marginTop: 10,
+  chipText: { 
+    fontWeight: '500' 
   },
-  continueText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
+  chipTextSelected: { 
+    color: 'white' 
+  },
+  continueButton: { 
+    backgroundColor: '#2D4635', 
+    paddingVertical: 18, 
+    borderRadius: 35, 
+    alignItems: 'center', 
+    marginTop: 10 
+  },
+  continueText: { 
+    color: 'white', 
+    fontWeight: 'bold', 
+    fontSize: 18 
   },
 });
