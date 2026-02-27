@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,11 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 
-export function ImageUploadBox() {
+interface ImageUploadBoxProps {
+  onImagesPicked: (uris: string[]) => void;
+}
+
+export function ImageUploadBox({ onImagesPicked }: ImageUploadBoxProps) {
   const [images, setImages] = useState<string[]>([]);
 
   const pickImage = async (useCamera: boolean = false) => {
@@ -27,26 +31,29 @@ export function ImageUploadBox() {
       return;
     }
 
-    let result;
-    if (useCamera && Platform.OS !== "web") {
-      result = await ImagePicker.launchCameraAsync({
-        quality: 1,
-      });
-    } else {
-      result = await ImagePicker.launchImageLibraryAsync({
-        allowsMultipleSelection: true, // Supports multi-upload
-        quality: 1,
-      });
-    }
+    let result = useCamera
+      ? await ImagePicker.launchCameraAsync({
+          quality: 0.8,
+        })
+      : await ImagePicker.launchImageLibraryAsync({
+          quality: 0.8,
+          allowsMultipleSelection: true,
+          selectionLimit: 5,
+        });
 
     if (!result.canceled) {
-      const newUris = result.assets.map((asset) => asset.uri);
-      setImages((prev) => [...prev, ...newUris]);
+      const selectedUris = result.assets.map((asset) => asset.uri);
+      const newImages = [...images, ...selectedUris];
+
+      setImages(newImages);
+      onImagesPicked(newImages);
     }
   };
 
   const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
+    onImagesPicked(updatedImages);
   };
 
   const handlePress = () => {
@@ -54,7 +61,7 @@ export function ImageUploadBox() {
       // Direct library pick for web to avoid Alert crash
       pickImage(false);
     } else {
-      Alert.alert("Upload Image", "Choose a source", [
+      Alert.alert("Upload Images", "Choose a source", [
         { text: "Camera", onPress: () => pickImage(true) },
         { text: "Library", onPress: () => pickImage(false) },
         { text: "Cancel", style: "cancel" },
