@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert, Image } from 'react-native';
+import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert, Image, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
@@ -186,19 +186,7 @@ export default function ReportForm() {
 
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
 
-        <ImageUploadBox 
-          onImagesPicked={(uris: string[]) => setImageUris(uris)} 
-          key={imageUris.length === 0 ? 'empty' : 'loaded'}
-          multiple={true}
-        />
-
-        {imageUris.length > 0 && (
-          <ScrollView horizontal style={styles.previewContainer}>
-            {imageUris.map((uri, idx) => (
-              <Image key={idx} source={{ uri }} style={styles.thumbnail} />
-            ))}
-          </ScrollView>
-        )}
+        <ImageUploadBox onImagesPicked={setImageUris} />
         
         <View style={styles.mapWrapper}>
           <View style={styles.mapPlaceholder} /> 
