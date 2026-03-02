@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert,Image } from 'react-native';
+import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
@@ -23,13 +23,16 @@ export default function ReportForm() {
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
-  const [imageUris, setImageUris] = useState<string[]>([]); // Array for multiple photos
+  const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
 
   const resetForm = () => {
     setNotes('');
     setImageUris([]);
     setSelectedCategory('Facilities');
+    setIsAcknowledged(false);
     router.back();
   };
 
@@ -48,7 +51,6 @@ export default function ReportForm() {
       const username = user.user_metadata?.username || user.email?.split('@')[0] || 'user';
       let uploadedPaths: string[] = [];
 
-      // Upload Multiple Photos
       if (imageUris.length > 0) {
         for (const uri of imageUris) {
           const response = await fetch(uri);
@@ -72,7 +74,6 @@ export default function ReportForm() {
         }
       }
 
-      // 3. Insert into DB (Matching your new SQL table columns)
       const { error: dbError } = await supabase
         .from('reports')
         .insert([
@@ -142,7 +143,6 @@ export default function ReportForm() {
           multiple={true}
         />
 
-        {/* Thumbnail Preview Area */}
         {imageUris.length > 0 && (
           <ScrollView horizontal style={styles.previewContainer}>
             {imageUris.map((uri, idx) => (
@@ -194,11 +194,32 @@ export default function ReportForm() {
         </View>
 
         <Pressable 
-          style={[styles.continueButton, isSubmitting && { opacity: 0.7 }]} 
-          onPress={handleSubmit}
-          disabled={isSubmitting}
+          style={styles.acknowledgeContainer} 
+          onPress={() => setIsAcknowledged(!isAcknowledged)}
         >
-          {isSubmitting ? <ActivityIndicator color="white" /> : <ThemedText style={styles.continueText}>Submit Report</ThemedText>}
+          <Ionicons 
+            name={isAcknowledged ? "checkbox" : "square-outline"} 
+            size={24} 
+            color={isAcknowledged ? '#2D4635' : '#999'} 
+          />
+          <ThemedText style={styles.acknowledgeText}>
+            I acknowledge that this report is accurate to the best of my knowledge and understand it may be reviewed or shared with relevant university departments.
+          </ThemedText>
+        </Pressable>
+
+        <Pressable 
+          style={[
+            styles.continueButton, 
+            (!isAcknowledged || isSubmitting) && styles.buttonDisabled
+          ]} 
+          onPress={handleSubmit}
+          disabled={!isAcknowledged || isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <ThemedText style={styles.continueText}>Submit Report</ThemedText> 
+          )}
         </Pressable>
       </ScrollView>
     </ThemedView>
@@ -302,4 +323,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     fontSize: 18 
   },
+  acknowledgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginTop: 10,
+    paddingRight: 10,
+  },
+  acknowledgeText: {
+    fontSize: 13,
+    lineHeight: 18,
+    flex: 1,
+    opacity: 0.8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.7,
+  },
+ 
 });
