@@ -99,7 +99,6 @@ export default function LoginScreen() {
 
       if (data.session) {
         console.log('Login successful:', data.user?.email);
-        // Navigate to main app
         router.replace('/(tabs)');
       } else {
         setError('Invalid code. Please try again.');

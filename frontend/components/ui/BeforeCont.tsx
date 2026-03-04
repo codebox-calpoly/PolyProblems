@@ -123,7 +123,7 @@ const beforeContStyles = (theme: {
 }) => StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -143,7 +143,7 @@ const beforeContStyles = (theme: {
   modalTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#000000',
+    color: theme.text,
     textAlign: 'center',
     lineHeight: 39,
     fontFamily: 'OpenRunde-Semibold',
@@ -154,7 +154,7 @@ const beforeContStyles = (theme: {
   description: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#000000',
+    color: theme.text,
     marginBottom: 12,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -164,7 +164,7 @@ const beforeContStyles = (theme: {
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#000000',
+    color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
@@ -172,7 +172,7 @@ const beforeContStyles = (theme: {
   sectionText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: theme.text,
     marginBottom: 4,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -183,14 +183,14 @@ const beforeContStyles = (theme: {
   bullet: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: theme.text,
     marginBottom: 2,
     fontFamily: 'OpenRunde-Regular',
   },
   contactText: {
     fontSize: 13,
     lineHeight: 20,
-    color: '#000000',
+    color: theme.text,
     marginBottom: 16,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -200,14 +200,14 @@ const beforeContStyles = (theme: {
   readyText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#000000',
+    color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
   continueText: {
     fontSize: 13,
-    color: '#000000',
+    color: theme.text,
     lineHeight: 20,
     fontFamily: 'OpenRunde-Regular',
   },
@@ -226,14 +226,14 @@ const beforeContStyles = (theme: {
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: theme.icon,
     marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#2d5744',
-    borderColor: '#2d5744',
+    backgroundColor: theme.tint,
+    borderColor: theme.tint,
   },
   checkmark: {
     color: '#FFFFFF',
@@ -242,11 +242,11 @@ const beforeContStyles = (theme: {
   },
   checkboxLabel: {
     fontSize: 18,
-    color: '#000000',
+    color: theme.text,
     fontFamily: 'OpenRunde-Regular',
   },
   reportButton: {
-    backgroundColor: '#2d5744',
+    backgroundColor: theme.tint,
     width: '100%',
     maxWidth: 324,
     height: 49,
