@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
+import { Fonts } from "@/constants/theme";
 
 interface ImageUploadBoxProps {
   onImagesPicked: (uris: string[]) => void;
@@ -131,14 +132,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   inner: { alignItems: "center" },
-  text: { color: "#666", marginVertical: 8, fontSize: 16 },
+  text: { color: "#666", marginVertical: 8, fontSize: 16, fontFamily: Fonts.body },
   button: {
     backgroundColor: "#2D4335",
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 25,
   },
-  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  buttonText: { color: "#fff", fontFamily: Fonts.heading, fontSize: 16 },
 
   // Grid Styles
   grid: {

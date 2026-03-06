@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, Image, StyleSheet } from "react-native";
-import { Colors } from "@/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ReportCard } from '@/components/reportCard';
@@ -150,12 +150,13 @@ const profileStyles = (theme: {
         },
         username: {
             fontSize: 28,
-            fontWeight: "600",
+            fontFamily: Fonts.heading,
             marginTop: 4,
             color: theme.text,
         },
         subtle: {
             fontSize: 14,
+            fontFamily: Fonts.body,
             color: theme.icon,
             marginTop: 6,
         },
@@ -164,7 +165,7 @@ const profileStyles = (theme: {
         },
         sectionTitle: {
             fontSize: 28,
-            fontWeight: "bold",
+            fontFamily: Fonts.heading,
             marginBottom: 16,
             color: theme.text,
         },
@@ -178,7 +179,7 @@ const profileStyles = (theme: {
         },
         cardTitle: {
             fontSize: 22,
-            fontWeight: "900",
+            fontFamily: Fonts.heading,
             lineHeight: 28,
             color: theme.text,
         },
@@ -198,11 +199,12 @@ const profileStyles = (theme: {
         viewButtonText: {
             color: "#ffffff",
             fontSize: 14,
-            fontWeight: "700",
+            fontFamily: Fonts.heading,
         },
 
         emptyMessage: {
             fontSize: 14,
+            fontFamily: Fonts.body,
             color: theme.icon,
             textAlign: "center",
             paddingVertical: 20,

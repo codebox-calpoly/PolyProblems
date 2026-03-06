@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, useColorScheme } from 'react-native';
 import { sessionStorage } from '@/utils/sessionStorage';
-import {Colors} from '@/constants/theme';
+import {Colors, Fonts} from '@/constants/theme';
 
 interface BeforeContProps {
   visible: boolean;
@@ -142,11 +142,10 @@ const beforeContStyles = (theme: {
   },
   modalTitle: {
     fontSize: 32,
-    fontWeight: '700',
     color: theme.text,
     textAlign: 'center',
     lineHeight: 39,
-    fontFamily: 'OpenRunde-Semibold',
+    fontFamily: Fonts.heading,
   },
   contentBlock: {
     marginBottom: 32,
@@ -156,25 +155,24 @@ const beforeContStyles = (theme: {
     lineHeight: 18,
     color: theme.text,
     marginBottom: 12,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   section: {
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: '700',
     color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.heading,
   },
   sectionText: {
     fontSize: 13,
     lineHeight: 20,
     color: theme.text,
     marginBottom: 4,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   bulletList: {
     marginLeft: 4,
@@ -185,31 +183,30 @@ const beforeContStyles = (theme: {
     lineHeight: 20,
     color: theme.text,
     marginBottom: 2,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   contactText: {
     fontSize: 13,
     lineHeight: 20,
     color: theme.text,
     marginBottom: 16,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   footer: {
     marginTop: 8,
   },
   readyText: {
     fontSize: 13,
-    fontWeight: '700',
     color: theme.text,
     marginBottom: 4,
     lineHeight: 20,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.heading,
   },
   continueText: {
     fontSize: 13,
     color: theme.text,
     lineHeight: 20,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   actionSection: {
     width: '100%',
@@ -238,12 +235,12 @@ const beforeContStyles = (theme: {
   checkmark: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.heading,
   },
   checkboxLabel: {
     fontSize: 18,
     color: theme.text,
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
   },
   reportButton: {
     backgroundColor: theme.tint,
@@ -257,8 +254,7 @@ const beforeContStyles = (theme: {
   reportButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '400',
-    fontFamily: 'OpenRunde-Regular',
+    fontFamily: Fonts.body,
     lineHeight: 21,
     letterSpacing: 0,
   },
