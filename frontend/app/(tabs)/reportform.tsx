@@ -282,8 +282,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 25,
-    fontWeight: "bold",
-    fontFamily: Fonts.rounded,
+    fontFamily: Fonts.heading,
     marginBottom: 10,
   },
   previewContainer: {
@@ -302,6 +301,7 @@ const styles = StyleSheet.create({
     padding: 18,
     height: 120,
     fontSize: 16,
+    fontFamily: Fonts.body,
     textAlignVertical: "top",
   },
   labelSection: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   labelTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: Fonts.heading,
   },
   chipContainer: {
     flexDirection: "row",
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     borderColor: "#2D4635",
   },
   chipText: {
-    fontWeight: "500",
+    fontFamily: Fonts.body,
   },
   chipTextSelected: {
     color: "white",
@@ -341,8 +341,8 @@ const styles = StyleSheet.create({
   },
   continueText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 18,
+    fontFamily: Fonts.heading,
   },
   acknowledgeContainer: {
     flexDirection: 'row',
@@ -356,6 +356,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     flex: 1,
     opacity: 0.8,
+    fontFamily: Fonts.body,
   },
   buttonDisabled: {
     backgroundColor: '#CCCCCC',

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 
 export type Report = {
   id: string;
@@ -27,7 +27,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   cardTitle: {
     fontSize: 22,
-    fontWeight: "900",
+    fontFamily: Fonts.heading,
     lineHeight: 28,
     color: theme.text,
   },
@@ -71,7 +71,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   viewButtonText: {
     color: "#ffffff",
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: Fonts.heading,
   },
 });
 

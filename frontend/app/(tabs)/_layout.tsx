@@ -5,7 +5,7 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { Session } from '@supabase/supabase-js';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { supabase } from '@/lib/supabase';
 import LandingLogo from '@/assets/images/landinglogo.svg';
@@ -58,7 +58,7 @@ export default function TabLayout() {
           paddingBottom: isWeb ? 5 : (Platform.OS === 'ios' ? 20 : 5),
         },
         tabBarLabelStyle: {
-          fontWeight: '700',
+          fontFamily: Fonts.heading,
           fontSize: fontSize,
           marginBottom: isWeb ? 10 : 0,
         },

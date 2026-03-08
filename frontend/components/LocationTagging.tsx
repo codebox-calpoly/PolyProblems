@@ -11,7 +11,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 
 /** Latitude / longitude pair returned to parent components. */
 export interface LocationCoords {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   barText: {
     color: '#fff',
     fontSize: 15,
-    fontWeight: '500',
+    fontFamily: Fonts.body,
   },
   attachButton: {
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   attachButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.heading,
   },
   warning: {
     flexDirection: 'row',
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
   warningText: {
     color: '#B85C00',
     fontSize: 13,
+    fontFamily: Fonts.body,
     flex: 1,
   },
 });
