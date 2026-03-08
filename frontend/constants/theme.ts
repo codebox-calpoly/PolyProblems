@@ -6,6 +6,13 @@
 const tintColorLight = "#0a7ea4";
 const tintColorDark = "#fff";
 
+export const feedTabs: Record<string, string> = {
+  Facilities: "#174735",
+  Safety: "#9F2424",
+  Dining: "#92771D",
+  Tech: "#3B82F6",
+};
+
 export const Colors = {
   light: {
     text: "#11181C",
@@ -16,6 +23,7 @@ export const Colors = {
     tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
     settingsButton: "#EDEDED",
+    line: "#E6E6E6",
   },
   dark: {
     text: "#ECEDEE",
@@ -26,6 +34,7 @@ export const Colors = {
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
     settingsButton: "#EDEDED",
+    line: "#252525",
   },
 };
 

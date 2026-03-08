@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Colors, Fonts } from "@/constants/theme";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 // Define navigation type (adjust based on your navigation setup)
 type SettingsNavigationProp = {
@@ -33,12 +34,19 @@ const Settings = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with decorative image */}
       <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={15} color={colors.text} />
+          <Text style={[styles.subTitle, { color: colors.text }]}>Profile</Text>
+        </TouchableOpacity>
         <Image
-          source={require("../../assets/images/settings.png")}
+          source={require("../assets/images/settings.png")}
           style={styles.decorativeImage}
           resizeMode="contain"
         />
-        <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Back</Text>
       </View>
 
       {/* Settings Options */}
@@ -80,6 +88,15 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 24,
     paddingBottom: 30,
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  subTitle: {
+    fontSize: 16,
+    fontFamily: Fonts.heading,
+    marginBottom: 4,
   },
   decorativeImage: {
     position: "absolute",
