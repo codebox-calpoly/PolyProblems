@@ -26,6 +26,7 @@ export default function ReportForm() {
   const [notes, setNotes] = useState('');
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [location, setLocation] = useState<LocationCoords | null>(null);
   
   const [isAcknowledged, setIsAcknowledged] = useState(false);
 
@@ -33,6 +34,7 @@ export default function ReportForm() {
     setNotes("");
     setImageUris([]);
     setSelectedCategory('Facilities');
+    setLocation(null);
     setIsAcknowledged(false);
     router.back();
   };
@@ -101,7 +103,7 @@ export default function ReportForm() {
             category: selectedCategory,
             description: notes,
             image_paths: uploadedPaths, 
-            location: null, 
+            location: location ? { latitude: location.latitude, longitude: location.longitude } : null, 
             status: 'pending',
           },
         ]);
@@ -188,12 +190,7 @@ export default function ReportForm() {
 
         <ImageUploadBox onImagesPicked={setImageUris} />
         
-        <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder} /> 
-          <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Location (Optional)</ThemedText>
-          </View>
-        </View>
+        <LocationTagging value={location} onChange={setLocation} />
 
         <TextInput
           style={[
@@ -297,25 +294,6 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 10,
     marginRight: 8,
-  },
-  mapWrapper: {
-    borderRadius: 20,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#EEE",
-  },
-  mapPlaceholder: {
-    height: 140,
-    backgroundColor: "#F9F9F9",
-  },
-  locationBar: {
-    backgroundColor: "#2D4635",
-    padding: 14,
-  },
-  locationBarText: {
-    color: "white",
-    fontSize: 15,
-    fontFamily: Fonts.body,
   },
   textArea: {
     borderWidth: 1,

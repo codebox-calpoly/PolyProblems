@@ -1,14 +1,33 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Slot, Tabs } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image, Platform } from 'react-native';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Session } from '@supabase/supabase-js';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { supabase } from '@/lib/supabase';
+import LandingLogo from '@/assets/images/landinglogo.svg';
 
 export default function TabLayout() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const colorScheme = useColorScheme() ?? 'light';
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsSessionLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsSessionLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   
   const activeColor = Colors[colorScheme].tabIconSelected; 
   const inactiveColor = Colors[colorScheme].tabIconDefault; 
@@ -18,6 +37,10 @@ export default function TabLayout() {
   const barHeight = isWeb ? 100 : (Platform.OS === 'ios' ? 90 : 75);
   const iconSize = isWeb ? 32 : 26;
   const fontSize = isWeb ? 14 : 12;
+
+  if (isSessionLoading || !session) {
+    return <Slot />;
+  }
 
   return (
     <Tabs
@@ -32,7 +55,6 @@ export default function TabLayout() {
           borderTopWidth: 0,
           elevation: 0, 
           height: barHeight,
-          // Reduced padding to allow content to sit lower
           paddingBottom: isWeb ? 5 : (Platform.OS === 'ios' ? 20 : 5),
         },
         tabBarLabelStyle: {
@@ -41,7 +63,6 @@ export default function TabLayout() {
           marginBottom: isWeb ? 10 : 0,
         },
         tabBarIconStyle: {
-          // Increased margin to push Feed/Profile icons down further
           marginTop: isWeb ? 15 : 12, 
         }
       }}>
@@ -71,10 +92,11 @@ export default function TabLayout() {
                 style={[styles.borderImage, isWeb && styles.borderWeb]}
                 resizeMode="contain"
               />
-              <Image 
-                source={require('../../assets/images/report.png')} 
-                style={[styles.mainIcon, isWeb && styles.iconWeb]}
-                resizeMode="contain"
+              <LandingLogo
+                width={isWeb ? 40 : 32}
+                height={isWeb ? 40 : 32}
+                color="#FFFFFF"
+                style={styles.logoIcon}
               />
             </View>
           ),
@@ -107,7 +129,6 @@ const styles = StyleSheet.create({
   megaphoneContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    // Pushing the middle button down further
     marginTop: Platform.OS === 'ios' ? 20 : 25, 
     width: 70,
     height: 70,
@@ -126,13 +147,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
   },
-  mainIcon: {
-    width: 32,
-    height: 32,
-    tintColor: 'white', 
+  logoIcon: {
+    position: 'absolute',
+    zIndex: 2,
   },
-  iconWeb: {
-    width: 40,
-    height: 40,
-  }
 });
+

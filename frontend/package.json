@@ -26,6 +26,7 @@
     "expo-image-picker": "~17.0.10",
     "expo-linking": "~8.0.11",
     "expo-location": "~19.0.8",
+    "leaflet": "^1.9.4",
     "expo-router": "~6.0.22",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
@@ -46,6 +47,7 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.12",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
