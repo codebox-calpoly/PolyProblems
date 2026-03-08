@@ -26,6 +26,7 @@ export default function ReportForm() {
   const [notes, setNotes] = useState('');
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [location, setLocation] = useState<LocationCoords | null>(null);
   
   const [isAcknowledged, setIsAcknowledged] = useState(false);
 
@@ -33,6 +34,7 @@ export default function ReportForm() {
     setNotes("");
     setImageUris([]);
     setSelectedCategory('Facilities');
+    setLocation(null);
     setIsAcknowledged(false);
     router.back();
   };
@@ -101,7 +103,7 @@ export default function ReportForm() {
             category: selectedCategory,
             description: notes,
             image_paths: uploadedPaths, 
-            location: null, 
+            location: location ? { latitude: location.latitude, longitude: location.longitude } : null, 
             status: 'pending',
           },
         ]);
@@ -188,12 +190,7 @@ export default function ReportForm() {
 
         <ImageUploadBox onImagesPicked={setImageUris} />
         
-        <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder} /> 
-          <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Location (Optional)</ThemedText>
-          </View>
-        </View>
+        <LocationTagging value={location} onChange={setLocation} />
 
         <TextInput
           style={[
@@ -285,8 +282,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 25,
-    fontWeight: "bold",
-    fontFamily: Fonts.rounded,
+    fontFamily: Fonts.heading,
     marginBottom: 10,
   },
   previewContainer: {
@@ -299,31 +295,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 8,
   },
-  mapWrapper: {
-    borderRadius: 20,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#EEE",
-  },
-  mapPlaceholder: {
-    height: 140,
-    backgroundColor: "#F9F9F9",
-  },
-  locationBar: {
-    backgroundColor: "#2D4635",
-    padding: 14,
-  },
-  locationBarText: {
-    color: "white",
-    fontSize: 15,
-    fontWeight: "500",
-  },
   textArea: {
     borderWidth: 1,
     borderRadius: 20,
     padding: 18,
     height: 120,
     fontSize: 16,
+    fontFamily: Fonts.body,
     textAlignVertical: "top",
   },
   labelSection: {
@@ -331,7 +309,7 @@ const styles = StyleSheet.create({
   },
   labelTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: Fonts.heading,
   },
   chipContainer: {
     flexDirection: "row",
@@ -349,7 +327,7 @@ const styles = StyleSheet.create({
     borderColor: "#2D4635",
   },
   chipText: {
-    fontWeight: "500",
+    fontFamily: Fonts.body,
   },
   chipTextSelected: {
     color: "white",
@@ -363,8 +341,8 @@ const styles = StyleSheet.create({
   },
   continueText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 18,
+    fontFamily: Fonts.heading,
   },
   acknowledgeContainer: {
     flexDirection: 'row',
@@ -378,6 +356,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     flex: 1,
     opacity: 0.8,
+    fontFamily: Fonts.body,
   },
   buttonDisabled: {
     backgroundColor: '#CCCCCC',

@@ -15,7 +15,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import {supabase} from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
+import { Fonts } from '@/constants/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -99,7 +100,6 @@ export default function LoginScreen() {
 
       if (data.session) {
         console.log('Login successful:', data.user?.email);
-        // Navigate to main app
         router.replace('/(tabs)');
       } else {
         setError('Invalid code. Please try again.');
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: '#000000',
     lineHeight: 32,
+    fontFamily: Fonts.body,
   },
   content: {
     flex: 1,
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontFamily: Fonts.heading,
     lineHeight: 40,
     marginBottom: 24,
   },
@@ -328,6 +329,7 @@ const styles = StyleSheet.create({
     color: '#c33',
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: Fonts.body,
   },
   form: {
     marginBottom: 30,
@@ -338,7 +340,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: Fonts.body,
     marginBottom: 8,
   },
   input: {
@@ -347,6 +349,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
+    fontFamily: Fonts.body,
   },
   continueButton: {
     height: 56,
@@ -361,19 +364,19 @@ const styles = StyleSheet.create({
   continueButtonText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.heading,
   },
   backButton: {
     marginTop: 16,
     textAlign: 'center',
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: Fonts.body,
   },
   resendButton: {
     marginTop: 8,
     textAlign: 'center',
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: Fonts.body,
     textDecorationLine: 'underline',
   },
   footer: {
@@ -385,11 +388,12 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 13,
     lineHeight: 18,
+    fontFamily: Fonts.body,
   },
   link: {
     color: '#000000',
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.heading,
     textDecorationLine: 'underline',
     lineHeight: 18,
   },

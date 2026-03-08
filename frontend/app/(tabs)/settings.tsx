@@ -90,9 +90,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 48,
-    fontWeight: "bold",
     marginBottom: 10,
-    fontFamily: Fonts.rounded,
+    fontFamily: Fonts.heading,
   },
   optionsContainer: {
     paddingHorizontal: 24,
@@ -109,13 +108,12 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: "#000",
-    fontWeight: "500",
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.body,
   },
   arrow: {
     fontSize: 20,
     color: "#000",
-    fontWeight: "300",
+    fontFamily: Fonts.body,
   },
 });
 

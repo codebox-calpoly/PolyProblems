@@ -42,7 +42,7 @@ export default function NotificationsScreen() {
             <Text
               style={[
                 styles.subTitle,
-                { fontFamily: Fonts.sans, color: colors.text },
+                { fontFamily: Fonts.body, color: colors.text },
               ]}
             >
               Settings
@@ -63,7 +63,7 @@ export default function NotificationsScreen() {
             <Text
               style={[
                 styles.title,
-                { fontFamily: Fonts.rounded, color: colors.text },
+                { fontFamily: Fonts.heading, color: colors.text },
               ]}
             >
               Notifications
@@ -77,7 +77,7 @@ export default function NotificationsScreen() {
                 <Text
                   style={[
                     styles.settingTitle,
-                    { fontFamily: Fonts.sans, color: colors.text },
+                    { fontFamily: Fonts.body, color: colors.text },
                   ]}
                 >
                   Push Notifications
@@ -85,7 +85,7 @@ export default function NotificationsScreen() {
                 <Text
                   style={[
                     styles.description,
-                    { fontFamily: Fonts.sans, color: colors.tabIconDefault },
+                    { fontFamily: Fonts.body, color: colors.tabIconDefault },
                   ]}
                 >
                   Get notified instantly when there's an update to your reports
@@ -108,7 +108,7 @@ export default function NotificationsScreen() {
                 <Text
                   style={[
                     styles.settingTitle,
-                    { fontFamily: Fonts.sans, color: colors.text },
+                    { fontFamily: Fonts.body, color: colors.text },
                   ]}
                 >
                   Priority Alerts
@@ -116,7 +116,7 @@ export default function NotificationsScreen() {
                 <Text
                   style={[
                     styles.description,
-                    { fontFamily: Fonts.sans, color: colors.tabIconDefault },
+                    { fontFamily: Fonts.body, color: colors.tabIconDefault },
                   ]}
                 >
                   Stay informed about major campus updates and disruptions that
@@ -139,7 +139,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subTitle,
-                      { fontFamily: Fonts.sans, color: colors.text },
+                      { fontFamily: Fonts.body, color: colors.text },
                     ]}
                   >
                     Food & Dining
@@ -147,7 +147,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subDescription,
-                      { fontFamily: Fonts.sans, color: colors.tabIconDefault },
+                      { fontFamily: Fonts.body, color: colors.tabIconDefault },
                     ]}
                   >
                     Alerts about dining hall closures, menu changes, or outages.
@@ -167,7 +167,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subTitle,
-                      { fontFamily: Fonts.sans, color: colors.text },
+                      { fontFamily: Fonts.body, color: colors.text },
                     ]}
                   >
                     Dorms
@@ -175,7 +175,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subDescription,
-                      { fontFamily: Fonts.sans, color: colors.tabIconDefault },
+                      { fontFamily: Fonts.body, color: colors.tabIconDefault },
                     ]}
                   >
                     Updates on maintenance, safety notices, or building alerts.
@@ -195,7 +195,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subTitle,
-                      { fontFamily: Fonts.sans, color: colors.text },
+                      { fontFamily: Fonts.body, color: colors.text },
                     ]}
                   >
                     Facilities
@@ -203,7 +203,7 @@ export default function NotificationsScreen() {
                   <Text
                     style={[
                       styles.subDescription,
-                      { fontFamily: Fonts.sans, color: colors.tabIconDefault },
+                      { fontFamily: Fonts.body, color: colors.tabIconDefault },
                     ]}
                   >
                     Major campus infrastructure issues like power, water, or
@@ -241,6 +241,7 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 17,
     marginLeft: 8,
+    fontFamily: Fonts.body,
   },
   scrollContent: {
     flex: 1,
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 48,
-    fontWeight: "bold",
+    fontFamily: Fonts.heading,
     marginBottom: 10,
   },
 
@@ -282,12 +283,13 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: Fonts.heading,
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: Fonts.body,
   },
   subSection: {
     marginTop: 20,
@@ -305,11 +307,12 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: Fonts.heading,
     marginBottom: 4,
   },
   subDescription: {
     fontSize: 13,
     lineHeight: 18,
+    fontFamily: Fonts.body,
   },
 });

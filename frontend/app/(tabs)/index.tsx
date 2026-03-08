@@ -7,7 +7,7 @@ import PolyLogo from "@/components/ui/poly-logo";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-
+import { Fonts } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function HomeScreen() {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     },
   descriptionText: {
     fontSize: 25,
-    fontWeight: 500,
+    fontFamily: Fonts.body,
     textAlign: "center",
     marginBottom: 15,
   },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "400",
+    fontFamily: Fonts.body,
   },
   dots: {
     flexDirection: "row",
@@ -101,11 +101,11 @@ const styles = StyleSheet.create({
   signInText: {
     marginTop: 5,
     fontSize: 13,
-    fontWeight: 200,
+    fontFamily: Fonts.body,
     textAlign: "center",
   },
   signInLink: {
-    fontWeight: 600,
+    fontFamily: Fonts.heading,
     fontSize: 13,
     textDecorationLine: "underline",
   },
