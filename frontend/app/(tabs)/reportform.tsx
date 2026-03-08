@@ -1,52 +1,162 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme } from 'react-native';
+import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert, Image, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { sessionStorage } from '@/utils/sessionStorage';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Colors, Fonts } from '@/constants/theme';
-import { ImageUploadBox } from '@/components/ImageUploadBox';
-import { BeforeCont } from '@/components/ui/BeforeCont';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Colors, Fonts } from "@/constants/theme";
+import { ImageUploadBox } from "@/components/ImageUploadBox";
+import { BeforeCont } from "@/components/ui/BeforeCont";
 
-const CATEGORIES = ['Facilities', 'Safety', 'Dining', 'Tech'];
-const STORAGE_KEY = 'disclaimer_dont_show_again';
+import { supabase } from "@/lib/supabase";
+import { LocationTagging, LocationCoords } from "@/components/LocationTagging";
+
+const CATEGORIES = ["Facilities", "Safety", "Dining", "Tech"];
+const STORAGE_KEY = "disclaimer_dont_show_again";
 
 export default function ReportForm() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Facilities');
   const [notes, setNotes] = useState('');
+  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [isAcknowledged, setIsAcknowledged] = useState(false);
+
+  const resetForm = () => {
+    setNotes("");
+    setImageUris([]);
+    setSelectedCategory('Facilities');
+    setIsAcknowledged(false);
+    router.back();
+  };
+
+  const handleSubmit = async () => {
+    if (!notes.trim()) {
+      Alert.alert("Missing Info", "Please provide a description of the issue.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user)
+        throw new Error("Please log in to submit a report.");
+
+      const username =
+        user.user_metadata?.username || user.email?.split("@")[0] || "user";
+      let uploadedPaths: string[] = [];
+
+      if (imageUris.length > 0) {
+        const mimeToExt: Record<string, string> = {
+          "image/jpeg": "jpg",
+          "image/jpg": "jpg",
+          "image/png": "png",
+          "image/webp": "webp",
+          "image/heic": "heic",
+          "image/heif": "heif",
+        };
+
+        for (const uri of imageUris) {
+          const response = await fetch(uri);
+          const blob = await response.blob();
+          const contentType =
+            blob.type || response.headers.get("content-type") || "image/jpeg";
+          const fileExt = mimeToExt[contentType] ?? "jpg";
+
+          const timestamp = Date.now();
+          const uniqueId = Math.random().toString(36).substring(7);
+          const fileName = `${username}-${timestamp}-${uniqueId}.${fileExt}`;
+          const filePath = `${user.id}/${fileName}`;
+
+          const { data: storageData, error: storageError } =
+            await supabase.storage
+              .from("report-photos")
+              .upload(filePath, blob, {
+                contentType,
+                upsert: false,
+              });
+
+          if (storageError) throw storageError;
+          uploadedPaths.push(storageData.path);
+        }
+      }
+
+      const { error: dbError } = await supabase
+        .from('reports')
+        .insert([
+          {
+            user_id: user.id,
+            username: username,
+            category: selectedCategory,
+            description: notes,
+            image_paths: uploadedPaths, 
+            location: null, 
+            status: 'pending',
+          },
+        ]);
+
+      if (dbError) throw dbError;
+
+      if (Platform.OS === "web") {
+        window.alert("Your report has been submitted.");
+        resetForm();
+        router.replace("/(tabs)/profile");
+      } else {
+        Alert.alert("Success", "Your report has been submitted.", [
+          {
+            text: "OK",
+            onPress: () => {
+              resetForm();
+              router.replace("/(tabs)/profile");
+            },
+          },
+        ]);
+      }
+    } catch (error: any) {
+      console.error("Submission error:", error);
+
+      const message = error?.message || "An unexpected error occurred.";
+
+      if (Platform.OS === "web") {
+        window.alert(`Submission Failed\n\n${message}`);
+      } else {
+        Alert.alert("Submission Failed", message);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     checkDisclaimerPreference();
   }, []);
-
   useFocusEffect(
     React.useCallback(() => {
       checkDisclaimerPreference();
-    }, [])
+    }, []),
   );
 
   const checkDisclaimerPreference = () => {
     const value = sessionStorage.getItem(STORAGE_KEY);
-    setShowDisclaimer(value !== 'true');
-  };
-
-  const handleCloseDisclaimer = (dontShowAgain: boolean) => {
-    setShowDisclaimer(false);
-  };
-
-  const handleBackNavigation = () => {
-    console.log("Back to Reporting Form");
+    setShowDisclaimer(value === "true" ? false : true);
   };
 
   if (showDisclaimer) {
     return (
       <BeforeCont
         visible={showDisclaimer}
-        onClose={handleCloseDisclaimer}
+        onClose={() => setShowDisclaimer(false)}
         setDisclaimer={setShowDisclaimer}
       />
     );
@@ -54,40 +164,46 @@ export default function ReportForm() {
 
   return (
     <ThemedView style={styles.screenContainer}>
-      <ScrollView contentContainerStyle={styles.container}>
-        
-        <Pressable 
-          onPress={handleBackNavigation} 
-          style={({ pressed }) => [styles.backLink, { opacity: pressed ? 0.5 : 1 }]}
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Pressable
+          onPress={() => resetForm()}
+          style={({ pressed }) => [
+            styles.backLink,
+            { opacity: pressed ? 0.5 : 1 },
+          ]}
         >
-          <Ionicons 
-            name="arrow-back" 
-            size={18} 
-            color={Colors[colorScheme ?? "light"].text} 
+          <Ionicons
+            name="arrow-back"
+            size={18}
+            color={Colors[colorScheme ?? "light"].text}
           />
           <ThemedText type="defaultSemiBold">Reporting Issues</ThemedText>
         </Pressable>
 
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
 
-        <ImageUploadBox/>
+        <ImageUploadBox onImagesPicked={setImageUris} />
         
         <View style={styles.mapWrapper}>
-          <View style={styles.mapPlaceholder}> </View>
+          <View style={styles.mapPlaceholder} /> 
           <View style={styles.locationBar}>
-            <ThemedText style={styles.locationBarText}>Choose a location</ThemedText>
+            <ThemedText style={styles.locationBarText}>Location (Optional)</ThemedText>
           </View>
         </View>
 
         <TextInput
           style={[
-            styles.textArea, 
-            { 
+            styles.textArea,
+            {
               color: Colors[colorScheme ?? "light"].text,
-              borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' 
-            }
+              borderColor: colorScheme === "dark" ? "#444" : "#E0E0E0",
+            },
           ]}
-          placeholder="Comments / Notes"
+          placeholder="Describe the issue"
           placeholderTextColor="#999"
           multiline
           value={notes}
@@ -104,13 +220,15 @@ export default function ReportForm() {
                 style={[
                   styles.chip,
                   selectedCategory === cat && styles.chipSelected,
-                  { borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' }
-                ]}>
+                  { borderColor: colorScheme === "dark" ? "#444" : "#E0E0E0" },
+                ]}
+              >
                 <ThemedText
                   style={[
                     styles.chipText,
                     selectedCategory === cat && styles.chipTextSelected,
-                  ]}>
+                  ]}
+                >
                   {cat}
                 </ThemedText>
               </Pressable>
@@ -118,8 +236,33 @@ export default function ReportForm() {
           </View>
         </View>
 
-        <Pressable style={styles.continueButton}>
-          <ThemedText style={styles.continueText}>Continue</ThemedText>
+        <Pressable 
+          style={styles.acknowledgeContainer} 
+          onPress={() => setIsAcknowledged(!isAcknowledged)}
+        >
+          <Ionicons 
+            name={isAcknowledged ? "checkbox" : "square-outline"} 
+            size={24} 
+            color={isAcknowledged ? '#2D4635' : '#999'} 
+          />
+          <ThemedText style={styles.acknowledgeText}>
+            I acknowledge that this report is accurate to the best of my knowledge and understand it may be reviewed or shared with relevant university departments.
+          </ThemedText>
+        </Pressable>
+
+        <Pressable 
+          style={[
+            styles.continueButton, 
+            (!isAcknowledged || isSubmitting) && styles.buttonDisabled
+          ]} 
+          onPress={handleSubmit}
+          disabled={!isAcknowledged || isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <ThemedText style={styles.continueText}>Submit Report</ThemedText> 
+          )}
         </Pressable>
       </ScrollView>
     </ThemedView>
@@ -127,58 +270,53 @@ export default function ReportForm() {
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-  },
+  screenContainer: { flex: 1 },
   container: {
     padding: 24,
     paddingTop: 60,
+    paddingBottom: 10,
     gap: 16,
   },
   backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 5,
   },
-  uploadText: {
-    color: '#888',
-    fontSize: 16,
-  },
-  browseButton: {
-    backgroundColor: '#2D4635',
-    borderRadius: 25,
-    paddingHorizontal: 28,
-    paddingVertical: 10,
-  },
-  browseButtonText: {
-    color: 'white',
-    fontWeight: '600',
-  },
   sectionTitle: {
-    fontSize: 34,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 25,
+    fontWeight: "bold",
     fontFamily: Fonts.rounded,
+    marginBottom: 10,
+  },
+  previewContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  thumbnail: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 8,
   },
   mapWrapper: {
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: '#EEE',
+    borderColor: "#EEE",
   },
   mapPlaceholder: {
     height: 140,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: "#F9F9F9",
   },
   locationBar: {
-    backgroundColor: '#2D4635',
+    backgroundColor: "#2D4635",
     padding: 14,
   },
   locationBarText: {
-    color: 'white',
+    color: "white",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   textArea: {
     borderWidth: 1,
@@ -186,18 +324,18 @@ const styles = StyleSheet.create({
     padding: 18,
     height: 120,
     fontSize: 16,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   labelSection: {
     gap: 12,
   },
   labelTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   chip: {
@@ -207,25 +345,43 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   chipSelected: {
-    backgroundColor: '#2D4635',
-    borderColor: '#2D4635',
+    backgroundColor: "#2D4635",
+    borderColor: "#2D4635",
   },
   chipText: {
-    fontWeight: '500',
+    fontWeight: "500",
   },
   chipTextSelected: {
-    color: 'white',
+    color: "white",
   },
   continueButton: {
-    backgroundColor: '#2D4635',
+    backgroundColor: "#2D4635",
     paddingVertical: 18,
     borderRadius: 35,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   continueText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 18,
   },
+  acknowledgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginTop: 10,
+    paddingRight: 10,
+  },
+  acknowledgeText: {
+    fontSize: 13,
+    lineHeight: 18,
+    flex: 1,
+    opacity: 0.8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.7,
+  },
+ 
 });

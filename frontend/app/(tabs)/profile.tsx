@@ -36,9 +36,6 @@ export default function ProfileScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        console.log('User ID:', user.id); // This will show in the console
-        console.log('User Email:', user.email);
-        // Create a basic profile from auth data
         setProfileUser({
           username: user.email?.split('@')[0] || 'User',
           memberSince: new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
