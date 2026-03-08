@@ -2,8 +2,8 @@ import { useColorScheme } from "react-native";
 import { useState, useEffect } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Image, StyleSheet } from "react-native";
-import { Colors } from "@/constants/theme";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
+import { Colors, Fonts } from "@/constants/theme";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ReportCard } from '@/components/reportCard';
@@ -17,6 +17,7 @@ export default function ProfileScreen() {
   const [profileUser, setProfileUser] = useState<any>(null);
   const [profileReports, setProfileReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>('');
   
   useEffect(() => {
     fetchProfileData();
@@ -30,6 +31,9 @@ export default function ProfileScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
+        // Store the user's email
+        setUserEmail(user.email || '');
+        
         // TODO: Fetch user profile from Supabase profiles table
         // For now, create a basic profile from auth data
         setProfileUser({
@@ -50,6 +54,12 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Get first letter of email (uppercase)
+  const getInitial = () => {
+    if (!userEmail) return '?';
+    return userEmail.charAt(0).toUpperCase();
   };
   
   // Calculate reportsCount dynamically based on actual reports
@@ -73,10 +83,10 @@ export default function ProfileScreen() {
             {/* Profile header */}
             <ThemedView style={styles.header}>
               <ThemedView style={styles.avatarRing}>
-                <Image
-                  source={{ uri: "https://i.pravatar.cc/300" }}
-                  style={styles.avatar}
-                />
+                {/* Letter Avatar */}
+                <View style={[styles.avatar, { backgroundColor: theme.tint }]}>
+                  <Text style={styles.avatarText}>{getInitial()}</Text>
+                </View>
               </ThemedView>
 
               <ThemedText style={styles.username}>@{profileUser.username}</ThemedText>
@@ -145,8 +155,15 @@ const profileStyles = (theme: {
         avatar: {
             width: 122,
             height: 122,
-            borderRadius: 65,
-            backgroundColor: "#d9d9d9",
+            borderRadius: 61,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        avatarText: {
+            fontSize: 56,
+            fontWeight: "700",
+            color: "#FFFFFF",
+            fontFamily: Fonts.rounded,
         },
         username: {
             fontSize: 28,
