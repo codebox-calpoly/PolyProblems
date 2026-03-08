@@ -1,5 +1,6 @@
 import { useColorScheme } from "react-native";
-import { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useState, useCallback } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Fonts } from "@/constants/theme";
@@ -20,13 +21,15 @@ export default function ProfileScreen() {
   const [profileReports, setProfileReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
-  
-  useEffect(() => {
-    fetchProfileData();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfileData();
+    }, [])
+  );
   
   const handleSettingsPress = () => {
-    router.push('/(tabs)/settings');
+    router.push('/settings');
   };
   
   const fetchProfileData = async () => {
@@ -184,10 +187,11 @@ const profileStyles = (theme: {
             fontSize: 56,
             fontWeight: "700",
             color: "#FFFFFF",
-            fontFamily: Fonts.rounded,
+            fontFamily: Fonts.heading,
         },
         username: {
             fontSize: 28,
+            lineHeight: 32,
             fontFamily: Fonts.heading,
             marginTop: 4,
             color: theme.text,
@@ -203,6 +207,7 @@ const profileStyles = (theme: {
         },
         sectionTitle: {
             fontSize: 28,
+            lineHeight: 32,
             fontFamily: Fonts.heading,
             marginBottom: 16,
             color: theme.text,

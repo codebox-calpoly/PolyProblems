@@ -43,7 +43,8 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="login" />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal', headerShown: true }} />
+        <Stack.Screen name="notifications" />
+        <Stack.Screen name="settings" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

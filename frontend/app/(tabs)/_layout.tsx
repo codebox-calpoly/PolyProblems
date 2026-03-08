@@ -68,7 +68,7 @@ export default function TabLayout() {
       }}>
       
       <Tabs.Screen
-        name="index"
+        name="feed"
         options={{
           title: 'Feed',
           tabBarIcon: ({ focused }) => (
@@ -116,11 +116,7 @@ export default function TabLayout() {
           ),
         }}
       />
-
-      <Tabs.Screen name="explore" options={{ href: null }} />
-      <Tabs.Screen name="camera" options={{ href: null }} />
-      <Tabs.Screen name="settings" options={{ href: null }} />
-      <Tabs.Screen name="BeforeCont" options={{ href: null }} />
+      <Tabs.Screen name="index" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -188,7 +188,7 @@ export default function ReportForm() {
 
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
 
-        <ImageUploadBox onImagesPicked={setImageUris} />
+        <ImageUploadBox images={imageUris} onImagesPicked={setImageUris} />
         
         <LocationTagging value={location} onChange={setLocation} />
 
