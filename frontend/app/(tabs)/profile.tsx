@@ -15,7 +15,6 @@ export default function ProfileScreen() {
   const scheme = useColorScheme(); // "light" | "dark" | null
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = profileStyles(theme);
-  const router = useRouter();
   
   const [profileUser, setProfileUser] = useState<any>(null);
   const [profileReports, setProfileReports] = useState<any[]>([]);
