@@ -13,12 +13,11 @@ import { Feather } from "@expo/vector-icons";
 import { Fonts } from "@/constants/theme";
 
 interface ImageUploadBoxProps {
+  images: string[];
   onImagesPicked: (uris: string[]) => void;
 }
 
-export function ImageUploadBox({ onImagesPicked }: ImageUploadBoxProps) {
-  const [images, setImages] = useState<string[]>([]);
-
+export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) {
   const pickImage = async (useCamera: boolean = false) => {
     const permission = useCamera
       ? await ImagePicker.requestCameraPermissionsAsync()
@@ -46,14 +45,12 @@ export function ImageUploadBox({ onImagesPicked }: ImageUploadBoxProps) {
       const selectedUris = result.assets.map((asset) => asset.uri);
       const newImages = [...images, ...selectedUris];
 
-      setImages(newImages);
       onImagesPicked(newImages);
     }
   };
 
   const removeImage = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
-    setImages(updatedImages);
     onImagesPicked(updatedImages);
   };
 

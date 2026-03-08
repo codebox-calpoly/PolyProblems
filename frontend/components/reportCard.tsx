@@ -25,15 +25,9 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginBottom: 14,
     backgroundColor: theme.background,
   },
-  cardTitle: {
-    fontSize: 22,
-    fontFamily: Fonts.heading,
-    lineHeight: 28,
-    color: theme.text,
-  },
   cardDescription: {
     fontSize: 22,
-    fontWeight: "700",
+    fontFamily: Fonts.heading,
     lineHeight: 28,
     color: theme.text,
   },
@@ -92,8 +86,7 @@ export const ReportCard = ({ report }: ReportCardProps) => {
 
   return (
     <ThemedView key={report.id} style={styles.card}>
-      <ThemedText style={styles.cardTitle}>{report.title}</ThemedText>
-      
+
       {report.description && (
         <ThemedText style={styles.cardDescription}>{report.description}</ThemedText>
       )}
