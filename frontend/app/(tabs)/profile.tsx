@@ -2,7 +2,7 @@ import { useColorScheme } from "react-native";
 import { useState, useEffect } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Image, StyleSheet, TouchableOpacity} from "react-native";
+import { ScrollView, Image, StyleSheet, Pressable, TouchableOpacity} from "react-native";
 import { Colors } from "@/constants/theme";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from "expo-router";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const scheme = useColorScheme(); // "light" | "dark" | null
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = profileStyles(theme);
@@ -24,6 +25,10 @@ export default function ProfileScreen() {
     fetchProfileData();
   }, []);
   
+  const handleSettingsPress = () => {
+    router.push('/(tabs)/settings');
+  };
+  
   const fetchProfileData = async () => {
     try {
       setLoading(true);
@@ -32,20 +37,24 @@ export default function ProfileScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // TODO: Fetch user profile from Supabase profiles table
-        // For now, create a basic profile from auth data
         setProfileUser({
           username: user.email?.split('@')[0] || 'User',
           memberSince: new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }),
           commentsCount: 0,
         });
         
-        // TODO: Fetch reports from Supabase reports table
-        // const { data: reports } = await supabase
-        //   .from('reports')
-        //   .select('*')
-        //   .eq('user_id', user.id);
-        // setProfileReports(reports || []);
+        // Fetch reports from Supabase reports table
+        const { data: reports, error } = await supabase
+          .from('reports')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching reports:', error);
+        } else {
+          setProfileReports(reports || []);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -70,7 +79,9 @@ export default function ProfileScreen() {
             <Ionicons name="log-out-outline" size={24} color={theme.tint} />
           </TouchableOpacity>
           <ThemedView style={{ flex: 1 }} />
-          <Ionicons name="settings-outline" size={24} color={theme.tint} />
+          <Pressable onPress={handleSettingsPress}>
+            <Ionicons name="settings-outline" size={24} color={theme.tint} />
+          </Pressable>
         </ThemedView>
 
         {loading ? (
@@ -102,7 +113,9 @@ export default function ProfileScreen() {
             <ThemedView style={styles.section}>
               <ThemedText style={styles.sectionTitle}>Reports</ThemedText>
 
-              {profileReports.length === 0 ? (
+              {loading ? (
+                <ThemedText style={styles.emptyMessage}>Loading reports...</ThemedText>
+              ) : profileReports.length === 0 ? (
                 <ThemedText style={styles.emptyMessage}>No reports yet</ThemedText>
               ) : (
                 profileReports.map((report) => (
