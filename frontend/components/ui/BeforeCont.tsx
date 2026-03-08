@@ -226,7 +226,7 @@ const beforeContStyles = (theme: {
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: theme.text,
+    borderColor: theme.icon,
     marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',

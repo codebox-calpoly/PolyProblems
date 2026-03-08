@@ -2,13 +2,13 @@ import { useColorScheme } from "react-native";
 import { useState, useEffect } from "react";
 import {Ionicons} from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, Image, StyleSheet, Pressable } from "react-native";
+import { ScrollView, Image, StyleSheet, Pressable, TouchableOpacity} from "react-native";
 import { Colors } from "@/constants/theme";
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ReportCard } from '@/components/reportCard';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -61,6 +61,10 @@ export default function ProfileScreen() {
       setLoading(false);
     }
   };
+  const handleSignOut = async() => {
+    await supabase.auth.signOut();
+    router.replace('/');
+    }
   
   // Calculate reportsCount dynamically based on actual reports
   const reportsCount = profileReports.length;
@@ -70,6 +74,9 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         {/* Settings icon */}
         <ThemedView style={styles.topRow}>
+          <TouchableOpacity onPress={handleSignOut}>
+            <Ionicons name="log-out-outline" size={24} color={theme.tint} />
+          </TouchableOpacity>
           <ThemedView style={{ flex: 1 }} />
           <Pressable onPress={handleSettingsPress}>
             <Ionicons name="settings-outline" size={24} color={theme.tint} />
