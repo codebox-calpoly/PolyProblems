@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,21 +6,18 @@ import {
   StyleSheet,
   useColorScheme,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { Colors, Fonts } from "@/constants/theme";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
-// Define navigation type (adjust based on your navigation setup)
-type SettingsNavigationProp = {
-  navigate: (screen: string) => void;
-};
+import { supabase } from "@/lib/supabase";
 
 const Settings = () => {
-  const navigation = useNavigation<SettingsNavigationProp>();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleEditProfile = () => {
     router.push("/(tabs)/profile");
@@ -28,6 +25,28 @@ const Settings = () => {
 
   const handleNotifications = () => {
     router.push("/notifications");
+  };
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+
+    setIsSigningOut(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        throw error;
+      }
+
+      router.replace("/login");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to sign out right now.";
+      Alert.alert("Sign out failed", message);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -42,7 +61,7 @@ const Settings = () => {
           <Text style={[styles.subTitle, { color: colors.text }]}>Profile</Text>
         </TouchableOpacity>
         <Image
-          source={require("../assets/images/settings.png")}
+          source={require("@/assets/images/settings.png")}
           style={styles.decorativeImage}
           resizeMode="contain"
         />
@@ -73,6 +92,25 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Notifications</Text>
           <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.signOutButton,
+            isSigningOut && styles.signOutButtonDisabled,
+          ]}
+          onPress={handleSignOut}
+          activeOpacity={0.7}
+          disabled={isSigningOut}
+        >
+          {isSigningOut ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <>
+              <Text style={styles.signOutText}>Sign Out</Text>
+              <Ionicons name="log-out-outline" size={18} color="#FFFFFF" />
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -126,6 +164,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     fontFamily: Fonts.body,
+  },
+  signOutButton: {
+    marginTop: 8,
+    minHeight: 56,
+    borderRadius: 12,
+    backgroundColor: "#C24E3D",
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  signOutButtonDisabled: {
+    opacity: 0.7,
+  },
+  signOutText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontFamily: Fonts.heading,
   },
   arrow: {
     fontSize: 20,
