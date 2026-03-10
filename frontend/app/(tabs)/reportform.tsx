@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, TextInput, Pressable, View, ScrollView, useColorScheme, ActivityIndicator, Alert, Image, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-import { sessionStorage } from '@/utils/sessionStorage';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  TextInput,
+  Pressable,
+  View,
+  ScrollView,
+  useColorScheme,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { sessionStorage } from "@/utils/sessionStorage";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -22,18 +32,18 @@ export default function ReportForm() {
   const router = useRouter();
 
   const [showDisclaimer, setShowDisclaimer] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('Facilities');
-  const [notes, setNotes] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("Facilities");
+  const [notes, setNotes] = useState("");
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [location, setLocation] = useState<LocationCoords | null>(null);
-  
+
   const [isAcknowledged, setIsAcknowledged] = useState(false);
 
   const resetForm = () => {
     setNotes("");
     setImageUris([]);
-    setSelectedCategory('Facilities');
+    setSelectedCategory("Facilities");
     setLocation(null);
     setIsAcknowledged(false);
     router.back();
@@ -71,10 +81,24 @@ export default function ReportForm() {
 
         for (const uri of imageUris) {
           const response = await fetch(uri);
-          const blob = await response.blob();
-          const contentType =
-            blob.type || response.headers.get("content-type") || "image/jpeg";
-          const fileExt = mimeToExt[contentType] ?? "jpg";
+          let uploadData;
+          let contentType;
+          let fileExt: string | undefined;
+          if (Platform.OS === "web") {
+            uploadData = await response.blob();
+            contentType =
+              uploadData.type ||
+              response.headers.get("content-type") ||
+              "image/jpeg";
+            fileExt = mimeToExt[contentType] ?? "jpg";
+          } else {
+            uploadData = await response.arrayBuffer();
+            fileExt = uri.split(".").pop()?.toLowerCase();
+            contentType =
+              Object.keys(mimeToExt).find(
+                (key) => mimeToExt[key] === fileExt,
+              ) || "image/jpeg";
+          }
 
           const timestamp = Date.now();
           const uniqueId = Math.random().toString(36).substring(7);
@@ -84,7 +108,7 @@ export default function ReportForm() {
           const { data: storageData, error: storageError } =
             await supabase.storage
               .from("report-photos")
-              .upload(filePath, blob, {
+              .upload(filePath, uploadData, {
                 contentType,
                 upsert: false,
               });
@@ -94,19 +118,19 @@ export default function ReportForm() {
         }
       }
 
-      const { error: dbError } = await supabase
-        .from('reports')
-        .insert([
-          {
-            user_id: user.id,
-            username: username,
-            category: selectedCategory,
-            description: notes,
-            image_paths: uploadedPaths, 
-            location: location ? { latitude: location.latitude, longitude: location.longitude } : null, 
-            status: 'pending',
-          },
-        ]);
+      const { error: dbError } = await supabase.from("reports").insert([
+        {
+          user_id: user.id,
+          username: username,
+          category: selectedCategory,
+          description: notes,
+          image_paths: uploadedPaths,
+          location: location
+            ? { latitude: location.latitude, longitude: location.longitude }
+            : null,
+          status: "pending",
+        },
+      ]);
 
       if (dbError) throw dbError;
 
@@ -189,7 +213,7 @@ export default function ReportForm() {
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
 
         <ImageUploadBox images={imageUris} onImagesPicked={setImageUris} />
-        
+
         <LocationTagging value={location} onChange={setLocation} />
 
         <TextInput
@@ -233,32 +257,34 @@ export default function ReportForm() {
           </View>
         </View>
 
-        <Pressable 
-          style={styles.acknowledgeContainer} 
+        <Pressable
+          style={styles.acknowledgeContainer}
           onPress={() => setIsAcknowledged(!isAcknowledged)}
         >
-          <Ionicons 
-            name={isAcknowledged ? "checkbox" : "square-outline"} 
-            size={24} 
-            color={isAcknowledged ? '#2D4635' : '#999'} 
+          <Ionicons
+            name={isAcknowledged ? "checkbox" : "square-outline"}
+            size={24}
+            color={isAcknowledged ? "#2D4635" : "#999"}
           />
           <ThemedText style={styles.acknowledgeText}>
-            I acknowledge that this report is accurate to the best of my knowledge and understand it may be reviewed or shared with relevant university departments.
+            I acknowledge that this report is accurate to the best of my
+            knowledge and understand it may be reviewed or shared with relevant
+            university departments.
           </ThemedText>
         </Pressable>
 
-        <Pressable 
+        <Pressable
           style={[
-            styles.continueButton, 
-            (!isAcknowledged || isSubmitting) && styles.buttonDisabled
-          ]} 
+            styles.continueButton,
+            (!isAcknowledged || isSubmitting) && styles.buttonDisabled,
+          ]}
           onPress={handleSubmit}
           disabled={!isAcknowledged || isSubmitting}
         >
           {isSubmitting ? (
             <ActivityIndicator color="white" />
           ) : (
-            <ThemedText style={styles.continueText}>Submit Report</ThemedText> 
+            <ThemedText style={styles.continueText}>Submit Report</ThemedText>
           )}
         </Pressable>
       </ScrollView>
@@ -345,8 +371,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.heading,
   },
   acknowledgeContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: 12,
     marginTop: 10,
     paddingRight: 10,
@@ -359,8 +385,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
   },
   buttonDisabled: {
-    backgroundColor: '#CCCCCC',
+    backgroundColor: "#CCCCCC",
     opacity: 0.7,
   },
- 
 });
