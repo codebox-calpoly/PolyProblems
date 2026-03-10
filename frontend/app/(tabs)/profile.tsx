@@ -131,7 +131,11 @@ export default function ProfileScreen() {
                 <ThemedText style={styles.emptyMessage}>No reports yet</ThemedText>
               ) : (
                 profileReports.map((report) => (
-                  <ReportCard key={report.id} report={report} />
+                  <ReportCard 
+                    key={report.id} 
+                    report={report} 
+                    onPress={() => router.push(`/${report.id}`)} // Added push navigation
+                  />
                 ))
               )}
 
