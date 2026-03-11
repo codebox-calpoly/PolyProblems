@@ -27,6 +27,24 @@ const Settings = () => {
     router.push("/notifications");
   };
 
+  const confirmSignOut = () => {
+    if (isSigningOut) return;
+
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: () => {
+          void handleSignOut();
+        },
+      },
+    ]);
+  };
+
   const handleSignOut = async () => {
     if (isSigningOut) return;
 
@@ -99,7 +117,7 @@ const Settings = () => {
             styles.signOutButton,
             isSigningOut && styles.signOutButtonDisabled,
           ]}
-          onPress={handleSignOut}
+          onPress={confirmSignOut}
           activeOpacity={0.7}
           disabled={isSigningOut}
         >
