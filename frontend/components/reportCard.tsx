@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme, TouchableOpacity } from 'react-native'; 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Fonts } from '@/constants/theme';
@@ -14,6 +14,7 @@ export type Report = {
 
 interface ReportCardProps {
   report: Report;
+  onPress?: () => void;
 }
 
 const createStyles = (theme: any) => StyleSheet.create({
@@ -69,7 +70,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
 });
 
-export const ReportCard = ({ report }: ReportCardProps) => {
+export const ReportCard = ({ report, onPress }: ReportCardProps) => {
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = createStyles(theme);
@@ -103,9 +104,9 @@ export const ReportCard = ({ report }: ReportCardProps) => {
       </ThemedView>
 
       <ThemedView style={styles.cardFooter}>
-        <ThemedView style={styles.viewButton}>
+        <TouchableOpacity style={styles.viewButton} onPress={onPress} activeOpacity={0.7}>
           <ThemedText style={styles.viewButtonText}>View</ThemedText>
-        </ThemedView>
+        </TouchableOpacity>
       </ThemedView>
     </ThemedView>
   );
