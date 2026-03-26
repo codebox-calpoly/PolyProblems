@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  Image,
-  Alert,
-  Platform,
-} from "react-native";
+import React from "react";
+import {StyleSheet,Text,View,Pressable,Image,Alert,Platform,} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 import { Fonts } from "@/constants/theme";
@@ -38,13 +30,12 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
       : await ImagePicker.launchImageLibraryAsync({
           quality: 0.8,
           allowsMultipleSelection: true,
-          selectionLimit: 5,
+          selectionLimit: 6 - images.length,
         });
 
     if (!result.canceled) {
       const selectedUris = result.assets.map((asset) => asset.uri);
-      const newImages = [...images, ...selectedUris];
-
+      const newImages = [...images, ...selectedUris].slice(0, 6);
       onImagesPicked(newImages);
     }
   };
@@ -56,7 +47,6 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
 
   const handlePress = () => {
     if (Platform.OS === "web") {
-      // Direct library pick for web to avoid Alert crash
       pickImage(false);
     } else {
       Alert.alert("Upload Images", "Choose a source", [
@@ -69,7 +59,6 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
 
   return (
     <View style={styles.container}>
-      {/* Organized Grid Display */}
       {images.length > 0 && (
         <View style={styles.grid}>
           {images.map((uri, index) => (
@@ -77,7 +66,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
               <Image
                 source={{ uri }}
                 style={styles.thumbnail}
-                resizeMode="contain" // Ensures full image is visible
+                resizeMode="cover" // Fix: Fills the square regardless of original dimensions
               />
               <Pressable
                 style={styles.removeBadge}
@@ -88,7 +77,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
             </View>
           ))}
 
-          {/* Dashboard "Plus" button synced to image dimensions */}
+          {/* Add More Button */}
           {images.length < 6 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
               <Feather name="plus" size={32} color="#999" />
@@ -97,7 +86,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
         </View>
       )}
 
-      {/* Initial state: Large dashed box */}
+      {/* Initial Empty State */}
       {images.length === 0 && (
         <Pressable style={styles.dashedBox} onPress={handlePress}>
           <View style={styles.inner}>
@@ -129,30 +118,41 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   inner: { alignItems: "center" },
-  text: { color: "#666", marginVertical: 8, fontSize: 16, fontFamily: Fonts.body },
+  text: { 
+    color: "#666", 
+    marginVertical: 8, 
+    fontSize: 16, 
+    fontFamily: Fonts.body 
+  },
   button: {
     backgroundColor: "#2D4335",
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 25,
   },
-  buttonText: { color: "#fff", fontFamily: Fonts.heading, fontSize: 16 },
+  buttonText: { 
+    color: "#fff", 
+    fontFamily: Fonts.heading, 
+    fontSize: 16 
+  },
 
   // Grid Styles
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 10, 
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E0E0E0",
+    alignItems: "flex-start", // Prevents rows from stretching vertically on Web
   },
   imageWrapper: {
-    width: "30%",
-    aspectRatio: 1, // Ensures perfect square alignment
-    borderRadius: 16,
+    // 31% width allows 3 columns with gap spacing comfortably
+    width: "31.3%", 
+    aspectRatio: 1, 
+    borderRadius: 12,
     overflow: "hidden",
     position: "relative",
     backgroundColor: "#f9f9f9",
@@ -164,10 +164,9 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   addMoreButton: {
-    width: "30%",
-    height: "100%",
+    width: "31.3%",
     aspectRatio: 1,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: "#E0E0E0",
     borderStyle: "dashed",
