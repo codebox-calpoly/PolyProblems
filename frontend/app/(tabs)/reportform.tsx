@@ -33,6 +33,7 @@ export default function ReportForm() {
 
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("Facilities");
+  const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +42,7 @@ export default function ReportForm() {
   const [isAcknowledged, setIsAcknowledged] = useState(false);
 
   const resetForm = () => {
+    setTitle("");
     setNotes("");
     setImageUris([]);
     setSelectedCategory("Facilities");
@@ -52,6 +54,10 @@ export default function ReportForm() {
   const handleSubmit = async () => {
     if (!notes.trim()) {
       Alert.alert("Missing Info", "Please provide a description of the issue.");
+      return;
+    }
+    if (!title.trim()) {
+      Alert.alert("Missing Info", "Please provide a title for the report.");
       return;
     }
 
@@ -122,6 +128,7 @@ export default function ReportForm() {
         {
           user_id: user.id,
           username: username,
+          title: title.trim(),
           category: selectedCategory,
           description: notes,
           image_paths: uploadedPaths,
@@ -211,6 +218,20 @@ export default function ReportForm() {
         </Pressable>
 
         <ThemedText style={styles.sectionTitle}>Issue Details</ThemedText>
+
+        <TextInput
+          style={[
+            styles.textInput,
+            {
+              color: Colors[colorScheme ?? "light"].text,
+              borderColor: colorScheme === "dark" ? "#444" : "#E0E0E0",
+            },
+          ]}
+          placeholder="Report Title"
+          placeholderTextColor="#999"
+          value={title}
+          onChangeText={setTitle}
+        />
 
         <ImageUploadBox images={imageUris} onImagesPicked={setImageUris} />
 
@@ -387,5 +408,12 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: "#CCCCCC",
     opacity: 0.7,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 16,
+    fontSize: 16,
+    fontFamily: Fonts.body,
   },
 });
