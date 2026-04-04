@@ -53,12 +53,22 @@ export default function ReportForm() {
 
   const handleSubmit = async () => {
     if (!notes.trim()) {
-      Alert.alert("Missing Info", "Please provide a description of the issue.");
-      return;
+      if (Platform.OS === "web") {
+        window.alert("Missing Info. Please provide a description of the issue.");
+        return;
+      } else {
+        Alert.alert("Missing Info", "Please provide a description of the issue.");
+        return;
+      }
     }
     if (!title.trim()) {
-      Alert.alert("Missing Info", "Please provide a title for the report.");
-      return;
+      if (Platform.OS === "web") {
+        window.alert("Missing Info. Please provide a title for the report.");
+        return;
+      } else {
+        Alert.alert("Missing Info", "Please provide a title for the report.");
+        return;
+      }
     }
 
     setIsSubmitting(true);
