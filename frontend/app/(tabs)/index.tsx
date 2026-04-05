@@ -41,9 +41,9 @@ export default function HomeScreen() {
   }
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
-      <PolyLogo />
-
-      <View style={{ flex: 1 }} />
+      <View style={styles.logoContainer}>
+        <PolyLogo />
+      </View>
 
       <ThemedView style={styles.descriptionContainer}>
         <ThemedText
@@ -90,6 +90,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
+  },
+  logoContainer: {
+    flex: 2,
+    justifyContent: "center",
     alignItems: "center",
   },
   header: {
