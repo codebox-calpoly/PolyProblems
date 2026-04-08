@@ -7,9 +7,8 @@ import {
   useColorScheme,
 } from "react-native";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
-
+import LocationPreview from "./Location";
 import { ThemedText } from "@/components/themed-text";
 import { Fonts } from "@/constants/theme";
 
@@ -120,24 +119,7 @@ export function LocationTagging({
       ]}
     >
       {/* ── Map preview (only when a location is attached) ───────────── */}
-      {isAttached && value && (
-        <MapView
-          style={styles.map}
-          region={{
-            latitude: value.latitude,
-            longitude: value.longitude,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }}
-          scrollEnabled={false}
-          zoomEnabled={false}
-          pitchEnabled={false}
-          rotateEnabled={false}
-          pointerEvents="none"
-        >
-          <Marker coordinate={value} />
-        </MapView>
-      )}
+      {isAttached && value && <LocationPreview value={value} />}
 
       {/* ── Status bar ────────────────────────────────────────────────── */}
       <View style={styles.bar}>
@@ -207,10 +189,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
-  },
-  map: {
-    width: "100%",
-    height: 140,
   },
   bar: {
     backgroundColor: "#2D4635",
