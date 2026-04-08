@@ -26,7 +26,7 @@ export default function AdminLayout() {
     };
 
     checkRole();
-  }, []);
+  }, [router]);
 
   if (loading) return null; // Or a loading spinner
 

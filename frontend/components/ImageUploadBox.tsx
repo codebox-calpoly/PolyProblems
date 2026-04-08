@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -17,7 +17,10 @@ interface ImageUploadBoxProps {
   onImagesPicked: (uris: string[]) => void;
 }
 
-export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) {
+export function ImageUploadBox({
+  images,
+  onImagesPicked,
+}: ImageUploadBoxProps) {
   const pickImage = async (useCamera: boolean = false) => {
     const permission = useCamera
       ? await ImagePicker.requestCameraPermissionsAsync()
@@ -25,9 +28,11 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
 
     if (!permission.granted) {
       const msg = "Permission Denied: We need access to your media.";
-      Platform.OS === "web"
-        ? alert(msg)
-        : Alert.alert("Permission Denied", msg);
+      if (Platform.OS === "web") {
+        alert(msg);
+      } else {
+        Alert.alert("Permission Denied", msg);
+      }
       return;
     }
 
@@ -129,7 +134,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   inner: { alignItems: "center" },
-  text: { color: "#666", marginVertical: 8, fontSize: 16, fontFamily: Fonts.body },
+  text: {
+    color: "#666",
+    marginVertical: 8,
+    fontSize: 16,
+    fontFamily: Fonts.body,
+  },
   button: {
     backgroundColor: "#2D4335",
     paddingHorizontal: 30,
