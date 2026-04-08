@@ -11,6 +11,8 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -141,71 +143,46 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
-      >
-        {/* Close Button */}
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => router.replace("/(tabs)")}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardAvoidingView}
         >
-          <AntDesign name="close" size={24} color="black" />
-        </TouchableOpacity>
+          {/* Close Button */}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => router.replace("/(tabs)")}
+          >
+            <AntDesign name="close" size={24} color="black" />
+          </TouchableOpacity>
 
-        <View style={styles.content}>
-          {/* Header, Error, and Form */}
-          <View style={styles.formSection}>
-            {/* Header */}
-            <Text style={[styles.title, { color: textColor }]}>
-              {screen === "email"
-                ? "Enter your Cal Poly email"
-                : "Enter verification code"}
-            </Text>
-
-            {screen === "otp" && (
+          <View style={styles.content}>
+            {/* Header, Error, and Form */}
+            <View style={styles.formSection}>
+              {/* Header */}
               <Text style={[styles.title, { color: textColor }]}>
-                We sent a 6-digit code to {email}
+                {screen === "email"
+                  ? "Enter your Cal Poly email"
+                  : "Enter verification code"}
               </Text>
-            )}
 
-            {/* Error Message */}
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
-            {/* Form */}
-            {screen === "email" ? (
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: textColor }]}>
-                  Your Cal Poly email
+              {screen === "otp" && (
+                <Text style={[styles.title, { color: textColor }]}>
+                  We sent a 6-digit code to {email}
                 </Text>
-                <TextInput
-                  style={[
-                    styles.input,
-                    {
-                      backgroundColor: inputBackground,
-                      color: textColor,
-                      borderColor: borderColor,
-                    },
-                  ]}
-                  placeholder="johndoe@calpoly.edu"
-                  placeholderTextColor={isDark ? "#888888" : "#999999"}
-                  value={email}
-                  onChangeText={setEmail}
-                  editable={!loading}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                />
-              </View>
-            ) : (
-              <>
-                {/* OTP Input */}
+              )}
+
+              {/* Error Message */}
+              {error ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{error}</Text>
+                </View>
+              ) : null}
+              {/* Form */}
+              {screen === "email" ? (
                 <View style={styles.inputGroup}>
                   <Text style={[styles.label, { color: textColor }]}>
-                    Verification code
+                    Your Cal Poly email
                   </Text>
                   <TextInput
                     style={[
@@ -214,98 +191,129 @@ export default function LoginScreen() {
                         backgroundColor: inputBackground,
                         color: textColor,
                         borderColor: borderColor,
-                        textAlign: "center",
-                        fontSize: 24,
-                        letterSpacing: 8,
                       },
                     ]}
-                    placeholder="000000"
+                    placeholder="johndoe@calpoly.edu"
                     placeholderTextColor={isDark ? "#888888" : "#999999"}
-                    value={otp}
-                    onChangeText={setOtp}
+                    value={email}
+                    onChangeText={setEmail}
                     editable={!loading}
-                    keyboardType="number-pad"
-                    maxLength={6}
-                    autoComplete="one-time-code"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
                   />
                 </View>
-                {/* Resend Code */}
-                <TouchableOpacity onPress={handleResendCode} disabled={loading}>
-                  <Text style={[styles.resendButton, { color: textColor }]}>
-                    Didn&apos;t Receive a code? Resend
-                  </Text>
-                </TouchableOpacity>
+              ) : (
+                <>
+                  {/* OTP Input */}
+                  <View style={styles.inputGroup}>
+                    <Text style={[styles.label, { color: textColor }]}>
+                      Verification code
+                    </Text>
+                    <TextInput
+                      style={[
+                        styles.input,
+                        {
+                          backgroundColor: inputBackground,
+                          color: textColor,
+                          borderColor: borderColor,
+                          textAlign: "center",
+                          fontSize: 24,
+                          letterSpacing: 8,
+                        },
+                      ]}
+                      placeholder="000000"
+                      placeholderTextColor={isDark ? "#888888" : "#999999"}
+                      value={otp}
+                      onChangeText={setOtp}
+                      editable={!loading}
+                      keyboardType="number-pad"
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                    />
+                  </View>
 
-                {/* Back Button */}
-                <TouchableOpacity
-                  onPress={handleBackToEmail}
-                  disabled={loading}
-                >
-                  <Text style={[styles.backButton, { color: textColor }]}>
-                    ← Back
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
+                  {/* Resend Code */}
+                  <TouchableOpacity
+                    onPress={handleResendCode}
+                    disabled={loading}
+                  >
+                    <Text style={[styles.resendButton, { color: textColor }]}>
+                      Didn&apos;t Receive a code? Resend
+                    </Text>
+                  </TouchableOpacity>
 
-          {/* Button and Footer */}
-          <View style={styles.bottomSection}>
-            {/* Footer */}
-            <View style={styles.footer}>
-              <Text style={[styles.footerText, { color: textColor }]}>
-                By registering, you accept our{" "}
-              </Text>
-              <TouchableOpacity
-                onPress={() => Linking.openURL("https://example.com/terms")}
-              >
-                <Text
-                  style={[
-                    styles.link,
-                    { color: isDark ? "#ffffff" : "#000000" },
-                  ]}
-                >
-                  Terms of Use
-                </Text>
-              </TouchableOpacity>
-              <Text style={[styles.footerText, { color: textColor }]}>
-                {" "}
-                and{" "}
-              </Text>
-              <TouchableOpacity
-                onPress={() => Linking.openURL("https://example.com/privacy")}
-              >
-                <Text
-                  style={[
-                    styles.link,
-                    { color: isDark ? "#ffffff" : "#000000" },
-                  ]}
-                >
-                  Privacy Policy
-                </Text>
-              </TouchableOpacity>
+                  {/* Back Button */}
+                  <TouchableOpacity
+                    onPress={handleBackToEmail}
+                    disabled={loading}
+                  >
+                    <Text style={[styles.backButton, { color: textColor }]}>
+                      ← Back
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
-            {/* Continue/Verify Button */}
-            <TouchableOpacity
-              style={[
-                styles.continueButton,
-                loading && styles.continueButtonDisabled,
-              ]}
-              onPress={screen === "email" ? handleContinue : handleVerifyOTP}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <Text style={styles.continueButtonText}>
-                  {screen === "email" ? "Send Code" : "Verify"}
+            {/* Button and Footer */}
+            <View style={styles.bottomSection}>
+              {/* Footer */}
+              <View style={styles.footer}>
+                <Text style={[styles.footerText, { color: textColor }]}>
+                  By registering, you accept our{" "}
                 </Text>
-              )}
-            </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL("https://example.com/terms")}
+                >
+                  <Text
+                    style={[
+                      styles.link,
+                      { color: isDark ? "#ffffff" : "#000000" },
+                    ]}
+                  >
+                    Terms of Use
+                  </Text>
+                </TouchableOpacity>
+                <Text style={[styles.footerText, { color: textColor }]}>
+                  {" "}
+                  and{" "}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL("https://example.com/privacy")}
+                >
+                  <Text
+                    style={[
+                      styles.link,
+                      { color: isDark ? "#ffffff" : "#000000" },
+                    ]}
+                  >
+                    Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Continue/Verify Button */}
+              <TouchableOpacity
+                style={[
+                  styles.continueButton,
+                  loading && styles.continueButtonDisabled,
+                ]}
+                onPress={screen === "email" ? handleContinue : handleVerifyOTP}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.continueButtonText}>
+                    {screen === "email" ? "Send Code" : "Verify"}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
