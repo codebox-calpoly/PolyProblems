@@ -1,17 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
   Pressable,
   ActivityIndicator,
   useColorScheme,
-} from 'react-native';
-import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
 
-import { ThemedText } from '@/components/themed-text';
-import { Colors, Fonts } from '@/constants/theme';
+import { ThemedText } from "@/components/themed-text";
+import { Fonts } from "@/constants/theme";
 
 /** Latitude / longitude pair returned to parent components. */
 export interface LocationCoords {
@@ -26,7 +26,13 @@ export interface LocationTaggingProps {
   onChange: (location: LocationCoords | null) => void;
 }
 
-type Status = 'idle' | 'loading' | 'attached' | 'denied' | 'unavailable' | 'error';
+type Status =
+  | "idle"
+  | "loading"
+  | "attached"
+  | "denied"
+  | "unavailable"
+  | "error";
 
 /**
  * Reusable location-tagging component.
@@ -36,22 +42,25 @@ type Status = 'idle' | 'loading' | 'attached' | 'denied' | 'unavailable' | 'erro
  * - Disabling clears the stored location immediately.
  * - Communicates location data (or `null`) to the parent via `onChange`.
  */
-export function LocationTagging({ value = null, onChange }: LocationTaggingProps) {
+export function LocationTagging({
+  value = null,
+  onChange,
+}: LocationTaggingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
 
-  const [status, setStatus] = useState<Status>(value ? 'attached' : 'idle');
+  const [status, setStatus] = useState<Status>(value ? "attached" : "idle");
 
   /** Enable location tagging: request permission → fetch coords → notify parent. */
   const enableTagging = useCallback(async () => {
-    setStatus('loading');
+    setStatus("loading");
 
     try {
       // 1. Check / request foreground permission
-      const { status: permStatus } = await Location.requestForegroundPermissionsAsync();
+      const { status: permStatus } =
+        await Location.requestForegroundPermissionsAsync();
 
-      if (permStatus !== 'granted') {
-        setStatus('denied');
+      if (permStatus !== "granted") {
+        setStatus("denied");
         onChange(null);
         return;
       }
@@ -59,7 +68,7 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
       // 2. Check whether location services are enabled on the device
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
-        setStatus('unavailable');
+        setStatus("unavailable");
         onChange(null);
         return;
       }
@@ -74,30 +83,31 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
         longitude: position.coords.longitude,
       };
 
-      setStatus('attached');
+      setStatus("attached");
       onChange(coords);
     } catch {
-      setStatus('error');
+      setStatus("error");
       onChange(null);
     }
   }, [onChange]);
 
   /** Disable location tagging and immediately clear data. */
   const disableTagging = useCallback(() => {
-    setStatus('idle');
+    setStatus("idle");
     onChange(null);
   }, [onChange]);
 
   // ─── Derived UI helpers ──────────────────────────────────────────────
 
-  const isAttached = status === 'attached' && value != null;
-  const isLoading = status === 'loading';
-  const hasWarning = status === 'denied' || status === 'unavailable' || status === 'error';
+  const isAttached = status === "attached" && value != null;
+  const isLoading = status === "loading";
+  const hasWarning =
+    status === "denied" || status === "unavailable" || status === "error";
 
   const warningMessage: Record<string, string> = {
-    denied: 'Location permission was denied. You can enable it in Settings.',
-    unavailable: 'Location services are turned off on this device.',
-    error: 'Unable to retrieve your location. Please try again.',
+    denied: "Location permission was denied. You can enable it in Settings.",
+    unavailable: "Location services are turned off on this device.",
+    error: "Unable to retrieve your location. Please try again.",
   };
 
   // ─── Render ──────────────────────────────────────────────────────────
@@ -106,7 +116,7 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
     <View
       style={[
         styles.wrapper,
-        { borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' },
+        { borderColor: colorScheme === "dark" ? "#444" : "#E0E0E0" },
       ]}
     >
       {/* ── Map preview (only when a location is attached) ───────────── */}
@@ -133,16 +143,16 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
       <View style={styles.bar}>
         <View style={styles.barLeft}>
           <Ionicons
-            name={isAttached ? 'location' : 'location-outline'}
+            name={isAttached ? "location" : "location-outline"}
             size={20}
             color="#fff"
           />
           <ThemedText style={styles.barText}>
             {isLoading
-              ? 'Getting location…'
+              ? "Getting location…"
               : isAttached
-                ? 'Location attached'
-                : 'Add location'}
+                ? "Location attached"
+                : "Add location"}
           </ThemedText>
         </View>
 
@@ -171,7 +181,7 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
             accessibilityRole="button"
           >
             <ThemedText style={styles.attachButtonText}>
-              {hasWarning ? 'Retry' : 'Enable'}
+              {hasWarning ? "Retry" : "Enable"}
             </ThemedText>
           </Pressable>
         )}
@@ -195,52 +205,52 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
 const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
   },
   map: {
-    width: '100%',
+    width: "100%",
     height: 140,
   },
   bar: {
-    backgroundColor: '#2D4635',
+    backgroundColor: "#2D4635",
     paddingVertical: 14,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   barLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   barText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 15,
     fontFamily: Fonts.body,
   },
   attachButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
   },
   attachButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
     fontFamily: Fonts.heading,
   },
   warning: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: "#FFF7ED",
   },
   warningText: {
-    color: '#B85C00',
+    color: "#B85C00",
     fontSize: 13,
     fontFamily: Fonts.body,
     flex: 1,

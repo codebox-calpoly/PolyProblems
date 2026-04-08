@@ -1,17 +1,16 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
   Pressable,
   ActivityIndicator,
   useColorScheme,
-} from 'react-native';
-import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
-import type L_Type from 'leaflet';
+} from "react-native";
+import * as Location from "expo-location";
+import { Ionicons } from "@expo/vector-icons";
+import type L_Type from "leaflet";
 
-import { ThemedText } from '@/components/themed-text';
-import { Colors } from '@/constants/theme';
+import { ThemedText } from "@/components/themed-text";
 
 export interface LocationCoords {
   latitude: number;
@@ -23,19 +22,25 @@ export interface LocationTaggingProps {
   onChange: (location: LocationCoords | null) => void;
 }
 
-type Status = 'idle' | 'loading' | 'attached' | 'denied' | 'unavailable' | 'error';
+type Status =
+  | "idle"
+  | "loading"
+  | "attached"
+  | "denied"
+  | "unavailable"
+  | "error";
 
 // Leaflet requires its CSS for correct tile/marker rendering.
-const LEAFLET_CSS_ID = 'leaflet-css';
+const LEAFLET_CSS_ID = "leaflet-css";
 function injectLeafletCSS() {
-  if (typeof document === 'undefined') return;
+  if (typeof document === "undefined") return;
   if (document.getElementById(LEAFLET_CSS_ID)) return;
-  const link = document.createElement('link');
+  const link = document.createElement("link");
   link.id = LEAFLET_CSS_ID;
-  link.rel = 'stylesheet';
-  link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-  link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-  link.crossOrigin = '';
+  link.rel = "stylesheet";
+  link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+  link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+  link.crossOrigin = "";
   document.head.appendChild(link);
 }
 
@@ -55,16 +60,18 @@ function LeafletMap({ latitude, longitude }: LocationCoords) {
     (async () => {
       // Dynamically import leaflet only in the browser
       if (!LRef.current) {
-        const leaflet = await import('leaflet');
+        const leaflet = await import("leaflet");
         LRef.current = leaflet.default ?? leaflet;
       }
       const L = LRef.current;
       if (cancelled || !containerRef.current) return;
 
       const icon = L.icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        iconRetinaUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
@@ -84,7 +91,7 @@ function LeafletMap({ latitude, longitude }: LocationCoords) {
           keyboard: false,
         });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19,
         }).addTo(map);
 
@@ -96,7 +103,9 @@ function LeafletMap({ latitude, longitude }: LocationCoords) {
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [latitude, longitude]);
 
   // Full cleanup on unmount
@@ -107,34 +116,33 @@ function LeafletMap({ latitude, longitude }: LocationCoords) {
     };
   }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      style={{ width: '100%', height: 180 }}
-    />
-  );
+  return <div ref={containerRef} style={{ width: "100%", height: 180 }} />;
 }
 
-export function LocationTagging({ value = null, onChange }: LocationTaggingProps) {
+export function LocationTagging({
+  value = null,
+  onChange,
+}: LocationTaggingProps) {
   const colorScheme = useColorScheme();
 
-  const [status, setStatus] = useState<Status>(value ? 'attached' : 'idle');
+  const [status, setStatus] = useState<Status>(value ? "attached" : "idle");
 
   const enableTagging = useCallback(async () => {
-    setStatus('loading');
+    setStatus("loading");
 
     try {
-      const { status: permStatus } = await Location.requestForegroundPermissionsAsync();
+      const { status: permStatus } =
+        await Location.requestForegroundPermissionsAsync();
 
-      if (permStatus !== 'granted') {
-        setStatus('denied');
+      if (permStatus !== "granted") {
+        setStatus("denied");
         onChange(null);
         return;
       }
 
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (!servicesEnabled) {
-        setStatus('unavailable');
+        setStatus("unavailable");
         onChange(null);
         return;
       }
@@ -148,34 +156,36 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
         longitude: position.coords.longitude,
       };
 
-      setStatus('attached');
+      setStatus("attached");
       onChange(coords);
     } catch {
-      setStatus('error');
+      setStatus("error");
       onChange(null);
     }
   }, [onChange]);
 
   const disableTagging = useCallback(() => {
-    setStatus('idle');
+    setStatus("idle");
     onChange(null);
   }, [onChange]);
 
-  const isAttached = status === 'attached' && value != null;
-  const isLoading = status === 'loading';
-  const hasWarning = status === 'denied' || status === 'unavailable' || status === 'error';
+  const isAttached = status === "attached" && value != null;
+  const isLoading = status === "loading";
+  const hasWarning =
+    status === "denied" || status === "unavailable" || status === "error";
 
   const warningMessage: Record<string, string> = {
-    denied: 'Location permission was denied. You can enable it in your browser settings.',
-    unavailable: 'Location services are turned off on this device.',
-    error: 'Unable to retrieve your location. Please try again.',
+    denied:
+      "Location permission was denied. You can enable it in your browser settings.",
+    unavailable: "Location services are turned off on this device.",
+    error: "Unable to retrieve your location. Please try again.",
   };
 
   return (
     <View
       style={[
         styles.wrapper,
-        { borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0' },
+        { borderColor: colorScheme === "dark" ? "#444" : "#E0E0E0" },
       ]}
     >
       {isAttached && value && (
@@ -185,16 +195,16 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
       <View style={styles.bar}>
         <View style={styles.barLeft}>
           <Ionicons
-            name={isAttached ? 'location' : 'location-outline'}
+            name={isAttached ? "location" : "location-outline"}
             size={20}
             color="#fff"
           />
           <ThemedText style={styles.barText}>
             {isLoading
-              ? 'Getting location…'
+              ? "Getting location…"
               : isAttached
-                ? 'Location attached'
-                : 'Add location'}
+                ? "Location attached"
+                : "Add location"}
           </ThemedText>
         </View>
 
@@ -220,7 +230,7 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
             accessibilityRole="button"
           >
             <ThemedText style={styles.attachButtonText}>
-              {hasWarning ? 'Retry' : 'Enable'}
+              {hasWarning ? "Retry" : "Enable"}
             </ThemedText>
           </Pressable>
         )}
@@ -241,48 +251,48 @@ export function LocationTagging({ value = null, onChange }: LocationTaggingProps
 const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
   },
   bar: {
-    backgroundColor: '#2D4635',
+    backgroundColor: "#2D4635",
     paddingVertical: 14,
     paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   barLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   barText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   attachButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
   },
   attachButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   warning: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: "#FFF7ED",
   },
   warningText: {
-    color: '#B85C00',
+    color: "#B85C00",
     fontSize: 13,
     flex: 1,
   },
