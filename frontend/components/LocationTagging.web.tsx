@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-import type L_Type from "leaflet";
-
+import LocationPreview from "./Location.web";
 import { ThemedText } from "@/components/themed-text";
 
+/** Latitude / longitude pair returned to parent components. */
 export interface LocationCoords {
   latitude: number;
   longitude: number;
@@ -29,95 +29,6 @@ type Status =
   | "denied"
   | "unavailable"
   | "error";
-
-// Leaflet requires its CSS for correct tile/marker rendering.
-const LEAFLET_CSS_ID = "leaflet-css";
-function injectLeafletCSS() {
-  if (typeof document === "undefined") return;
-  if (document.getElementById(LEAFLET_CSS_ID)) return;
-  const link = document.createElement("link");
-  link.id = LEAFLET_CSS_ID;
-  link.rel = "stylesheet";
-  link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-  link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
-  link.crossOrigin = "";
-  document.head.appendChild(link);
-}
-
-function LeafletMap({ latitude, longitude }: LocationCoords) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L_Type.Map | null>(null);
-  const LRef = useRef<typeof L_Type | null>(null);
-
-  useEffect(() => {
-    injectLeafletCSS();
-  }, []);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    let cancelled = false;
-
-    (async () => {
-      // Dynamically import leaflet only in the browser
-      if (!LRef.current) {
-        const leaflet = await import("leaflet");
-        LRef.current = leaflet.default ?? leaflet;
-      }
-      const L = LRef.current;
-      if (cancelled || !containerRef.current) return;
-
-      const icon = L.icon({
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        iconRetinaUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-        shadowUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
-      });
-
-      if (!mapRef.current) {
-        const map = L.map(containerRef.current, {
-          center: [latitude, longitude],
-          zoom: 16,
-          zoomControl: false,
-          attributionControl: false,
-          dragging: false,
-          scrollWheelZoom: false,
-          doubleClickZoom: false,
-          touchZoom: false,
-          keyboard: false,
-        });
-
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-        }).addTo(map);
-
-        L.marker([latitude, longitude], { icon }).addTo(map);
-
-        mapRef.current = map;
-      } else {
-        mapRef.current.setView([latitude, longitude], 16);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [latitude, longitude]);
-
-  // Full cleanup on unmount
-  useEffect(() => {
-    return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  return <div ref={containerRef} style={{ width: "100%", height: 180 }} />;
-}
 
 export function LocationTagging({
   value = null,
@@ -189,7 +100,9 @@ export function LocationTagging({
       ]}
     >
       {isAttached && value && (
-        <LeafletMap latitude={value.latitude} longitude={value.longitude} />
+        <View style={styles.map}>
+          <LocationPreview value={value} />
+        </View>
       )}
 
       <View style={styles.bar}>
@@ -253,6 +166,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
+  },
+  map: {
+    width: "100%",
+    height: 250,
   },
   bar: {
     backgroundColor: "#2D4635",
