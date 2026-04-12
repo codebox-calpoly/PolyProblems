@@ -43,13 +43,12 @@ export function ImageUploadBox({
       : await ImagePicker.launchImageLibraryAsync({
           quality: 0.8,
           allowsMultipleSelection: true,
-          selectionLimit: 5,
+          selectionLimit: 6 - images.length,
         });
 
     if (!result.canceled) {
       const selectedUris = result.assets.map((asset) => asset.uri);
-      const newImages = [...images, ...selectedUris];
-
+      const newImages = [...images, ...selectedUris].slice(0, 6);
       onImagesPicked(newImages);
     }
   };
@@ -61,7 +60,6 @@ export function ImageUploadBox({
 
   const handlePress = () => {
     if (Platform.OS === "web") {
-      // Direct library pick for web to avoid Alert crash
       pickImage(false);
     } else {
       Alert.alert("Upload Images", "Choose a source", [
@@ -74,7 +72,6 @@ export function ImageUploadBox({
 
   return (
     <View style={styles.container}>
-      {/* Organized Grid Display */}
       {images.length > 0 && (
         <View style={styles.grid}>
           {images.map((uri, index) => (
@@ -82,7 +79,7 @@ export function ImageUploadBox({
               <Image
                 source={{ uri }}
                 style={styles.thumbnail}
-                resizeMode="contain" // Ensures full image is visible
+                resizeMode="contain"
               />
               <Pressable
                 style={styles.removeBadge}
@@ -93,16 +90,20 @@ export function ImageUploadBox({
             </View>
           ))}
 
-          {/* Dashboard "Plus" button synced to image dimensions */}
+          {/* Add More Button */}
           {images.length < 6 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
               <Feather name="plus" size={32} color="#999" />
             </Pressable>
           )}
+
+          {images.length > 0 && images.length < 5 && (
+            <View style={{ width: "32%" }} />
+          )}
         </View>
       )}
 
-      {/* Initial state: Large dashed box */}
+      {/* Initial Empty State */}
       {images.length === 0 && (
         <Pressable style={styles.dashedBox} onPress={handlePress}>
           <View style={styles.inner}>
@@ -146,13 +147,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 25,
   },
-  buttonText: { color: "#fff", fontFamily: Fonts.heading, fontSize: 16 },
+  buttonText: {
+    color: "#fff",
+    fontFamily: Fonts.heading,
+    fontSize: 16,
+  },
 
   // Grid Styles
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    justifyContent: "space-between",
+    rowGap: 12,
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 16,
@@ -160,9 +166,9 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
   },
   imageWrapper: {
-    width: "30%",
-    aspectRatio: 1, // Ensures perfect square alignment
-    borderRadius: 16,
+    width: "32%",
+    aspectRatio: 1,
+    borderRadius: 12,
     overflow: "hidden",
     position: "relative",
     backgroundColor: "#f9f9f9",
@@ -174,10 +180,9 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   addMoreButton: {
-    width: "30%",
-    height: "100%",
+    width: "32%",
     aspectRatio: 1,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: "#E0E0E0",
     borderStyle: "dashed",
