@@ -19,6 +19,8 @@ import { supabase } from "@/lib/supabase";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors, Fonts } from "@/constants/theme";
+import LocationPreview from "@/components/Location";
+import { LocationCoords } from "@/components/LocationTagging";
 
 const { width } = Dimensions.get("window");
 
@@ -34,6 +36,7 @@ export default function ReportDetailsScreen() {
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
 
   const [report, setReport] = useState<any>(null);
+  const [location, setLocation] = useState<LocationCoords | null>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,8 +49,41 @@ export default function ReportDetailsScreen() {
   const mainScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("reports")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (error || !data) {
+          Alert.alert("Error", "Report not found");
+          router.back();
+          return;
+        }
+        setReport(data);
+        if (data.image_paths?.length > 0) {
+          const { data: signedData } = await supabase.storage
+            .from("report-photos")
+            .createSignedUrls(data.image_paths, 3600);
+          if (signedData)
+            setImageUrls(signedData.map((item) => item.signedUrl));
+        }
+        if (data && data.location) {
+          const coords: LocationCoords = {
+            latitude: data.location.latitude,
+            longitude: data.location.longitude,
+          };
+          setLocation(coords);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
     if (id) fetchReport();
-  }, [id]);
+  }, [id, router]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -59,33 +95,7 @@ export default function ReportDetailsScreen() {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [isModalVisible]);
-
-  const fetchReport = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("reports")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error || !data) {
-        Alert.alert("Error", "Report not found");
-        router.back();
-        return;
-      }
-      setReport(data);
-      if (data.image_paths?.length > 0) {
-        const { data: signedData } = await supabase.storage
-          .from("report-photos")
-          .createSignedUrls(data.image_paths, 3600);
-        if (signedData) setImageUrls(signedData.map((item) => item.signedUrl));
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isModalVisible, viewerIndex]);
 
   const openViewer = (index: number) => {
     setViewerIndex(index);
@@ -104,14 +114,6 @@ export default function ReportDetailsScreen() {
     if (index !== viewerIndex && index >= 0 && index < imageUrls.length) {
       setViewerIndex(index);
     }
-  };
-
-  const renderLocation = (loc: any) => {
-    if (!loc) return "Location not shared";
-    if (typeof loc === "object") {
-      return `Lat: ${loc.latitude?.toFixed(4)}, Lon: ${loc.longitude?.toFixed(4)}`;
-    }
-    return String(loc);
   };
 
   if (loading)
@@ -165,23 +167,27 @@ export default function ReportDetailsScreen() {
             <ThemedText style={styles.description}>
               {report?.description}
             </ThemedText>
-
             <View style={styles.divider} />
-
             <ThemedText style={styles.label}>Location Details</ThemedText>
-            <View style={styles.locationRow}>
-              <View
-                style={[
-                  styles.iconCircle,
-                  { backgroundColor: theme.tint + "20" },
-                ]}
-              >
-                <Ionicons name="navigate" size={18} color={theme.tint} />
+            {location ? (
+              <View style={styles.mapWrapper}>
+                {location && <LocationPreview value={location} />}
               </View>
-              <ThemedText style={styles.locationValue}>
-                {renderLocation(report?.location)}
-              </ThemedText>
-            </View>
+            ) : (
+              <View style={styles.locationRow}>
+                <View
+                  style={[
+                    styles.iconCircle,
+                    { backgroundColor: theme.tint + "20" },
+                  ]}
+                >
+                  <Ionicons name="navigate" size={18} color={theme.tint} />
+                </View>
+                <ThemedText style={styles.locationValue}>
+                  Location not shared.
+                </ThemedText>
+              </View>
+            )}
           </View>
 
           {/* Main Gallery */}
@@ -452,6 +458,12 @@ const reportStyles = (theme: { background: string }) =>
     locationRow: {
       flexDirection: "row",
       alignItems: "center",
+    },
+    mapWrapper: {
+      borderRadius: 20,
+      overflow: "hidden",
+      borderWidth: 1,
+      height: 250,
     },
     iconCircle: {
       width: 36,

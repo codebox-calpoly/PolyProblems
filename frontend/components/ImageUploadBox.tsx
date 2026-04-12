@@ -1,5 +1,13 @@
 import React from "react";
-import {StyleSheet,Text,View,Pressable,Image, Alert,Platform,} from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Image,
+  Alert,
+  Platform,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 import { Fonts } from "@/constants/theme";
@@ -9,7 +17,10 @@ interface ImageUploadBoxProps {
   onImagesPicked: (uris: string[]) => void;
 }
 
-export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) {
+export function ImageUploadBox({
+  images,
+  onImagesPicked,
+}: ImageUploadBoxProps) {
   const pickImage = async (useCamera: boolean = false) => {
     const permission = useCamera
       ? await ImagePicker.requestCameraPermissionsAsync()
@@ -17,9 +28,11 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
 
     if (!permission.granted) {
       const msg = "Permission Denied: We need access to your media.";
-      Platform.OS === "web"
-        ? alert(msg)
-        : Alert.alert("Permission Denied", msg);
+      if (Platform.OS === "web") {
+        alert(msg);
+      } else {
+        Alert.alert("Permission Denied", msg);
+      }
       return;
     }
 
@@ -66,7 +79,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
               <Image
                 source={{ uri }}
                 style={styles.thumbnail}
-                resizeMode="contain" 
+                resizeMode="contain"
               />
               <Pressable
                 style={styles.removeBadge}
@@ -76,7 +89,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
               </Pressable>
             </View>
           ))}
-          
+
           {/* Add More Button */}
           {images.length < 6 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
@@ -85,7 +98,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
           )}
 
           {images.length > 0 && images.length < 5 && (
-             <View style={{ width: "32%" }} />
+            <View style={{ width: "32%" }} />
           )}
         </View>
       )}
@@ -122,11 +135,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   inner: { alignItems: "center" },
-  text: { 
-    color: "#666", 
-    marginVertical: 8, 
-    fontSize: 16, 
-    fontFamily: Fonts.body 
+  text: {
+    color: "#666",
+    marginVertical: 8,
+    fontSize: 16,
+    fontFamily: Fonts.body,
   },
   button: {
     backgroundColor: "#2D4335",
@@ -134,17 +147,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 25,
   },
-  buttonText: { 
-    color: "#fff", 
-    fontFamily: Fonts.heading, 
-    fontSize: 16 
+  buttonText: {
+    color: "#fff",
+    fontFamily: Fonts.heading,
+    fontSize: 16,
   },
 
   // Grid Styles
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
     rowGap: 12,
     backgroundColor: "#fff",
     padding: 12,
@@ -153,8 +166,8 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
   },
   imageWrapper: {
-    width: "32%", 
-    aspectRatio: 1, 
+    width: "32%",
+    aspectRatio: 1,
     borderRadius: 12,
     overflow: "hidden",
     position: "relative",

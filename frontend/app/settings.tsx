@@ -60,7 +60,9 @@ const Settings = () => {
       router.replace("/login");
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Unable to sign out right now.";
+        error instanceof Error
+          ? error.message
+          : "Unable to sign out right now.";
       Alert.alert("Sign out failed", message);
     } finally {
       setIsSigningOut(false);
