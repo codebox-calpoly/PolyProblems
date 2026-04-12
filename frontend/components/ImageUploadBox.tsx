@@ -1,5 +1,5 @@
 import React from "react";
-import {StyleSheet,Text,View,Pressable,Image,Alert,Platform,} from "react-native";
+import {StyleSheet,Text,View,Pressable,Image, Alert,Platform,} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
 import { Fonts } from "@/constants/theme";
@@ -66,7 +66,7 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
               <Image
                 source={{ uri }}
                 style={styles.thumbnail}
-                resizeMode="cover" // Fix: Fills the square regardless of original dimensions
+                resizeMode="contain" 
               />
               <Pressable
                 style={styles.removeBadge}
@@ -76,12 +76,16 @@ export function ImageUploadBox({ images, onImagesPicked }: ImageUploadBoxProps) 
               </Pressable>
             </View>
           ))}
-
+          
           {/* Add More Button */}
           {images.length < 6 && (
             <Pressable style={styles.addMoreButton} onPress={handlePress}>
               <Feather name="plus" size={32} color="#999" />
             </Pressable>
+          )}
+
+          {images.length > 0 && images.length < 5 && (
+             <View style={{ width: "32%" }} />
           )}
         </View>
       )}
@@ -140,17 +144,16 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10, 
+    justifyContent: "space-between", 
+    rowGap: 12,
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    alignItems: "flex-start", // Prevents rows from stretching vertically on Web
   },
   imageWrapper: {
-    // 31% width allows 3 columns with gap spacing comfortably
-    width: "31.3%", 
+    width: "32%", 
     aspectRatio: 1, 
     borderRadius: 12,
     overflow: "hidden",
@@ -164,7 +167,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   addMoreButton: {
-    width: "31.3%",
+    width: "32%",
     aspectRatio: 1,
     borderRadius: 12,
     borderWidth: 2,
