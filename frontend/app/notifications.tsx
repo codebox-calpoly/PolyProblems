@@ -7,10 +7,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  useColorScheme,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { Colors, Fonts } from "@/constants/theme";
-import { useColorScheme } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 
 export default function NotificationsScreen() {
@@ -88,8 +89,8 @@ export default function NotificationsScreen() {
                     { fontFamily: Fonts.body, color: colors.tabIconDefault },
                   ]}
                 >
-                  Get notified instantly when there's an update to your reports
-                  or when something nearby affects you.
+                  Get notified instantly when there&apos;s an update to your
+                  reports or when something nearby affects you.
                 </Text>
               </View>
               <Switch
