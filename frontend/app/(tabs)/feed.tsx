@@ -3,20 +3,21 @@ import {
   StyleSheet,
   View,
   Text,
+  useColorScheme,
   Platform,
   useWindowDimensions,
-  Animated,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
-import { feedTabs } from "@/constants/theme";
+import { ThemedView } from "@/components/themed-view";
+import { Colors, Fonts, feedTabs } from "@/constants/theme";
 
 // --- TEST SCENES ---
 const TestScene = ({ title, color }: { title: string; color: string }) => (
   <View style={styles.scene}>
     <Text style={[styles.testText, { color }]}>{title} Feed</Text>
-    <Text style={styles.subText}>Everything is working below the bar.</Text>
+    <Text style={styles.subText}>Swipe left or right to switch categories</Text>
   </View>
 );
 
@@ -29,12 +30,8 @@ const renderScene = SceneMap({
 
 export default function FeedScreen() {
   const layout = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === 'web';
-
-  // Explicit Platform Colors
-  const bgColor = isWeb ? "#000000" : "#FFFFFF";
-  const labelColor = isWeb ? "#FFFFFF" : "#000000";
+  const scheme = useColorScheme();
+  const theme = scheme === "dark" ? Colors.dark : Colors.light;
 
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -45,83 +42,68 @@ export default function FeedScreen() {
   ]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: bgColor }}>
-      {/* 1. PHYSICAL HEADER: This ensures the bar is pushed down below the notch */}
-      <View style={{ height: insets.top, backgroundColor: bgColor }} />
-
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]} edges={['top']}>
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
-        swipeEnabled={!isWeb}
+        swipeEnabled={Platform.OS !== "web"}
         renderTabBar={(props) => (
-          <View style={{ height: 60, backgroundColor: bgColor }}>
-            <TabBar
-              {...props}
-              renderIndicator={(indicatorProps) => {
-                // Smooth line color transition
-                const indicatorColor = props.position.interpolate({
-                  inputRange: routes.map((_, i) => i),
-                  outputRange: routes.map((route) => feedTabs[route.key] || "#000"),
-                });
-                return (
-                  <Animated.View
-                    style={[
-                      indicatorProps.style,
-                      { backgroundColor: indicatorColor, height: 3, bottom: 0 }
-                    ]}
-                  />
-                );
-              }}
-              style={{ 
-                backgroundColor: 'transparent',
-                elevation: 0,
-                shadowOpacity: 0,
-                height: 60,
-              }}
-              tabStyle={{ height: 60 }}
-              // 2. STABLE COLOR PROPS
-              activeColor={labelColor} 
-              inactiveColor={isWeb ? "#888" : "#444"}
-              renderLabel={({ route, focused, color }) => {
-                const routeIndex = routes.findIndex((r) => r.key === route.key);
-                const activeColor = feedTabs[route.key] || labelColor;
-
-                // 3. THE "SEAMLESS" COLOR BLEND
-                const textColor = props.position.interpolate({
-                  inputRange: [routeIndex - 1, routeIndex, routeIndex + 1],
-                  outputRange: [labelColor, activeColor, labelColor],
-                  extrapolate: 'clamp',
-                });
-
-                return (
-                  <Animated.Text
-                    style={{
-                      color: textColor,
-                      fontSize: 14,
-                      fontWeight: "700",
-                      textAlign: "center",
-                      width: layout.width / 4,
-                      // Adding height/lineHeight ensures it doesn't compress to 0
-                      height: 20,
-                      lineHeight: 20,
-                    }}
-                  >
-                    {route.title}
-                  </Animated.Text>
-                );
-              }}
-            />
-          </View>
+          <TabBar
+            {...props}
+            // Smoothly animated indicator
+            indicatorStyle={{ 
+              backgroundColor: feedTabs[routes[index].key] || theme.tint, 
+              height: 4,
+              borderRadius: 2 
+            }}
+            // TabBar Container Styling
+            style={{ 
+              backgroundColor: theme.background, 
+              elevation: 0, 
+              shadowOpacity: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: theme.line,
+              paddingTop: 10, // Added padding to clear the notch/Dynamic Island
+            }}
+            // Explicitly set Label colors and styles
+            activeColor={feedTabs[routes[index].key] || theme.tint}
+            inactiveColor={theme.text}
+            labelStyle={{ 
+              fontFamily: Fonts.body, 
+              fontWeight: '600', 
+              fontSize: 14,
+              textTransform: 'none' // Keeps "Facilities" instead of "FACILITIES"
+            }}
+            // Distribute labels evenly
+            tabStyle={{ width: layout.width / 4 }}
+            pressColor="transparent"
+          />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  scene: { flex: 1, alignItems: "center", justifyContent: "center" },
-  testText: { fontSize: 22, fontWeight: '700', marginBottom: 10 },
-  subText: { fontSize: 14, color: "#888" },
+  safe: {
+    flex: 1,
+  },
+  scene: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  testText: {
+    fontSize: 24,
+    fontFamily: Fonts.heading,
+    marginBottom: 8,
+  },
+  subText: {
+    fontSize: 14,
+    color: "#888",
+    fontFamily: Fonts.body,
+  },
 });
