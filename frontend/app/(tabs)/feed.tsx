@@ -6,26 +6,27 @@ import {
   useColorScheme,
   Platform,
   useWindowDimensions,
+  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
-import { ThemedView } from "@/components/themed-view";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
 
-// --- TEST SCENES ---
-const TestScene = ({ title, color }: { title: string; color: string }) => (
+const FeedScene = ({ title, color }: { title: string; color: string }) => (
   <View style={styles.scene}>
     <Text style={[styles.testText, { color }]}>{title} Feed</Text>
-    <Text style={styles.subText}>Swipe left or right to switch categories</Text>
+    <Text style={styles.subText}>No unresolved reports at the moment.</Text>
   </View>
 );
 
 const renderScene = SceneMap({
-  Facilities: () => <TestScene title="Facilities" color={feedTabs.Facilities} />,
-  Safety: () => <TestScene title="Safety" color={feedTabs.Safety} />,
-  Dining: () => <TestScene title="Dining" color={feedTabs.Dining} />,
-  Tech: () => <TestScene title="Tech" color={feedTabs.Tech} />,
+  Facilities: () => (
+    <FeedScene title="Facilities" color={feedTabs.Facilities} />
+  ),
+  Safety: () => <FeedScene title="Safety" color={feedTabs.Safety} />,
+  Dining: () => <FeedScene title="Dining" color={feedTabs.Dining} />,
+  Tech: () => <FeedScene title="Tech" color={feedTabs.Tech} />,
 });
 
 export default function FeedScreen() {
@@ -41,46 +42,70 @@ export default function FeedScreen() {
     { key: "Tech", title: "Tech" },
   ]);
 
+  // Helper to get color array matching the routes
+  const colorRange = routes.map((route) => feedTabs[route.key] || theme.tint);
+  const inputRange = routes.map((_, i) => i);
+
+  const renderTabBar = (props: any) => {
+    // Interpolate the indicator and label colors based on scroll position
+    const activeColor = props.position.interpolate({
+      inputRange,
+      outputRange: colorRange,
+    });
+
+    return (
+      <TabBar
+        {...props}
+        // Animate the Indicator
+        renderIndicator={(indicatorProps) => {
+          // Calculate width of one tab
+          const width = layout.width / routes.length;
+          const translateX = indicatorProps.position.interpolate({
+            inputRange,
+            outputRange: inputRange.map((i) => i * width),
+          });
+
+          return (
+            <Animated.View
+              style={[
+                styles.indicator,
+                {
+                  width: width - 20, // slightly narrower for aesthetic
+                  transform: [{ translateX: Animated.add(translateX, 10) }],
+                  backgroundColor: activeColor,
+                },
+              ]}
+            />
+          );
+        }}
+        style={{
+          backgroundColor: theme.background,
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.line,
+          paddingTop: 10,
+        }}
+        activeColor={theme.text}
+        inactiveColor={theme.text}
+        tabStyle={{ width: layout.width / 4 }}
+        pressColor="transparent"
+      />
+    );
+  };
+
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]} edges={['top']}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: theme.background }]}
+      edges={["top"]}
+    >
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
         swipeEnabled={Platform.OS !== "web"}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            // Smoothly animated indicator
-            indicatorStyle={{ 
-              backgroundColor: feedTabs[routes[index].key] || theme.tint, 
-              height: 4,
-              borderRadius: 2 
-            }}
-            // TabBar Container Styling
-            style={{ 
-              backgroundColor: theme.background, 
-              elevation: 0, 
-              shadowOpacity: 0,
-              borderBottomWidth: 1,
-              borderBottomColor: theme.line,
-              paddingTop: 10, // Added padding to clear the notch/Dynamic Island
-            }}
-            // Explicitly set Label colors and styles
-            activeColor={feedTabs[routes[index].key] || theme.tint}
-            inactiveColor={theme.text}
-            labelStyle={{ 
-              fontFamily: Fonts.body, 
-              fontWeight: '600', 
-              fontSize: 14,
-              textTransform: 'none' // Keeps "Facilities" instead of "FACILITIES"
-            }}
-            // Distribute labels evenly
-            tabStyle={{ width: layout.width / 4 }}
-            pressColor="transparent"
-          />
-        )}
+        renderTabBar={renderTabBar}
       />
     </SafeAreaView>
   );
@@ -105,5 +130,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#888",
     fontFamily: Fonts.body,
+  },
+  label: {
+    fontFamily: Fonts.body,
+    fontSize: 14,
+    textTransform: "none",
+    margin: 4,
+  },
+  indicator: {
+    position: "absolute",
+    bottom: 0,
+    height: 4,
+    borderRadius: 2,
   },
 });
