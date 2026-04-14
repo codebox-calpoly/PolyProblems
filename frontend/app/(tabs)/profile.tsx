@@ -7,8 +7,7 @@ import {
   View,
   Text,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { useState, useCallback } from "react";
+
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors, Fonts } from "@/constants/theme";
@@ -18,6 +17,7 @@ import { ThemedView } from "@/components/themed-view";
 import { ReportCard } from "@/components/reportCard";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -25,75 +25,59 @@ export default function ProfileScreen() {
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = profileStyles(theme);
 
-  const [profileUser, setProfileUser] = useState<any>(null);
-  const [profileReports, setProfileReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string>("");
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfileData();
-    }, []),
-  );
-
-  const handleSettingsPress = () => {
-    router.push("/settings");
-  };
-
-  const fetchProfileData = async () => {
-    try {
-      setLoading(true);
-
-      // Get current user session
+  // --- TANSTACK QUERY: Fetch Profile & Reports ---
+  const { data: profileData, isLoading: isProfileLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
 
-      if (user) {
-        // Store the user's email
-        setUserEmail(user.email || "");
+      return {
+        id: user.id,
+        email: user.email || "",
+        username: user.email?.split("@")[0] || "User",
+        memberSince: new Date(user.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+        }),
+      };
+    },
+  });
 
-        setProfileUser({
-          username: user.email?.split("@")[0] || "User",
-          memberSince: new Date(user.created_at).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-          }),
-          commentsCount: 0,
-        });
+  const { data: reports, isLoading: isReportsLoading } = useQuery({
+    queryKey: ["user-reports", profileData?.id],
+    enabled: !!profileData?.id, // Only run if we have a user ID
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // Consider data "fresh" for 5 minutes
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reports")
+        .select("*")
+        .eq("user_id", profileData!.id)
+        .order("created_at", { ascending: false });
 
-        // Fetch reports from Supabase reports table
-        const { data: reports, error } = await supabase
-          .from("reports")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
-        if (error) {
-          console.error("Error fetching reports:", error);
-        } else {
-          setProfileReports(reports || []);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.replace("/");
   };
 
-  // Get first letter of email (uppercase)
-  const getInitial = () => {
-    if (!userEmail) return "?";
-    return userEmail.charAt(0).toUpperCase();
+  const handleSettingsPress = () => {
+    router.push("/settings");
   };
 
+  // Get first letter of email (uppercase)
+  const getInitial = () => profileData?.email?.charAt(0).toUpperCase() || "?";
+
   // Calculate reportsCount dynamically based on actual reports
-  const reportsCount = profileReports.length;
+  const reportsCount = reports?.length || 0;
+  const loading = isProfileLoading || isReportsLoading;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -113,7 +97,7 @@ export default function ProfileScreen() {
           <ThemedText style={styles.emptyMessage}>
             Loading profile...
           </ThemedText>
-        ) : !profileUser ? (
+        ) : !profileData ? (
           <ThemedText style={styles.emptyMessage}>
             No profile data found
           </ThemedText>
@@ -129,13 +113,13 @@ export default function ProfileScreen() {
               </ThemedView>
 
               <ThemedText style={styles.username}>
-                @{profileUser.username}
+                @{profileData.username}
               </ThemedText>
               <ThemedText style={styles.subtle}>
-                Member since {profileUser.memberSince}
+                Member since {profileData.memberSince}
               </ThemedText>
               <ThemedText style={styles.subtle}>
-                {reportsCount} Reports | {profileUser.commentsCount} comments
+                {reportsCount} Reports
               </ThemedText>
             </ThemedView>
 
@@ -147,12 +131,12 @@ export default function ProfileScreen() {
                 <ThemedText style={styles.emptyMessage}>
                   Loading reports...
                 </ThemedText>
-              ) : profileReports.length === 0 ? (
+              ) : reportsCount === 0 ? (
                 <ThemedText style={styles.emptyMessage}>
                   No reports yet
                 </ThemedText>
               ) : (
-                profileReports.map((report) => (
+                reports?.map((report) => (
                   <ReportCard
                     key={report.id}
                     report={report}

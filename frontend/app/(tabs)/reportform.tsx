@@ -24,12 +24,15 @@ import { BeforeCont } from "@/components/ui/BeforeCont";
 import { supabase } from "@/lib/supabase";
 import { LocationTagging, LocationCoords } from "@/components/LocationTagging";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 const CATEGORIES = ["Facilities", "Safety", "Dining", "Tech"];
 const STORAGE_KEY = "disclaimer_dont_show_again";
 
 export default function ReportForm() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("Facilities");
@@ -155,6 +158,12 @@ export default function ReportForm() {
       ]);
 
       if (dbError) throw dbError;
+
+      // --- INVALIDATE THE CACHE HERE ---
+      // This matches the key you used in ProfileScreen: ["user-reports", user.id]
+      await queryClient.invalidateQueries({
+        queryKey: ["user-reports", user.id],
+      });
 
       if (Platform.OS === "web") {
         window.alert("Your report has been submitted.");

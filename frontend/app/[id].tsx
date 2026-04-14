@@ -21,6 +21,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors, Fonts } from "@/constants/theme";
 import LocationPreview from "@/components/Location";
 import { LocationCoords } from "@/components/LocationTagging";
+import { useQuery } from "@tanstack/react-query";
 
 const { width } = Dimensions.get("window");
 
@@ -35,11 +36,6 @@ export default function ReportDetailsScreen() {
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
 
-  const [report, setReport] = useState<any>(null);
-  const [location, setLocation] = useState<LocationCoords | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
@@ -48,42 +44,64 @@ export default function ReportDetailsScreen() {
   const styles = reportStyles(theme);
   const mainScrollRef = useRef<ScrollView>(null);
 
-  useEffect(() => {
-    const fetchReport = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("reports")
-          .select("*")
-          .eq("id", id)
-          .single();
-        if (error || !data) {
-          Alert.alert("Error", "Report not found");
-          router.back();
-          return;
-        }
-        setReport(data);
-        if (data.image_paths?.length > 0) {
-          const { data: signedData } = await supabase.storage
-            .from("report-photos")
-            .createSignedUrls(data.image_paths, 3600);
-          if (signedData)
-            setImageUrls(signedData.map((item) => item.signedUrl));
-        }
-        if (data && data.location) {
-          const coords: LocationCoords = {
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-          };
-          setLocation(coords);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+  const {
+    data,
+    isLoading: loading,
+    isError,
+  } = useQuery({
+    queryKey: ["report", id],
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const { data: report, error } = await supabase
+        .from("reports")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      // Just throw the error here
+      if (error || !report) throw new Error("NOT_FOUND");
+
+      let urls: string[] = [];
+      if (report.image_paths?.length > 0) {
+        const { data: signedData } = await supabase.storage
+          .from("report-photos")
+          .createSignedUrls(report.image_paths, 3600);
+        if (signedData) urls = signedData.map((item) => item.signedUrl);
       }
-    };
-    if (id) fetchReport();
-  }, [id, router]);
+
+      const coords = report.location
+        ? {
+            latitude: report.location.latitude,
+            longitude: report.location.longitude,
+          }
+        : null;
+
+      return {
+        report,
+        imageUrls: urls,
+        location: coords,
+      };
+    },
+  });
+
+  // Handle the side effect (Alert/Back) here, OUTSIDE the fetcher
+  useEffect(() => {
+    if (isError) {
+      const msg = "Report not found";
+      if (Platform.OS === "web") {
+        window.alert(msg);
+      } else {
+        Alert.alert("Error", msg);
+      }
+      router.back();
+    }
+  }, [isError, router]);
+
+  // Destructure for easy use in your JSX
+  const report = data?.report;
+  const imageUrls = data?.imageUrls || [];
+  const location: LocationCoords | null = data?.location ?? null;
 
   useEffect(() => {
     if (isModalVisible) {
