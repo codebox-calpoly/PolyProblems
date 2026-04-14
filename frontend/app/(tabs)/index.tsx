@@ -1,8 +1,8 @@
 import { StyleSheet, Pressable, View } from "react-native";
 import { Redirect, useRouter } from "expo-router";
 
-import Dot from "@/assets/images/dot.svg";
-import DotActive from "@/assets/images/dot-active.svg";
+// import Dot from "@/assets/images/dot.svg";
+// import DotActive from "@/assets/images/dot-active.svg";
 import PolyLogo from "@/components/ui/poly-logo";
 
 import { ThemedText } from "@/components/themed-text";
@@ -16,7 +16,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const tintColor = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "text");
-  const inactiveDotColor = useThemeColor({}, "tabIconDefault");
+  // const inactiveDotColor = useThemeColor({}, "tabIconDefault");
   const backgroundColor = useThemeColor({}, "background");
   const [session, setSession] = useState<boolean>(false);
 
@@ -54,11 +54,11 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
 
-      <View style={styles.dots}>
+      {/* <View style={styles.dots}>
         <DotActive width={8} height={8} fill={tintColor} />
         <Dot width={8} height={8} fill={inactiveDotColor} />
         <Dot width={8} height={8} fill={inactiveDotColor} />
-      </View>
+      </View> */}
 
       <Pressable
         style={[styles.button, { backgroundColor: tintColor }]}

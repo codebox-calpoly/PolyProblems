@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { router } from "expo-router";
@@ -19,9 +20,9 @@ const Settings = () => {
   const colors = Colors[colorScheme ?? "light"];
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleEditProfile = () => {
-    router.push("/(tabs)/profile");
-  };
+  // const handleEditProfile = () => {
+  //   router.push("/(tabs)/profile");
+  // };
 
   const handleNotifications = () => {
     router.push("/notifications");
@@ -30,19 +31,31 @@ const Settings = () => {
   const confirmSignOut = () => {
     if (isSigningOut) return;
 
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Sign Out",
-        style: "destructive",
-        onPress: () => {
-          void handleSignOut();
+    const title = "Sign Out";
+    const message = "Are you sure you want to sign out?";
+
+    if (Platform.OS === "web") {
+      // Standard browser confirmation dialog
+      const confirmed = window.confirm(`${title}\n${message}`);
+      if (confirmed) {
+        void handleSignOut();
+      }
+    } else {
+      // Native Mobile Alert
+      Alert.alert(title, message, [
+        {
+          text: "Cancel",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: () => {
+            void handleSignOut();
+          },
+        },
+      ]);
+    }
   };
 
   const handleSignOut = async () => {
@@ -90,7 +103,7 @@ const Settings = () => {
 
       {/* Settings Options */}
       <View style={styles.optionsContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.optionButton,
             { backgroundColor: colors.settingsButton },
@@ -100,7 +113,7 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Edit Profile</Text>
           <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[
