@@ -254,7 +254,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       {/* Meta */}
       <View style={styles.metaRow}>
         <Text style={[styles.author, { color: theme.icon }]}>
-          By {report.author_name || "Anonymous"}
+          By {report.username || "Anonymous"}
         </Text>
         <View style={[styles.tag, { backgroundColor: activeCategoryColor }]}>
           <Text style={styles.tagText}>{report.category}</Text>
