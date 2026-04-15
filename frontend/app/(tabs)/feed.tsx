@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
@@ -19,7 +20,12 @@ import { supabase } from "@/lib/supabase";
 import FeedPost from "@/components/feedPost";
 
 const FeedScene = ({ title, color }: { title: string; color: string }) => {
-  const { data: reports, isLoading } = useQuery({
+  const {
+    data: reports,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["reports", title],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -34,9 +40,17 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
     },
     // Optional: Prevents fetching if title is empty
     enabled: !!title,
+
+    // Keep the list "fresh" for 2 minutes
+    // Users won't see a loading spinner or background refresh if they
+    // switch tabs and come back quickly.
+    staleTime: 2 * 60 * 1000,
+
+    // Keep in memory for 10 minutes even if the user leaves the screen
+    gcTime: 10 * 60 * 1000,
   });
 
-  if (isLoading) {
+  if (isLoading || isRefetching) {
     return (
       <View style={styles.scene}>
         <ActivityIndicator color={color} />
@@ -46,10 +60,24 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
   // --- CASE 1: No Reports Found (Uses your centered scene style) ---
   if (!reports || reports.length === 0) {
     return (
-      <View style={styles.scene}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scene,
+          { flex: 1, justifyContent: "center" },
+        ]}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={color} // Matches your theme
+          />
+        }
+      >
         <Text style={[styles.testText, { color }]}>{title} Feed</Text>
-        <Text style={styles.subText}>No reports in {title} yet.</Text>
-      </View>
+        <Text style={[styles.subText, { color: color }]}>
+          No reports in {title} yet.
+        </Text>
+      </ScrollView>
     );
   }
 
@@ -62,6 +90,13 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
         alignItems: "center",
         flexGrow: 1,
       }}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefetching}
+          onRefresh={refetch}
+          tintColor={color} // For iOS spinner color
+        />
+      }
     >
       <Text style={[styles.testText, { color, marginBottom: 20 }]}>
         {title} Feed
