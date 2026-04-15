@@ -104,11 +104,24 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       });
       if (error) throw error;
     },
-    // Refresh the data after the vote succeeds
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["report", reportId] });
-      // If you have a main feed list, invalidate that too:
-      queryClient.invalidateQueries({ queryKey: ["reports"] });
+    onSuccess: (_data, variables) => {
+      // Manually update the cache without a network request
+      queryClient.setQueryData(["report", reportId], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        // Logic: If user clicks the same vote again, it becomes 0 (unvote)
+        // Otherwise, it becomes the new type (1 or -1)
+        const newVote = oldData.userVote === variables ? 0 : variables;
+
+        // Calculate the score change
+        const scoreAdjustment = newVote - oldData.userVote;
+
+        return {
+          ...oldData,
+          userVote: newVote,
+          total_score: (oldData.total_score || 0) + scoreAdjustment,
+        };
+      });
     },
   });
 
