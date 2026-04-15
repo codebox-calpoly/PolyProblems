@@ -242,7 +242,7 @@ export default function LoginScreen() {
                     disabled={loading}
                   >
                     <Text style={[styles.resendButton, { color: textColor }]}>
-                      Didn&apos;t Receive a code? Resend
+                      Didn&apos;t receive a code? Resend
                     </Text>
                   </TouchableOpacity>
 
