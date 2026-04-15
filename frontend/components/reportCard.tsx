@@ -2,7 +2,8 @@ import React from "react";
 import { StyleSheet, useColorScheme, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Colors, Fonts } from "@/constants/theme";
+import { Colors, feedTabs, Fonts } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 
 export type Report = {
   id: string;
@@ -10,6 +11,7 @@ export type Report = {
   description: string;
   category: string;
   created_at: string;
+  total_score: number;
 };
 
 interface ReportCardProps {
@@ -27,11 +29,18 @@ const createStyles = (theme: any) =>
       marginBottom: 14,
       backgroundColor: theme.background,
     },
-    cardDescription: {
-      fontSize: 22,
+    cardTitle: {
+      fontSize: 20,
       fontFamily: Fonts.heading,
-      lineHeight: 28,
+      fontWeight: "700",
       color: theme.text,
+      marginBottom: 4,
+    },
+    cardDescription: {
+      fontSize: 16,
+      lineHeight: 22,
+      color: theme.text,
+      marginBottom: 8,
     },
     cardMeta: {
       flexDirection: "row",
@@ -40,10 +49,10 @@ const createStyles = (theme: any) =>
       marginTop: 12,
     },
     categoryBadge: {
-      backgroundColor: theme.tint,
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 8,
+      marginRight: 8,
     },
     categoryText: {
       color: "#ffffff",
@@ -69,12 +78,32 @@ const createStyles = (theme: any) =>
       fontSize: 14,
       fontFamily: Fonts.heading,
     },
+    scoreBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.icon + "15",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 12,
+    },
+    leftMeta: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    scoreText: {
+      fontSize: 14,
+      fontWeight: "bold",
+      marginLeft: 4,
+    },
   });
 
 export const ReportCard = ({ report, onPress }: ReportCardProps) => {
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
   const styles = createStyles(theme);
+
+  const badgeColor =
+    feedTabs[report.category as keyof typeof feedTabs] || theme.tint;
 
   // Format the date to a readable format
   const formatDate = (dateString: string) => {
@@ -92,20 +121,49 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
 
   return (
     <ThemedView key={report.id} style={styles.card}>
+      {report.title && (
+        <ThemedText style={styles.cardTitle} numberOfLines={1}>
+          {report.title}
+        </ThemedText>
+      )}
       {report.description && (
-        <ThemedText style={styles.cardDescription}>
+        <ThemedText style={styles.cardDescription} numberOfLines={3}>
           {report.description}
         </ThemedText>
       )}
 
       <ThemedView style={styles.cardMeta}>
-        {report.category && (
-          <ThemedView style={styles.categoryBadge}>
-            <ThemedText style={styles.categoryText}>
-              {report.category}
+        <ThemedView style={styles.leftMeta}>
+          {report.category && (
+            <ThemedView
+              style={[styles.categoryBadge, { backgroundColor: badgeColor }]}
+            >
+              <ThemedText style={styles.categoryText}>
+                {report.category}
+              </ThemedText>
+            </ThemedView>
+          )}
+
+          <ThemedView style={styles.scoreBadge}>
+            <Ionicons
+              name="stats-chart"
+              size={14}
+              color={(report.total_score || 0) >= 0 ? "#2ECC71" : "#FF4500"}
+            />
+            <ThemedText
+              style={[
+                styles.scoreText,
+                {
+                  color: (report.total_score || 0) >= 0 ? "#2ECC71" : "#FF4500",
+                },
+              ]}
+            >
+              {report.total_score || 0}
             </ThemedText>
           </ThemedView>
-        )}
+        </ThemedView>
+
+        {/* DATE REMAINS ON FAR RIGHT */}
         {report.created_at && (
           <ThemedText style={styles.timeText}>
             {formatDate(report.created_at)}
