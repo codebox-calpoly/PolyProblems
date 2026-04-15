@@ -7,18 +7,77 @@ import {
   Platform,
   useWindowDimensions,
   Animated,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import FeedPost from "@/components/feedPost";
 
-const FeedScene = ({ title, color }: { title: string; color: string }) => (
-  <View style={styles.scene}>
-    <Text style={[styles.testText, { color }]}>{title} Feed</Text>
-    <Text style={styles.subText}>No unresolved reports at the moment.</Text>
-  </View>
-);
+const FeedScene = ({ title, color }: { title: string; color: string }) => {
+  const { data: reports, isLoading } = useQuery({
+    queryKey: ["reports", title],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reports")
+        .select("id")
+        .eq("category", title)
+        .eq("status", "unresolved")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    // Optional: Prevents fetching if title is empty
+    enabled: !!title,
+  });
+
+  if (isLoading) {
+    return (
+      <View style={styles.scene}>
+        <ActivityIndicator color={color} />
+      </View>
+    );
+  }
+  // --- CASE 1: No Reports Found (Uses your centered scene style) ---
+  if (!reports || reports.length === 0) {
+    return (
+      <View style={styles.scene}>
+        <Text style={[styles.testText, { color }]}>{title} Feed</Text>
+        <Text style={styles.subText}>No reports in {title} yet.</Text>
+      </View>
+    );
+  }
+
+  // --- CASE 2: Reports Exist (Uses ScrollView for content) ---
+  return (
+    <ScrollView
+      style={{ flex: 1 }} // Force the width to the screen size
+      contentContainerStyle={{
+        paddingVertical: 20,
+        alignItems: "center",
+        flexGrow: 1,
+      }}
+    >
+      <Text style={[styles.testText, { color, marginBottom: 20 }]}>
+        {title} Feed
+      </Text>
+
+      {reports.map((report) => (
+        <View
+          key={report.id}
+          style={{ width: "100%", maxWidth: 1200, alignItems: "center" }}
+        >
+          <FeedPost reportId={report.id} />
+        </View>
+      ))}
+    </ScrollView>
+  );
+};
 
 const renderScene = SceneMap({
   Facilities: () => (

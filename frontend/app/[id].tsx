@@ -245,12 +245,19 @@ export default function ReportDetailsScreen() {
                 showsHorizontalScrollIndicator={false}
                 pagingEnabled
                 style={[{ width: imageWidth }]}
+                scrollEventThrottle={16}
+                onScroll={(e) => {
+                  const offset = e.nativeEvent.contentOffset.x;
+                  const newIndex = Math.round(offset / imageWidth);
+                  if (newIndex !== activeIndex) {
+                    setActiveIndex(newIndex);
+                  }
+                }}
                 onMomentumScrollEnd={(e) =>
                   setActiveIndex(
                     Math.round(e.nativeEvent.contentOffset.x / imageWidth),
                   )
                 }
-                scrollEventThrottle={16}
               >
                 {imageUrls.map((url, index) => (
                   <TouchableOpacity
