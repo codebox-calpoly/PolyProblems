@@ -33,6 +33,7 @@ const imageWidth = isWeb ? displayWidth - 80 : width - 40;
 
 export default function ReportDetailsScreen() {
   const { id } = useLocalSearchParams();
+  const reportId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
@@ -53,14 +54,15 @@ export default function ReportDetailsScreen() {
     isLoading: loading,
     isError,
   } = useQuery({
-    queryKey: ["report", id],
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5,
+    queryKey: ["report", reportId],
+    enabled: !!reportId,
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: async () => {
       const { data: report, error } = await supabase
         .from("reports")
         .select("*")
-        .eq("id", id)
+        .eq("id", reportId)
         .single();
 
       // Just throw the error here
@@ -133,13 +135,26 @@ export default function ReportDetailsScreen() {
           status,
           rejection_reason: reason,
         })
-        .eq("id", id);
+        .eq("id", reportId);
 
       if (error) throw error;
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      queryClient.setQueryData(["report", reportId], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          report: {
+            ...oldData.report,
+            status: variables.status,
+            rejection_reason: variables.reason,
+          },
+        };
+      });
+
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["report", id] }),
+        queryClient.invalidateQueries({ queryKey: ["report", reportId] }),
         queryClient.invalidateQueries({ queryKey: ["reports"] }),
         queryClient.invalidateQueries({ queryKey: ["user-reports"] }),
       ]);
@@ -170,7 +185,7 @@ export default function ReportDetailsScreen() {
   const imageUrls = data?.imageUrls || [];
   const location: LocationCoords | null = data?.location ?? null;
   const statusConfig = {
-    unresolved: { label: "Approved", color: "#2D7A53" },
+    unresolved: { label: "Unresolved", color: "#2D7A53" },
     pending: { label: "Unapproved", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
   } as const;
@@ -306,7 +321,9 @@ export default function ReportDetailsScreen() {
                 onPress={handleApprove}
                 disabled={updateReportStatus.isPending}
               >
-                <ThemedText style={styles.actionButtonText}>Approve</ThemedText>
+                <ThemedText style={styles.actionButtonText}>
+                  {isApproved ? "Unresolved" : "Approve"}
+                </ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -323,7 +340,9 @@ export default function ReportDetailsScreen() {
                 }}
                 disabled={updateReportStatus.isPending}
               >
-                <ThemedText style={styles.actionButtonText}>Reject</ThemedText>
+                <ThemedText style={styles.actionButtonText}>
+                  {isRejected ? "Rejected" : "Reject"}
+                </ThemedText>
               </TouchableOpacity>
             </View>
           )}

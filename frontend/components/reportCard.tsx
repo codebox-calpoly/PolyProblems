@@ -119,7 +119,7 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
   const badgeColor =
     feedTabs[report.category as keyof typeof feedTabs] || theme.tint;
   const statusConfig = {
-    unresolved: { label: "Approved", color: "#2D7A53" },
+    unresolved: { label: "Unresolved", color: "#2D7A53" },
     pending: { label: "Unapproved", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
   } as const;
