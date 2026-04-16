@@ -12,6 +12,7 @@ export type Report = {
   category: string;
   created_at: string;
   total_score: number;
+  status?: string;
 };
 
 interface ReportCardProps {
@@ -89,11 +90,24 @@ const createStyles = (theme: any) =>
     leftMeta: {
       flexDirection: "row",
       alignItems: "center",
+      flexWrap: "wrap",
+      gap: 8,
     },
     scoreText: {
       fontSize: 14,
       fontWeight: "bold",
       marginLeft: 4,
+    },
+    statusBadge: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 999,
+    },
+    statusText: {
+      color: "#ffffff",
+      fontSize: 12,
+      fontWeight: "700",
+      textTransform: "uppercase",
     },
   });
 
@@ -104,6 +118,15 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
 
   const badgeColor =
     feedTabs[report.category as keyof typeof feedTabs] || theme.tint;
+  const statusConfig = {
+    unresolved: { label: "Approved", color: "#2D7A53" },
+    pending: { label: "Unapproved", color: "#C9922F" },
+    rejected: { label: "Rejected", color: "#C95C4B" },
+  } as const;
+  const normalizedStatus = (report.status || "pending").toLowerCase();
+  const statusBadge =
+    statusConfig[normalizedStatus as keyof typeof statusConfig] ||
+    statusConfig.pending;
 
   // Format the date to a readable format
   const formatDate = (dateString: string) => {
@@ -159,6 +182,14 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
               ]}
             >
               {report.total_score || 0}
+            </ThemedText>
+          </ThemedView>
+
+          <ThemedView
+            style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
+          >
+            <ThemedText style={styles.statusText}>
+              {statusBadge.label}
             </ThemedText>
           </ThemedView>
         </ThemedView>
