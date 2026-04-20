@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poly Problems — The smarter way to handle campus issues.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:#edeae2;
+  --cream-light:#f2efe8;
+  --green-dark:#1c3527;
+  --green-deeper:#162d21;
+  --near-black:#0d1710;
+  --pitch:#09100c;
+  --text-dark:#1a1a14;
+  --text-muted:#737368;
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--sans);background:var(--cream);color:var(--text-dark);overflow-x:hidden;line-height:1.6;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;
+  background:rgba(237,234,226,0.82);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--sans);font-weight:500;font-size:0.92rem;
+  color:var(--text-dark);text-decoration:none;
+}
+.btn-dl{
+  background:var(--green-dark);color:#fff;border:none;
+  padding:0.5rem 1.35rem;border-radius:50px;
+  font-family:var(--sans);font-size:0.82rem;font-weight:500;
+  cursor:pointer;text-decoration:none;letter-spacing:0.01em;
+  transition:opacity .18s;
+}
+.btn-dl:hover{opacity:.82;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;background:var(--cream);
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;overflow:hidden;padding-top:4.5rem;
+}
+.hero-content{
+  position:relative;z-index:3;
+  text-align:center;padding:4.5rem 2rem 0;
+}
+.badge{
+  display:inline-block;
+  border:1px solid rgba(0,0,0,0.18);border-radius:50px;
+  padding:0.28rem 0.95rem;margin-bottom:1.5rem;
+  font-size:0.75rem;color:var(--text-muted);font-weight:400;
+}
+.hero h1{
+  font-family:var(--serif);font-weight:400;font-style:normal;
+  font-size:clamp(2.6rem,5.5vw,3.8rem);
+  color:var(--text-dark);line-height:1.12;letter-spacing:-0.015em;
+  max-width:520px;margin:0 auto 1rem;
+}
+.cb-credit{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:0.76rem;color:var(--text-muted);margin-bottom:1.75rem;
+}
+.cb-icon{
+  width:17px;height:17px;border-radius:4px;
+  background:linear-gradient(135deg,#33c458,#1e8bc3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.5rem;font-weight:700;color:#fff;letter-spacing:-0.03em;
+}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:.7rem;}
+.btn-solid{
+  background:var(--green-dark);color:#fff;
+  border:1.5px solid var(--green-dark);
+  padding:.62rem 1.55rem;border-radius:50px;
+  font-family:var(--sans);font-size:.86rem;font-weight:500;
+  text-decoration:none;transition:opacity .18s;
+}
+.btn-solid:hover{opacity:.82;}
+.btn-ghost{
+  background:transparent;color:var(--text-dark);
+  border:1.5px solid rgba(0,0,0,.22);
+  padding:.62rem 1.55rem;border-radius:50px;
+  font-family:var(--sans);font-size:.86rem;font-weight:500;
+  text-decoration:none;transition:border-color .18s;
+}
+.btn-ghost:hover{border-color:rgba(0,0,0,.5);}
+.hero-mountains{
+  position:absolute;bottom:0;left:0;right:0;width:100%;
+  pointer-events:none;z-index:1;
+}
+
+/* ── TAKE ACTION ── */
+.s-action{background:var(--green-dark);padding:5.5rem 6vw 5rem;}
+.s-action-inner{
+  max-width:1060px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;
+}
+.action-headline{
+  font-family:var(--sans);font-weight:700;
+  font-size:clamp(2.4rem,4.5vw,3.4rem);
+  color:#fff;line-height:1.05;letter-spacing:-0.02em;
+  text-transform:uppercase;margin-bottom:2.5rem;
+}
+.action-headline em{font-style:italic;font-weight:400;}
+.action-card{
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  padding:1.75rem;background:rgba(255,255,255,.04);
+}
+.action-card p{
+  font-size:.88rem;color:rgba(255,255,255,.55);
+  line-height:1.8;font-weight:300;margin-bottom:1rem;
+}
+.action-card p:last-child{margin-bottom:0;}
+.phone-col{display:flex;justify-content:center;padding-top:.5rem;}
+.phone-tilt{transform:rotate(-7deg) translateX(24px);}
+.phone{
+  width:215px;background:#090e0b;
+  border-radius:38px;padding:13px 8px;
+  border:1.5px solid rgba(255,255,255,.09);
+  box-shadow:0 36px 90px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04);
+}
+.phone-notch{
+  width:68px;height:19px;background:#090e0b;
+  border-radius:0 0 13px 13px;margin:0 auto 7px;
+}
+.phone-screen{background:#111a14;border-radius:28px;overflow:hidden;padding-bottom:10px;}
+.ps-bar{
+  background:#1c3527;padding:12px 14px 9px;
+  display:flex;align-items:center;gap:7px;
+}
+.ps-back{color:rgba(255,255,255,.5);font-size:.75rem;}
+.ps-label{font-size:.68rem;font-weight:600;color:rgba(255,255,255,.85);}
+.ps-body{padding:13px 13px 0;}
+.ps-title{font-size:.85rem;font-weight:700;color:#f0ede6;margin-bottom:4px;}
+.ps-meta{font-size:.6rem;color:rgba(255,255,255,.38);margin-bottom:10px;}
+.ps-desc{font-size:.62rem;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:12px;}
+.ps-img{
+  width:100%;height:82px;border-radius:9px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;margin-bottom:10px;
+}
+.ps-map{
+  width:100%;height:64px;border-radius:9px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;margin-bottom:12px;
+}
+.ps-submit{
+  width:100%;background:#1c3527;color:#fff;
+  border:none;border-radius:50px;padding:9px;
+  font-family:var(--sans);font-size:.7rem;font-weight:600;text-align:center;
+}
+
+/* ── HOW IT WORKS ── */
+.s-how{background:var(--near-black);padding:5.5rem 6vw;}
+.s-how-inner{
+  max-width:1060px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;
+}
+.how-eyebrow{
+  font-size:.68rem;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(255,255,255,.35);
+  margin-bottom:2.25rem;
+}
+.step{
+  display:flex;gap:1rem;margin-bottom:1rem;
+  padding:.9rem 1rem;border-radius:10px;cursor:pointer;
+  transition:background .18s;
+}
+.step:hover{background:rgba(255,255,255,.03);}
+.step.active{background:rgba(255,255,255,.04);}
+.sn{
+  width:26px;height:26px;min-width:26px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:600;color:rgba(255,255,255,.3);
+  margin-top:1px;transition:all .18s;
+}
+.step.active .sn{
+  border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;
+}
+.st{
+  font-size:.95rem;font-weight:500;color:rgba(255,255,255,.3);
+  margin-bottom:.3rem;transition:color .18s;
+}
+.step.active .st{font-size:1.05rem;font-weight:600;color:#fff;}
+.sd{
+  font-size:.82rem;color:rgba(255,255,255,.42);
+  line-height:1.65;display:none;
+}
+.step.active .sd{display:block;}
+.how-phone-side{display:flex;justify-content:flex-end;}
+.how-phone{
+  width:196px;background:#0d1812;
+  border-radius:32px;padding:10px 7px;
+  border:1.5px solid rgba(255,255,255,.07);
+  box-shadow:0 20px 55px rgba(0,0,0,.55);
+}
+.how-phone-screen{
+  background:#111a14;border-radius:24px;min-height:330px;
+}
+
+/* ── FILTER ── */
+.s-filter{background:var(--pitch);padding:5rem 6vw;}
+.s-filter-inner{max-width:1060px;margin:0 auto;}
+.filter-h{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.9rem,3.5vw,2.7rem);
+  color:#fff;margin-bottom:2rem;
+}
+.filter-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:.9rem;
+}
+.fc{
+  border:1px solid rgba(255,255,255,.09);border-radius:16px;
+  padding:1.35rem 1.5rem 4.5rem;
+  background:rgba(255,255,255,.025);cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:background .18s,border-color .18s;
+}
+.fc:hover{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.18);}
+.fc-label{
+  font-size:.68rem;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:rgba(255,255,255,.55);
+}
+.fc-glow{
+  position:absolute;bottom:-50px;right:-50px;
+  width:150px;height:150px;border-radius:50%;
+  filter:blur(38px);opacity:.07;pointer-events:none;
+}
+.fc-facilities .fc-glow{background:#4ade80;}
+.fc-safety .fc-glow{background:#f87171;}
+.fc-dining .fc-glow{background:#fbbf24;}
+.fc-tech .fc-glow{background:#60a5fa;}
+
+/* ── TEAM ── */
+.s-team{background:var(--green-deeper);padding:5.5rem 6vw;}
+.s-team-inner{max-width:1060px;margin:0 auto;}
+.team-h{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.9rem,3.5vw,2.7rem);
+  color:#fff;margin-bottom:.7rem;
+}
+.team-sub{
+  font-size:.86rem;color:rgba(255,255,255,.42);
+  font-weight:300;line-height:1.7;max-width:370px;margin-bottom:2.75rem;
+}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.tm-photo{
+  width:100%;aspect-ratio:1;background:rgba(255,255,255,.08);
+  border-radius:8px;display:flex;align-items:flex-end;
+  justify-content:center;padding-bottom:12px;margin-bottom:.55rem;
+  overflow:hidden;
+}
+.tm-initials{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.13);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:600;color:rgba(255,255,255,.7);
+}
+.tm-name{font-size:.78rem;font-weight:500;color:#fff;margin-bottom:2px;}
+.tm-role{font-size:.7rem;color:rgba(255,255,255,.38);font-weight:300;}
+.team-row2{margin-top:.9rem;}
+.tm-empty .tm-photo{opacity:.25;}
+
+/* ── CTA ── */
+.s-cta{background:var(--cream);padding:7rem 2rem;text-align:center;}
+.cta-h{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(2rem,4vw,3.1rem);
+  color:var(--text-dark);margin-bottom:.7rem;letter-spacing:-.015em;
+}
+.store-row{display:flex;align-items:center;justify-content:center;gap:.7rem;flex-wrap:wrap;margin-top:2rem;}
+.store-btn{
+  display:inline-flex;align-items:center;gap:9px;
+  background:var(--text-dark);color:#fff;
+  border-radius:10px;padding:.6rem 1.2rem;
+  text-decoration:none;transition:opacity .18s;
+}
+.store-btn:hover{opacity:.8;}
+.sb-icon{font-size:1.3rem;line-height:1;}
+.sb-sub{font-size:.58rem;opacity:.65;display:block;font-weight:300;line-height:1.2;}
+.sb-name{font-size:.82rem;font-weight:600;display:block;line-height:1.3;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--cream-light);
+  border-top:1px solid rgba(0,0,0,.07);
+  padding:2.5rem 6vw 1.5rem;
+}
+.ft-inner{max-width:1060px;margin:0 auto;}
+.ft-top{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:2rem;margin-bottom:2rem;flex-wrap:wrap;
+}
+.ft-logo{
+  display:flex;align-items:center;gap:8px;
+  font-size:.9rem;font-weight:500;color:var(--text-dark);margin-bottom:.55rem;
+}
+.ft-tagline{font-size:.78rem;color:var(--text-muted);font-weight:300;line-height:1.65;max-width:250px;}
+.ft-links{display:flex;gap:2rem;align-items:center;}
+.ft-links a{
+  font-size:.82rem;color:var(--text-dark);text-decoration:none;
+  transition:opacity .18s;
+}
+.ft-links a:hover{opacity:.55;}
+.ft-bottom{
+  border-top:1px solid rgba(0,0,0,.07);padding-top:1.2rem;
+  display:flex;justify-content:center;
+}
+.ft-cb{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text-muted);}
+
+@media(max-width:780px){
+  .s-action-inner,.s-how-inner{grid-template-columns:1fr;}
+  .phone-tilt{transform:none;}
+  .phone-col,.how-phone-side{display:none;}
+  .filter-grid{grid-template-columns:1fr;}
+  .team-grid{grid-template-columns:repeat(2,1fr);}
+  nav{padding:1rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+      <path d="M17 7L8 10H5C3.9 10 3 10.9 3 12v0c0 1.1.9 2 2 2h.5l1.2 4h2l-1.2-4 9.5 3V7z" fill="#1c3527"/>
+      <path d="M20 9.5V14.5" stroke="#1c3527" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    Poly Problems
+  </a>
+  <a href="#" class="btn-dl">Download</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="badge">Launch day is on April ..., 2026!</div>
+    <h1>The smarter way to handle campus issues.</h1>
+    <div class="cb-credit">
+      <div class="cb-icon">cb</div>
+      Developed by CodeBox
+    </div>
+    <div class="hero-btns">
+      <a href="#" class="btn-solid">Download</a>
+      <a href="#how" class="btn-ghost">Learn more</a>
+    </div>
+  </div>
+
+  <!-- Layered watercolor mountains -->
+  <svg class="hero-mountains" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="wc1"><feGaussianBlur stdDeviation="9"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4" seed="3" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="wc2"><feGaussianBlur stdDeviation="6"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="15"/>
+      </filter>
+      <filter id="blur4"><feGaussianBlur stdDeviation="7"/></filter>
+      <filter id="blur2"><feGaussianBlur stdDeviation="3"/></filter>
+    </defs>
+
+    <!-- Layer 1: farthest, haziest -->
+    <path opacity="0.14" filter="url(#blur4)"
+      d="M0 390 Q200 230 420 270 Q640 310 800 190 Q960 70 1200 160 Q1380 230 1440 200 L1440 560 L0 560Z"
+      fill="#5a8870"/>
+    <!-- Layer 2 -->
+    <path opacity="0.2" filter="url(#wc1)"
+      d="M0 420 Q180 290 380 330 Q580 370 740 250 Q900 130 1100 220 Q1280 300 1440 270 L1440 560 L0 560Z"
+      fill="#3d6b52"/>
+    <!-- Layer 3 -->
+    <path opacity="0.27" filter="url(#wc2)"
+      d="M0 445 Q220 330 420 365 Q620 400 780 300 Q940 200 1120 275 Q1300 350 1440 320 L1440 560 L0 560Z"
+      fill="#2d5a3e"/>
+    <!-- Layer 4 -->
+    <path opacity="0.38" filter="url(#blur2)"
+      d="M0 468 Q240 370 440 400 Q640 430 800 345 Q960 260 1120 325 Q1260 375 1380 345 Q1420 330 1440 355 L1440 560 L0 560Z"
+      fill="#244d35"/>
+    <!-- Layer 5: near -->
+    <path opacity="0.55"
+      d="M0 490 Q200 420 420 445 Q640 470 820 405 Q1000 340 1160 395 Q1300 440 1440 415 L1440 560 L0 560Z"
+      fill="#1c3d2c"/>
+    <!-- Layer 6: closest -->
+    <path opacity="0.78"
+      d="M0 514 Q300 465 520 482 Q740 499 920 452 Q1100 405 1260 455 Q1380 488 1440 470 L1440 560 L0 560Z"
+      fill="#1c3527"/>
+    <!-- Ground fill -->
+    <rect x="0" y="540" width="1440" height="20" fill="#1c3527"/>
+  </svg>
+</section>
+
+<!-- TAKE ACTION -->
+<section class="s-action">
+  <div class="s-action-inner">
+    <div>
+      <div class="action-headline">
+        TAKE ACTION<br><em>FASTER</em>
+      </div>
+      <div class="action-card">
+        <p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor.</p>
+        <p>Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere.</p>
+      </div>
+    </div>
+
+    <div class="phone-col">
+      <div class="phone-tilt">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="ps-bar">
+              <span class="ps-back">←</span>
+              <span class="ps-label">Reporting Issue</span>
+            </div>
+            <div class="ps-body">
+              <div class="ps-title">Issue Details</div>
+              <div class="ps-meta">Building 52, Room 103 · Facilities</div>
+              <div class="ps-desc">HVAC unit not producing airflow. The room becomes noticeably warm during afternoon hours.</div>
+              <div class="ps-img">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+              </div>
+              <div class="ps-map">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                  <circle cx="12" cy="9" r="2.5"/>
+                </svg>
+              </div>
+              <div class="ps-submit">Submit Report</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="s-how" id="how">
+  <div class="s-how-inner">
+    <div>
+      <div class="how-eyebrow">How it works</div>
+      <div class="step active" onclick="setStep(1)">
+        <div class="sn">1</div>
+        <div>
+          <div class="st">Hit the report button</div>
+          <div class="sd">Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.</div>
+        </div>
+      </div>
+      <div class="step" onclick="setStep(2)">
+        <div class="sn">2</div>
+        <div>
+          <div class="st">Fill out the details</div>
+          <div class="sd">Add a title, description, location, and category. Attach photos to help staff understand and resolve the issue faster.</div>
+        </div>
+      </div>
+      <div class="step" onclick="setStep(3)">
+        <div class="sn">3</div>
+        <div>
+          <div class="st">Confirm and submit</div>
+          <div class="sd">Review your report and submit. Your issue is instantly routed to the right department and tracked in real time.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-phone-side">
+      <div class="how-phone">
+        <div class="how-phone-screen"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BY TYPE -->
+<section class="s-filter">
+  <div class="s-filter-inner">
+    <h2 class="filter-h">Filter by type</h2>
+    <div class="filter-grid">
+      <div class="fc fc-facilities"><div class="fc-label">Facilities</div><div class="fc-glow"></div></div>
+      <div class="fc fc-safety"><div class="fc-label">Safety</div><div class="fc-glow"></div></div>
+      <div class="fc fc-dining"><div class="fc-label">Dining</div><div class="fc-glow"></div></div>
+      <div class="fc fc-tech"><div class="fc-label">Tech</div><div class="fc-glow"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="s-team">
+  <div class="s-team-inner">
+    <h2 class="team-h">Meet our dedicated team</h2>
+    <p class="team-sub">Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.</p>
+    <div class="team-grid">
+      <div>
+        <div class="tm-photo"><div class="tm-initials">PC</div></div>
+        <div class="tm-name">Peter Chinh</div>
+        <div class="tm-role">Technical Lead</div>
+      </div>
+      <div>
+        <div class="tm-photo"><div class="tm-initials">NM</div></div>
+        <div class="tm-name">Namish Mannepali</div>
+        <div class="tm-role">Technical Lead</div>
+      </div>
+      <div>
+        <div class="tm-photo"><div class="tm-initials">H</div></div>
+        <div class="tm-name">Harry</div>
+        <div class="tm-role">Product Manager</div>
+      </div>
+      <div class="tm-empty">
+        <div class="tm-photo"></div>
+      </div>
+    </div>
+    <div class="team-grid team-row2">
+      <div class="tm-empty"><div class="tm-photo"></div></div>
+      <div class="tm-empty"><div class="tm-photo"></div></div>
+      <div class="tm-empty"><div class="tm-photo"></div></div>
+      <div class="tm-empty"><div class="tm-photo"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="s-cta">
+  <div class="badge">Launch day is on April ..., 2026!</div>
+  <h2 class="cta-h">Ready to get started?</h2>
+  <div class="cb-credit">
+    <div class="cb-icon">cb</div>
+    Developed by CodeBox
+  </div>
+  <div class="store-row">
+    <a href="#" class="store-btn">
+      <span class="sb-icon">🍎</span>
+      <div>
+        <span class="sb-sub">Download on the</span>
+        <span class="sb-name">App Store</span>
+      </div>
+    </a>
+    <a href="#" class="store-btn">
+      <span class="sb-icon" style="font-size:1rem;">▶</span>
+      <div>
+        <span class="sb-sub">GET IT ON</span>
+        <span class="sb-name">Google Play</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div class="ft-top">
+      <div>
+        <div class="ft-logo">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M17 7L8 10H5C3.9 10 3 10.9 3 12v0c0 1.1.9 2 2 2h.5l1.2 4h2l-1.2-4 9.5 3V7z" fill="#1c3527"/>
+            <path d="M20 9.5V14.5" stroke="#1c3527" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Poly Problems
+        </div>
+        <p class="ft-tagline">A smarter system for collecting, organizing, and resolving campus concerns at scale.</p>
+      </div>
+      <div class="ft-links">
+        <a href="#">Site map</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <div class="ft-cb">
+        <div class="cb-icon" style="width:15px;height:15px;font-size:.46rem;">cb</div>
+        Developed by CodeBox
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function setStep(n){
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.toggle('active',i+1===n);
+  });
+}
+</script>
+</body>
+</html>
