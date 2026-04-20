@@ -62,6 +62,27 @@ export default function ProfileScreen() {
       return data || [];
     },
   });
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+    queryKey: ["is-admin"],
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return false;
+
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) return false;
+
+      return data?.role === "admin";
+    },
+  });
 
   // const handleSignOut = async () => {
   //   await supabase.auth.signOut();
@@ -125,6 +146,21 @@ export default function ProfileScreen() {
 
             {/* Reports */}
             <ThemedView style={styles.section}>
+              {isAdmin && !isAdminLoading && (
+                <Pressable
+                  onPress={() => router.push("/admin/dashboard")}
+                  style={({ pressed }) => [
+                    styles.adminButton,
+                    { opacity: pressed ? 0.85 : 1 },
+                  ]}
+                >
+                  <Ionicons name="shield-checkmark" size={18} color="#FFFFFF" />
+                  <ThemedText style={styles.adminButtonText}>
+                    Admin Dashboard
+                  </ThemedText>
+                </Pressable>
+              )}
+
               <ThemedText style={styles.sectionTitle}>Reports</ThemedText>
 
               {loading ? (
@@ -216,6 +252,22 @@ const profileStyles = (theme: {
     },
     section: {
       marginTop: 20,
+    },
+    adminButton: {
+      backgroundColor: theme.tint,
+      borderRadius: 16,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      marginBottom: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+    },
+    adminButtonText: {
+      color: "#FFFFFF",
+      fontFamily: Fonts.heading,
+      fontSize: 16,
     },
     sectionTitle: {
       fontSize: 28,

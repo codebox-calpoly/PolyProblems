@@ -287,6 +287,15 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   if (!report) return null;
 
   const activeCategoryColor = feedTabs[report.category] || theme.tint;
+  const statusConfig = {
+    unresolved: { label: "Unresolved", color: "#2D7A53" },
+    pending: { label: "Pending Approval", color: "#C9922F" },
+    rejected: { label: "Rejected", color: "#C95C4B" },
+  } as const;
+  const normalizedStatus = (report.status || "pending").toLowerCase();
+  const statusBadge =
+    statusConfig[normalizedStatus as keyof typeof statusConfig] ||
+    statusConfig.pending;
 
   return (
     <View
@@ -317,6 +326,11 @@ export default function FeedPost({ reportId }: { reportId: string }) {
         </Text>
         <View style={[styles.tag, { backgroundColor: activeCategoryColor }]}>
           <Text style={styles.tagText}>{report.category}</Text>
+        </View>
+        <View
+          style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
+        >
+          <Text style={styles.statusText}>{statusBadge.label}</Text>
         </View>
       </View>
 
@@ -491,6 +505,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   tagText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  statusText: {
     color: "white",
     fontSize: 11,
     fontWeight: "800",
