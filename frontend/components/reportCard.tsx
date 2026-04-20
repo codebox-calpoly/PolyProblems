@@ -66,7 +66,9 @@ const createStyles = (theme: any) =>
     },
     cardFooter: {
       marginTop: 12,
-      alignItems: "flex-end",
+      flexDirection: "row", // Changed to row
+      justifyContent: "space-between", // Pushes items to opposite sides
+      alignItems: "center",
     },
     viewButton: {
       backgroundColor: theme.tint,
@@ -120,7 +122,7 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
     feedTabs[report.category as keyof typeof feedTabs] || theme.tint;
   const statusConfig = {
     unresolved: { label: "Unresolved", color: "#2D7A53" },
-    pending: { label: "Unapproved", color: "#C9922F" },
+    pending: { label: "Pending Approval", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
   } as const;
   const normalizedStatus = (report.status || "pending").toLowerCase();
@@ -184,14 +186,6 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
               {report.total_score || 0}
             </ThemedText>
           </ThemedView>
-
-          <ThemedView
-            style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
-          >
-            <ThemedText style={styles.statusText}>
-              {statusBadge.label}
-            </ThemedText>
-          </ThemedView>
         </ThemedView>
 
         {/* DATE REMAINS ON FAR RIGHT */}
@@ -203,6 +197,13 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
       </ThemedView>
 
       <ThemedView style={styles.cardFooter}>
+        <ThemedView
+            style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
+          >
+            <ThemedText style={styles.statusText}>
+              {statusBadge.label}
+            </ThemedText>
+          </ThemedView>
         <TouchableOpacity
           style={styles.viewButton}
           onPress={onPress}

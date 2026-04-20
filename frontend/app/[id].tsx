@@ -186,7 +186,7 @@ export default function ReportDetailsScreen() {
   const location: LocationCoords | null = data?.location ?? null;
   const statusConfig = {
     unresolved: { label: "Unresolved", color: "#2D7A53" },
-    pending: { label: "Unapproved", color: "#C9922F" },
+    pending: { label: "Pending Approval", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
   } as const;
   const normalizedStatus = (report?.status || "pending").toLowerCase();
