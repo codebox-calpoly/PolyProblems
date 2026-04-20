@@ -1,23 +1,48 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { View, StyleSheet, Image, Platform } from 'react-native';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Slot, Tabs } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Image, Platform } from "react-native";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Session } from "@supabase/supabase-js";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { HapticTab } from "@/components/haptic-tab";
+import { Colors, Fonts } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { supabase } from "@/lib/supabase";
+import LandingLogo from "@/assets/images/landinglogo.svg";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
-  
-  const activeColor = Colors[colorScheme].tabIconSelected; 
-  const inactiveColor = Colors[colorScheme].tabIconDefault; 
+  const [session, setSession] = useState<Session | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
+  const colorScheme = useColorScheme() ?? "light";
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setIsSessionLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsSessionLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const activeColor = Colors[colorScheme].tabIconSelected;
+  const inactiveColor = Colors[colorScheme].tabIconDefault;
   const navBackgroundColor = Colors[colorScheme].tabBarBackground;
 
-  const isWeb = Platform.OS === 'web';
-  const barHeight = isWeb ? 100 : (Platform.OS === 'ios' ? 90 : 75);
+  const isWeb = Platform.OS === "web";
+  const barHeight = isWeb ? 100 : Platform.OS === "ios" ? 90 : 75;
   const iconSize = isWeb ? 32 : 26;
   const fontSize = isWeb ? 14 : 12;
+
+  if (isSessionLoading || !session) {
+    return <Slot />;
+  }
 
   return (
     <Tabs
@@ -26,35 +51,33 @@ export default function TabLayout() {
         tabBarInactiveTintColor: inactiveColor,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarLabelPosition: 'below-icon',
+        tabBarLabelPosition: "below-icon",
         tabBarStyle: {
           backgroundColor: navBackgroundColor,
           borderTopWidth: 0,
-          elevation: 0, 
+          elevation: 0,
           height: barHeight,
-          // Reduced padding to allow content to sit lower
-          paddingBottom: isWeb ? 5 : (Platform.OS === 'ios' ? 20 : 5),
+          paddingBottom: isWeb ? 5 : Platform.OS === "ios" ? 20 : 5,
         },
         tabBarLabelStyle: {
-          fontWeight: '700',
+          fontFamily: Fonts.heading,
           fontSize: fontSize,
-          marginBottom: isWeb ? 10 : 0, // Keeps text from floating too high
+          marginBottom: isWeb ? 10 : 0,
         },
         tabBarIconStyle: {
-          // Increased margin to push Feed/Profile icons down further
-          marginTop: isWeb ? 15 : 12, 
-        }
-      }}>
-      
+          marginTop: isWeb ? 15 : 12,
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="feed"
         options={{
-          title: 'Feed',
+          title: "Feed",
           tabBarIcon: ({ focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "view-dashboard" : "view-dashboard-outline"} 
-              size={iconSize} 
-              color={focused ? activeColor : inactiveColor} 
+            <MaterialCommunityIcons
+              name={focused ? "view-dashboard" : "view-dashboard-outline"}
+              size={iconSize}
+              color={focused ? activeColor : inactiveColor}
             />
           ),
         }}
@@ -63,18 +86,21 @@ export default function TabLayout() {
       <Tabs.Screen
         name="reportform"
         options={{
-          title: '', 
+          title: "",
           tabBarIcon: () => (
-            <View style={[styles.megaphoneContainer, isWeb && styles.megaphoneWeb]}>
-              <Image 
-                source={require('../../assets/images/reportBorder.png')} 
+            <View
+              style={[styles.megaphoneContainer, isWeb && styles.megaphoneWeb]}
+            >
+              <Image
+                source={require("../../assets/images/reportBorder.png")}
                 style={[styles.borderImage, isWeb && styles.borderWeb]}
                 resizeMode="contain"
               />
-              <Image 
-                source={require('../../assets/images/report.png')} 
-                style={[styles.mainIcon, isWeb && styles.iconWeb]}
-                resizeMode="contain"
+              <LandingLogo
+                width={isWeb ? 40 : 32}
+                height={isWeb ? 40 : 32}
+                color="#FFFFFF"
+                style={styles.logoIcon}
               />
             </View>
           ),
@@ -84,31 +110,26 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: "Profile",
           tabBarIcon: ({ focused }) => (
-            <Ionicons 
-              name={focused ? "person" : "person-outline"} 
-              size={iconSize} 
-              color={focused ? activeColor : inactiveColor} 
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={iconSize}
+              color={focused ? activeColor : inactiveColor}
             />
           ),
         }}
       />
-
-      <Tabs.Screen name="explore" options={{ href: null }} />
-      <Tabs.Screen name="camera" options={{ href: null }} />
-      <Tabs.Screen name="settings" options={{ href: null }} />
-      <Tabs.Screen name="BeforeCont" options={{ href: null }} />
+      <Tabs.Screen name="index" options={{ href: null }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
   megaphoneContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    // Pushing the middle button down further
-    marginTop: Platform.OS === 'ios' ? 20 : 25, 
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Platform.OS === "ios" ? 20 : 25,
     width: 70,
     height: 70,
   },
@@ -118,7 +139,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   borderImage: {
-    position: 'absolute',
+    position: "absolute",
     width: 65,
     height: 65,
   },
@@ -126,13 +147,8 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
   },
-  mainIcon: {
-    width: 32,
-    height: 32,
-    tintColor: 'white', 
+  logoIcon: {
+    position: "absolute",
+    zIndex: 2,
   },
-  iconWeb: {
-    width: 40,
-    height: 40,
-  }
 });

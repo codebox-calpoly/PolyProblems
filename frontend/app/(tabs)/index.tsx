@@ -1,27 +1,49 @@
 import { StyleSheet, Pressable, View } from "react-native";
-import {useRouter} from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 
-import Dot from "@/assets/images/dot.svg";
-import DotActive from "@/assets/images/dot-active.svg";
+// import Dot from "@/assets/images/dot.svg";
+// import DotActive from "@/assets/images/dot-active.svg";
 import PolyLogo from "@/components/ui/poly-logo";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-
+import { Fonts } from "@/constants/theme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function HomeScreen() {
   const router = useRouter();
   const tintColor = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "text");
-  const inactiveDotColor = useThemeColor({}, "tabIconDefault");
+  // const inactiveDotColor = useThemeColor({}, "tabIconDefault");
   const backgroundColor = useThemeColor({}, "background");
+  const [session, setSession] = useState<boolean>(false);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        // User is logged in, redirect to Profile
+        setSession(true);
+      } else {
+        setSession(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  if (session === true) {
+    return <Redirect href="/profile" />;
+  }
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
-      <PolyLogo />
-
-      <View style={{ flex: 1 }} />
+      <View style={styles.logoContainer}>
+        <PolyLogo />
+      </View>
 
       <ThemedView style={styles.descriptionContainer}>
         <ThemedText
@@ -32,14 +54,15 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
 
-      <View style={styles.dots}>
+      {/* <View style={styles.dots}>
         <DotActive width={8} height={8} fill={tintColor} />
         <Dot width={8} height={8} fill={inactiveDotColor} />
         <Dot width={8} height={8} fill={inactiveDotColor} />
-      </View>
+      </View> */}
 
-      <Pressable style={[styles.button, { backgroundColor: tintColor }]}
-        onPress = {() => router.push("/login")}
+      <Pressable
+        style={[styles.button, { backgroundColor: tintColor }]}
+        onPress={() => router.push("/login")}
       >
         <ThemedText style={styles.buttonText}> Get Started</ThemedText>
       </Pressable>
@@ -47,11 +70,15 @@ export default function HomeScreen() {
       <ThemedView>
         <ThemedText
           style={[styles.signInText, { color: textColor }]}
-          type="subtitle">
-          Already have an account? {" "}
-        
-          <ThemedText style={styles.signInLink} onPress={() => router.push("/login")}>Sign in</ThemedText>
-
+          type="subtitle"
+        >
+          Already have an account?{" "}
+          <ThemedText
+            style={styles.signInLink}
+            onPress={() => router.push("/login")}
+          >
+            Sign in
+          </ThemedText>
         </ThemedText>
       </ThemedView>
 
@@ -65,19 +92,24 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  logoContainer: {
+    flex: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     flex: 1,
   },
-    descriptionContainer: {
-      paddingHorizontal: 20,
-      marginBottom:20,
-    },
+  descriptionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
   descriptionText: {
     fontSize: 25,
-    fontWeight: 500,
+    fontFamily: Fonts.body,
     textAlign: "center",
     marginBottom: 15,
   },
@@ -92,7 +124,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "400",
+    fontFamily: Fonts.body,
   },
   dots: {
     flexDirection: "row",
@@ -101,11 +133,11 @@ const styles = StyleSheet.create({
   signInText: {
     marginTop: 5,
     fontSize: 13,
-    fontWeight: 200,
+    fontFamily: Fonts.body,
     textAlign: "center",
   },
   signInLink: {
-    fontWeight: 600,
+    fontFamily: Fonts.heading,
     fontSize: 13,
     textDecorationLine: "underline",
   },
