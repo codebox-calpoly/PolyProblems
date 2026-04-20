@@ -1,5 +1,18 @@
 {
-  "buildCommand": "npx expo export -p web",
+  "buildCommand": "npx expo export -p web && cp -r ../landing ./dist/landing",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { 
+      "source": "/landing", 
+      "destination": "/landing/index.html" 
+    },
+    { 
+      "source": "/landing/(.*)", 
+      "destination": "/landing/$1" 
+    },
+    { 
+      "source": "/((?!landing).*)", 
+      "destination": "/index.html" 
+    }
+  ]
 }
