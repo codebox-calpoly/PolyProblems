@@ -11,6 +11,7 @@ import {
   ScrollView,
   Platform,
   useWindowDimensions,
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
@@ -25,10 +26,13 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [numLines, setNumLines] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isFullscreenLoading, setIsFullscreenLoading] = useState(false);
+  const [isImageRendering, setIsImageRendering] = useState(false);
 
   const mainScrollRef = useRef<ScrollView>(null);
   const isWeb = Platform.OS === "web";
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   // Adjusted width calculation: screen width minus FeedPost/FeedScene padding
   const cardPadding = 48; // paddingHorizontal: 24 * 2
@@ -54,12 +58,22 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       // 2. Fetch signed URLs if images exist
       let signedUrls: string[] = [];
       if (report.image_paths?.length > 0) {
-        const { data: signedData, error: signedError } = await supabase.storage
-          .from("report-photos")
-          .createSignedUrls(report.image_paths, 3600);
-
-        if (signedError) throw signedError;
-        signedUrls = signedData.map((item) => item.signedUrl);
+        const urls = await Promise.all(
+          report.image_paths.map(async (path: string) => {
+            const { data, error } = await supabase.storage
+              .from("report-photos")
+              .createSignedUrl(path, 3600, {
+                transform: {
+                  width: 600,
+                  quality: 70,
+                  resize: "contain",
+                },
+              });
+            if (error) throw error;
+            return data.signedUrl;
+          }),
+        );
+        signedUrls = urls;
       }
 
       let userVote = 0;
@@ -90,6 +104,37 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   const report = reportData;
   const imageUrls = reportData?.imageUrls || [];
   const loading = isLoading;
+
+  const handleImagePress = async (index: number) => {
+    const path = report?.image_paths?.[index];
+    if (!path) return;
+
+    setIsFullscreenLoading(true);
+    setIsImageRendering(true);
+
+    try {
+      // .ensureQueryData checks the cache first.
+      // If valid data exists, it returns it instantly.
+      // If not, it runs the queryFn.
+      const data = await queryClient.ensureQueryData({
+        queryKey: ["full-image", path],
+        queryFn: async () => {
+          const { data, error } = await supabase.storage
+            .from("report-photos")
+            .createSignedUrl(path, 3600);
+          if (error) throw error;
+          return data.signedUrl;
+        },
+      });
+
+      setSelectedImage(data);
+    } catch (err) {
+      console.error("Error:", err);
+      setIsImageRendering(false);
+    } finally {
+      setIsFullscreenLoading(false);
+    }
+  };
 
   const hasNewLines = (report?.description?.match(/\n/g) || []).length >= 2;
   const isTooLong = report?.description?.length > 100;
@@ -177,8 +222,9 @@ export default function FeedPost({ reportId }: { reportId: string }) {
           }
         >
           {imageUrls.map((url, index) => (
-            <View
+            <Pressable
               key={index}
+              onPress={() => handleImagePress(index)}
               style={{
                 width: imageWidth,
                 aspectRatio: 1.5,
@@ -192,7 +238,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
                 style={styles.image}
                 resizeMode="contain"
               />
-            </View>
+            </Pressable>
           ))}
         </ScrollView>
 
@@ -341,10 +387,65 @@ export default function FeedPost({ reportId }: { reportId: string }) {
           </TouchableOpacity>
         </View>
 
+        <Modal
+          visible={!!selectedImage || isFullscreenLoading}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => {
+            setSelectedImage(null);
+            setIsImageRendering(false);
+          }}
+        >
+          <View style={styles.modalBackground}>
+            <Pressable
+              style={styles.modalCloseArea}
+              onPress={() => {
+                setSelectedImage(null);
+                setIsImageRendering(false);
+              }}
+            >
+              <Ionicons name="close" size={32} color="white" />
+            </Pressable>
+
+            {(isFullscreenLoading || isImageRendering) && (
+              <View style={styles.absoluteCenter}>
+                <ActivityIndicator size="large" color="white" />
+              </View>
+            )}
+
+            {selectedImage && (
+              <ScrollView
+                // Important for iOS Zoom
+                maximumZoomScale={5}
+                minimumZoomScale={1}
+                centerContent={true}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                // Ensuring the ScrollView fills the space
+                contentContainerStyle={styles.scrollContent}
+              >
+                <Image
+                  source={{ uri: selectedImage }}
+                  style={[
+                    styles.fullImage,
+                    {
+                      width: windowWidth,
+                      height: windowHeight,
+                      opacity: isImageRendering ? 0 : 1,
+                    },
+                  ]}
+                  resizeMode="contain"
+                  onLoad={() => setIsImageRendering(false)}
+                />
+              </ScrollView>
+            )}
+          </View>
+        </Modal>
+
         {/* More Menu */}
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Ionicons name="ellipsis-horizontal" size={20} color={theme.icon} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -475,5 +576,26 @@ const styles = StyleSheet.create({
     minWidth: 24,
     textAlign: "center",
     fontFamily: Fonts.heading,
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalCloseArea: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    zIndex: 20,
+    padding: 10,
+  },
+  fullImage: {
+    width: "100%",
+    height: "80%",
+  },
+  absoluteCenter: {
+    position: "absolute",
+    zIndex: 10,
   },
 });

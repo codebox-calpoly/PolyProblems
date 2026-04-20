@@ -397,6 +397,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: Fonts.body,
+    letterSpacing: 0,
   },
   continueButton: {
     height: 56,

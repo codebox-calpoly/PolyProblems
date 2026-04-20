@@ -63,10 +63,10 @@ export default function ProfileScreen() {
     },
   });
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.replace("/");
-  };
+  // const handleSignOut = async () => {
+  //   await supabase.auth.signOut();
+  //   router.replace("/");
+  // };
 
   const handleSettingsPress = () => {
     router.push("/settings");
@@ -84,9 +84,9 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         {/* Settings icon */}
         <ThemedView style={styles.topRow}>
-          <TouchableOpacity onPress={handleSignOut}>
+          {/* <TouchableOpacity onPress={handleSignOut}>
             <Ionicons name="log-out-outline" size={24} color={theme.tint} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <ThemedView style={{ flex: 1 }} />
           <Pressable onPress={handleSettingsPress}>
             <Ionicons name="settings-outline" size={24} color={theme.tint} />

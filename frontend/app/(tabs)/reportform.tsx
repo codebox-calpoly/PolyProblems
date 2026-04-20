@@ -439,5 +439,6 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     fontFamily: Fonts.body,
+    letterSpacing: 0,
   },
 });
