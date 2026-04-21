@@ -25,9 +25,9 @@ const Settings = () => {
   //   router.push("/(tabs)/profile");
   // };
 
-  const handleNotifications = () => {
-    router.push("/notifications");
-  };
+  // const handleNotifications = () => {
+  //   router.push("/notifications");
+  // };
 
   const confirmSignOut = () => {
     if (isSigningOut) return;

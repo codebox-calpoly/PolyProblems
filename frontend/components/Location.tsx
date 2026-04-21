@@ -38,7 +38,7 @@ const LocationPreview: React.FC<LocationProps> = ({ value }) => {
 const styles = StyleSheet.create({
   map: {
     width: "100%",
-    height: 140,
+    height: "100%",
   },
 });
 

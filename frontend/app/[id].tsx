@@ -83,10 +83,23 @@ export default function ReportDetailsScreen() {
           }
         : null;
 
+      let userVote = 0;
+      if (user) {
+        const { data: voteData } = await supabase
+          .from("votes")
+          .select("vote_type")
+          .eq("report_id", reportId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        userVote = voteData?.vote_type || 0;
+      }
+
       return {
         report,
         imageUrls: urls,
         location: coords,
+        userVote,
       };
     },
   });
@@ -98,6 +111,33 @@ export default function ReportDetailsScreen() {
         data: { user },
       } = await supabase.auth.getUser();
       return user;
+    },
+  });
+
+  const voteMutation = useMutation({
+    mutationFn: async (type: 1 | -1) => {
+      const { error } = await supabase.rpc("handle_vote", {
+        target_report_id: reportId,
+        new_vote_type: type,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(["report", reportId], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        const newVote = oldData.userVote === variables ? 0 : variables;
+        const scoreAdjustment = newVote - (oldData.userVote || 0);
+
+        return {
+          ...oldData,
+          userVote: newVote,
+          report: {
+            ...oldData.report,
+            total_score: (oldData.report?.total_score || 0) + scoreAdjustment,
+          },
+        };
+      });
     },
   });
 
@@ -430,6 +470,40 @@ export default function ReportDetailsScreen() {
                 </ThemedText>
               </View>
             )}
+            <View style={styles.divider} />
+            {/* Voting Bar */}
+            <View
+              style={[
+                styles.voteContainer,
+                { backgroundColor: theme.icon + "15" },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.voteButton}
+                onPress={() => voteMutation.mutate(1)}
+              >
+                <Ionicons
+                  name="arrow-up"
+                  size={22}
+                  color={data?.userVote === 1 ? theme.tint : theme.icon}
+                />
+              </TouchableOpacity>
+
+              <ThemedText style={styles.voteScore}>
+                {report?.total_score ?? 0}
+              </ThemedText>
+
+              <TouchableOpacity
+                style={styles.voteButton}
+                onPress={() => voteMutation.mutate(-1)}
+              >
+                <Ionicons
+                  name="arrow-down"
+                  size={22}
+                  color={data?.userVote === -1 ? "#FF4500" : theme.icon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {!!report?.rejection_reason && (
@@ -1014,5 +1088,23 @@ const reportStyles = (theme: { background: string }) =>
     },
     confirmRejectButton: {
       backgroundColor: "#C95C4B",
+    },
+    voteContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderRadius: 20,
+      paddingHorizontal: 6,
+      paddingVertical: 6,
+      alignSelf: "flex-start",
+    },
+    voteButton: {
+      paddingHorizontal: 10,
+    },
+    voteScore: {
+      fontSize: 16,
+      fontWeight: "700",
+      minWidth: 30,
+      textAlign: "center",
+      fontFamily: Fonts.heading,
     },
   });
