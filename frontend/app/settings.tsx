@@ -195,7 +195,7 @@ const Settings = () => {
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity> */}
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.optionButton,
             { backgroundColor: colors.settingsButton },
@@ -205,7 +205,7 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Notifications</Text>
           <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[
