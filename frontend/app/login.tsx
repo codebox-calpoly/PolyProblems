@@ -267,7 +267,9 @@ export default function LoginScreen() {
                   By registering, you accept our{" "}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => Linking.openURL("https://example.com/terms")}
+                  onPress={() =>
+                    Linking.openURL("https://poly-problems.vercel.app/terms")
+                  }
                 >
                   <Text
                     style={[
@@ -283,7 +285,9 @@ export default function LoginScreen() {
                   and{" "}
                 </Text>
                 <TouchableOpacity
-                  onPress={() => Linking.openURL("https://example.com/privacy")}
+                  onPress={() =>
+                    Linking.openURL("https://poly-problems.vercel.app/privacy")
+                  }
                 >
                   <Text
                     style={[
