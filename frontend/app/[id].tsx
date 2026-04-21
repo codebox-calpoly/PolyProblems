@@ -90,24 +90,28 @@ export default function ReportDetailsScreen() {
       };
     },
   });
-  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
-    queryKey: ["is-admin"],
-    staleTime: 1000 * 60 * 5,
+
+  const { data: user } = useQuery({
+    queryKey: ["current-user"],
     queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      return user;
+    },
+  });
 
-      if (!user) return false;
-
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+    queryKey: ["is-admin", user?.id], // Dependent on user ID
+    enabled: !!user?.id, // Only run once user is found
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
       const { data: roleData, error } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
+        .eq("user_id", user?.id)
         .single();
-
-      if (error) return false;
-
+      if (error) throw error;
       return roleData?.role === "admin";
     },
   });
@@ -126,7 +130,7 @@ export default function ReportDetailsScreen() {
       status,
       reason,
     }: {
-      status: "unresolved" | "rejected";
+      status: "unresolved" | "rejected" | "resolved";
       reason: string | null;
     }) => {
       const { error } = await supabase
@@ -188,13 +192,17 @@ export default function ReportDetailsScreen() {
     unresolved: { label: "Unresolved", color: "#2D7A53" },
     pending: { label: "Pending Approval", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
+    resolved: { label: "Resolved", color: "#2E86C1" },
   } as const;
   const normalizedStatus = (report?.status || "pending").toLowerCase();
   const statusBadge =
     statusConfig[normalizedStatus as keyof typeof statusConfig] ||
     statusConfig.pending;
+  const isResolved = normalizedStatus === "resolved";
   const isApproved = normalizedStatus === "unresolved";
   const isRejected = normalizedStatus === "rejected";
+  const isOwner = user?.id === report?.user_id;
+  const showUserResolveButton = isOwner && !(isRejected || isResolved);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -213,12 +221,31 @@ export default function ReportDetailsScreen() {
     setIsModalVisible(true);
   };
 
-  const handleApprove = async () => {
+  const handleApprove = async (isUserAction: boolean = false) => {
+    // If the user/owner clicks it, it ALWAYS goes to resolved (from pending or unresolved)
+    // If the admin clicks it, it toggles between unresolved and resolved
+    let nextStatus: "resolved" | "unresolved" = "resolved";
+
+    if (!isUserAction) {
+      nextStatus = isApproved ? "resolved" : "unresolved";
+    }
+
     await updateReportStatus.mutateAsync({
-      status: "unresolved",
+      status: nextStatus,
       reason: null,
     });
-    showMessage("Report Approved", "The report has been marked as unresolved.");
+
+    // Dynamic success message
+    let successMsg = "";
+    if (isUserAction) {
+      successMsg = "You have marked your report as resolved.";
+    } else {
+      successMsg = isApproved
+        ? "The report has been marked as resolved."
+        : "The report has been approved and is now unresolved.";
+    }
+
+    showMessage("Status Updated", successMsg);
   };
 
   const handleReject = async () => {
@@ -312,17 +339,25 @@ export default function ReportDetailsScreen() {
               <TouchableOpacity
                 style={[
                   styles.actionButton,
-                  isRejected
+                  isRejected || isResolved
                     ? styles.inactiveActionButton
                     : styles.approveButton,
                   isApproved && styles.activeApproveButton,
                   updateReportStatus.isPending && styles.actionButtonDisabled,
                 ]}
-                onPress={handleApprove}
-                disabled={updateReportStatus.isPending}
+                onPress={() => handleApprove(false)}
+                disabled={
+                  updateReportStatus.isPending || isResolved || isRejected
+                }
               >
                 <ThemedText style={styles.actionButtonText}>
-                  {isApproved ? "Unresolved" : "Approve"}
+                  {updateReportStatus.isPending
+                    ? "Updating..."
+                    : isApproved
+                      ? "Mark as Resolved"
+                      : isResolved
+                        ? "Resolved"
+                        : "Approve"}
                 </ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
@@ -342,6 +377,27 @@ export default function ReportDetailsScreen() {
               >
                 <ThemedText style={styles.actionButtonText}>
                   {isRejected ? "Rejected" : "Reject"}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* User-Owner Action: Resolve Button */}
+          {showUserResolveButton && (
+            <View style={styles.adminActions}>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  styles.approveButton,
+                  updateReportStatus.isPending && styles.actionButtonDisabled,
+                ]}
+                onPress={() => handleApprove(true)}
+                disabled={updateReportStatus.isPending}
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  {updateReportStatus.isPending
+                    ? "Updating..."
+                    : "Mark as Resolved"}
                 </ThemedText>
               </TouchableOpacity>
             </View>

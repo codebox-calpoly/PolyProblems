@@ -124,6 +124,7 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
     unresolved: { label: "Unresolved", color: "#2D7A53" },
     pending: { label: "Pending Approval", color: "#C9922F" },
     rejected: { label: "Rejected", color: "#C95C4B" },
+    resolved: { label: "Resolved", color: "#2E86C1" },
   } as const;
   const normalizedStatus = (report.status || "pending").toLowerCase();
   const statusBadge =
@@ -198,12 +199,10 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
 
       <ThemedView style={styles.cardFooter}>
         <ThemedView
-            style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
-          >
-            <ThemedText style={styles.statusText}>
-              {statusBadge.label}
-            </ThemedText>
-          </ThemedView>
+          style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
+        >
+          <ThemedText style={styles.statusText}>{statusBadge.label}</ThemedText>
+        </ThemedView>
         <TouchableOpacity
           style={styles.viewButton}
           onPress={onPress}
