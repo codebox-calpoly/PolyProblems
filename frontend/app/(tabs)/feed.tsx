@@ -12,12 +12,14 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import { TabView, TabBar } from "react-native-tab-view";
 
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FeedPost from "@/components/feedPost";
+
+
 
 const FeedScene = ({ title, color }: { title: string; color: string }) => {
   const {
@@ -28,25 +30,23 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
   } = useQuery({
     queryKey: ["reports", title],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("reports")
         .select("id")
-        .eq("category", title)
         .eq("status", "unresolved")
         .order("created_at", { ascending: false });
 
+      // Only filter by category when not on the "All" tab
+      if (title !== "All") {
+        query = query.eq("category", title);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
-    // Optional: Prevents fetching if title is empty
     enabled: !!title,
-
-    // Keep the list "fresh" for 2 minutes
-    // Users won't see a loading spinner or background refresh if they
-    // switch tabs and come back quickly.
     staleTime: 2 * 60 * 1000,
-
-    // Keep in memory for 10 minutes even if the user leaves the screen
     gcTime: 10 * 60 * 1000,
   });
 
@@ -57,7 +57,8 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
       </View>
     );
   }
-  // --- CASE 1: No Reports Found (Uses your centered scene style) ---
+
+  // --- CASE 1: No Reports Found ---
   if (!reports || reports.length === 0) {
     return (
       <ScrollView
@@ -69,22 +70,26 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={color} // Matches your theme
+            tintColor={color}
           />
         }
       >
-        <Text style={[styles.testText, { color }]}>{title} Feed</Text>
-        <Text style={[styles.subText, { color: color }]}>
-          No reports in {title} yet.
+        <Text style={[styles.testText, { color }]}>
+          {title === "All" ? "All Reports" : `${title} Feed`}
+        </Text>
+        <Text style={[styles.subText, { color }]}>
+          {title === "All"
+            ? "No reports yet."
+            : `No reports in ${title} yet.`}
         </Text>
       </ScrollView>
     );
   }
 
-  // --- CASE 2: Reports Exist (Uses ScrollView for content) ---
+  // --- CASE 2: Reports Exist ---
   return (
     <ScrollView
-      style={{ flex: 1 }} // Force the width to the screen size
+      style={{ flex: 1 }}
       contentContainerStyle={{
         paddingVertical: 20,
         alignItems: "center",
@@ -94,12 +99,12 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
         <RefreshControl
           refreshing={isRefetching}
           onRefresh={refetch}
-          tintColor={color} // For iOS spinner color
+          tintColor={color}
         />
       }
     >
       <Text style={[styles.testText, { color, marginBottom: 20 }]}>
-        {title} Feed
+        {title === "All" ? "All Reports" : `${title} Feed`}
       </Text>
 
       {reports.map((report) => (
@@ -114,34 +119,36 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
   );
 };
 
-const renderScene = SceneMap({
-  Facilities: () => (
-    <FeedScene title="Facilities" color={feedTabs.Facilities} />
-  ),
-  Safety: () => <FeedScene title="Safety" color={feedTabs.Safety} />,
-  Dining: () => <FeedScene title="Dining" color={feedTabs.Dining} />,
-  Tech: () => <FeedScene title="Tech" color={feedTabs.Tech} />,
-});
-
 export default function FeedScreen() {
   const layout = useWindowDimensions();
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
 
+  const ALL_TAB_COLOR = "#174735";
+
+  // Default to index 0 = "All"
   const [index, setIndex] = useState(0);
   const [routes] = useState([
+    { key: "All", title: "All" },
     { key: "Facilities", title: "Facilities" },
     { key: "Safety", title: "Safety" },
     { key: "Dining", title: "Dining" },
     { key: "Tech", title: "Tech" },
   ]);
 
-  // Helper to get color array matching the routes
-  const colorRange = routes.map((route) => feedTabs[route.key] || theme.tint);
+  // Build color array matching routes order (All first)
+  const colorRange = routes.map(
+    (route) => feedTabs[route.key] ?? ALL_TAB_COLOR
+  );
   const inputRange = routes.map((_, i) => i);
 
+  // Moved inside component so SceneMap has access to theme
+  const renderScene = ({ route }: { route: { key: string } }) => {
+    const color = feedTabs[route.key] ?? ALL_TAB_COLOR;
+    return <FeedScene title={route.key} color={color} />;
+  };
+
   const renderTabBar = (props: any) => {
-    // Interpolate the indicator and label colors based on scroll position
     const activeColor = props.position.interpolate({
       inputRange,
       outputRange: colorRange,
@@ -150,9 +157,7 @@ export default function FeedScreen() {
     return (
       <TabBar
         {...props}
-        // Animate the Indicator
         renderIndicator={(indicatorProps) => {
-          // Calculate width of one tab
           const width = layout.width / routes.length;
           const translateX = indicatorProps.position.interpolate({
             inputRange,
@@ -164,7 +169,7 @@ export default function FeedScreen() {
               style={[
                 styles.indicator,
                 {
-                  width: width - 20, // slightly narrower for aesthetic
+                  width: width - 20,
                   transform: [{ translateX: Animated.add(translateX, 10) }],
                   backgroundColor: activeColor,
                 },
@@ -182,8 +187,9 @@ export default function FeedScreen() {
         }}
         activeColor={theme.text}
         inactiveColor={theme.text}
-        tabStyle={{ width: layout.width / 4 }}
+        tabStyle={{ width: layout.width / routes.length }}
         pressColor="transparent"
+        scrollEnabled={false}
       />
     );
   };
