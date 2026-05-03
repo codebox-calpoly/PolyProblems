@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   TextInput,
   TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -13,63 +12,102 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  Pressable,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Redirect, useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { supabase } from "@/lib/supabase";
 import { Fonts } from "@/constants/theme";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import PolyLogo from "@/components/ui/poly-logo";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  // theme
+  const tintColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "text");
+  const backgroundColor = useThemeColor({}, "background");
+  const inputBackground = isDark ? "#2a2a2a" : "#f5f5f5";
+  const borderColor = isDark ? "#444444" : "#e0e0e0";
+
+  // auth state
+  const [session, setSession] = useState<boolean | null>(null);
+
+  // screen state: 'welcome' | 'email' | 'otp'
+  const [screen, setScreen] = useState<"welcome" | "email" | "otp">("welcome");
+
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [screen, setScreen] = useState("email"); // 'email' or 'password'
-  const colorScheme = useColorScheme();
 
-  const isDark = colorScheme === "dark";
-  const backgroundColor = isDark ? "#1a1a1a" : "#ffffff";
-  const textColor = isDark ? "#ffffff" : "#000000";
-  const inputBackground = isDark ? "#2a2a2a" : "#f5f5f5";
-  const borderColor = isDark ? "#444444" : "#e0e0e0";
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        // invalid/expired refresh token — treat as logged out
+        supabase.auth.signOut();
+        setSession(false);
+      } else {
+        setSession(!!session?.user);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // still checking auth
+  if (session === null) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor }]}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" color={tintColor} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // already logged in
+  if (session === true) return <Redirect href="/(tabs)/feed" />;
 
   const handleContinue = async () => {
     setError("");
-
     if (!email.trim()) {
       setError("Please enter your email");
       return;
     }
-
     const calPolyEmailRegex = /^[^\s@]+@calpoly\.edu$/i;
     if (!calPolyEmailRegex.test(email)) {
       setError("Please enter a valid Cal Poly email (@calpoly.edu)");
       return;
     }
-
     setLoading(true);
-
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase().trim(),
-        options: {
-          shouldCreateUser: true,
-        },
+        options: { shouldCreateUser: true },
       });
-
       if (error) throw error;
-
-      Alert.alert(
-        "Check your email",
-        `We sent a login code to ${email}. Please check your inbox.`,
-        [{ text: "OK" }],
-      );
+      Alert.alert("Check your email", `We sent a login code to ${email}.`, [
+        { text: "OK" },
+      ]);
       setScreen("otp");
     } catch (err: any) {
       setError(err.message || "Failed to send code. Please try again.");
-      console.error("OTP send error:", err);
     } finally {
       setLoading(false);
     }
@@ -77,62 +115,43 @@ export default function LoginScreen() {
 
   const handleVerifyOTP = async () => {
     setError("");
-
     if (!otp.trim()) {
       setError("Please enter the verification code");
       return;
     }
-
     if (otp.length !== 6) {
       setError("Please enter a valid 6-digit code");
       return;
     }
-
     setLoading(true);
-
     try {
       const { data, error } = await supabase.auth.verifyOtp({
         email: email.toLowerCase().trim(),
         token: otp.trim(),
         type: "email",
       });
-
       if (error) throw error;
-
       if (data.session) {
-        console.log("Login successful:", data.user?.email);
-        router.replace("/(tabs)");
+        router.replace("/(tabs)/feed");
       } else {
         setError("Invalid code. Please try again.");
       }
     } catch (err: any) {
       setError(err.message || "Verification failed. Please try again.");
-      console.error("OTP verify error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBackToEmail = () => {
-    setScreen("email");
-    setOtp("");
-    setError("");
-  };
-
   const handleResendCode = async () => {
     setError("");
     setLoading(true);
-
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase().trim(),
-        options: {
-          shouldCreateUser: true,
-        },
+        options: { shouldCreateUser: true },
       });
-
       if (error) throw error;
-
       Alert.alert("Code resent", "Check your email for a new code.");
     } catch (err: any) {
       setError(err.message || "Failed to resend code.");
@@ -141,6 +160,47 @@ export default function LoginScreen() {
     }
   };
 
+  // ── WELCOME SCREEN ──
+  if (screen === "welcome") {
+    return (
+      <ThemedView style={[styles.welcomeContainer, { backgroundColor }]}>
+        <View style={styles.logoContainer}>
+          <PolyLogo />
+        </View>
+        <ThemedView style={styles.descriptionContainer}>
+          <ThemedText
+            style={[styles.descriptionText, { color: textColor }]}
+            type="subtitle"
+          >
+            Review and manage reported campus issues.
+          </ThemedText>
+        </ThemedView>
+        <Pressable
+          style={[styles.button, { backgroundColor: tintColor }]}
+          onPress={() => setScreen("email")}
+        >
+          <Text style={styles.buttonText}>Get Started</Text>
+        </Pressable>
+        <ThemedView>
+          <ThemedText
+            style={[styles.signInText, { color: textColor }]}
+            type="subtitle"
+          >
+            Already have an account?{" "}
+            <ThemedText
+              style={styles.signInLink}
+              onPress={() => setScreen("email")}
+            >
+              Sign in
+            </ThemedText>
+          </ThemedText>
+        </ThemedView>
+        <View style={{ height: 60 }} />
+      </ThemedView>
+    );
+  }
+
+  // ── EMAIL / OTP SCREEN ──
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <TouchableWithoutFeedback
@@ -151,37 +211,36 @@ export default function LoginScreen() {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}
         >
-          {/* Close Button */}
+          {/* Back to welcome */}
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={() => router.replace("/(tabs)")}
+            onPress={() => {
+              setScreen("welcome");
+              setError("");
+              setOtp("");
+            }}
           >
             <AntDesign name="close" size={24} color="black" />
           </TouchableOpacity>
 
           <View style={styles.content}>
-            {/* Header, Error, and Form */}
             <View style={styles.formSection}>
-              {/* Header */}
               <Text style={[styles.title, { color: textColor }]}>
                 {screen === "email"
                   ? "Enter your Cal Poly email"
                   : "Enter verification code"}
               </Text>
-
               {screen === "otp" && (
-                <Text style={[styles.title, { color: textColor }]}>
+                <Text style={[styles.subtitle, { color: textColor }]}>
                   We sent a 6-digit code to {email}
                 </Text>
               )}
-
-              {/* Error Message */}
               {error ? (
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{error}</Text>
                 </View>
               ) : null}
-              {/* Form */}
+
               {screen === "email" ? (
                 <View style={styles.inputGroup}>
                   <Text style={[styles.label, { color: textColor }]}>
@@ -193,7 +252,7 @@ export default function LoginScreen() {
                       {
                         backgroundColor: inputBackground,
                         color: textColor,
-                        borderColor: borderColor,
+                        borderColor,
                       },
                     ]}
                     placeholder="johndoe@calpoly.edu"
@@ -208,7 +267,6 @@ export default function LoginScreen() {
                 </View>
               ) : (
                 <>
-                  {/* OTP Input */}
                   <View style={styles.inputGroup}>
                     <Text style={[styles.label, { color: textColor }]}>
                       Verification code
@@ -219,7 +277,7 @@ export default function LoginScreen() {
                         {
                           backgroundColor: inputBackground,
                           color: textColor,
-                          borderColor: borderColor,
+                          borderColor,
                           textAlign: "center",
                           fontSize: 24,
                           letterSpacing: 8,
@@ -233,10 +291,9 @@ export default function LoginScreen() {
                       keyboardType="number-pad"
                       maxLength={6}
                       autoComplete="one-time-code"
+                      textContentType="oneTimeCode"
                     />
                   </View>
-
-                  {/* Resend Code */}
                   <TouchableOpacity
                     onPress={handleResendCode}
                     disabled={loading}
@@ -245,10 +302,12 @@ export default function LoginScreen() {
                       Didn&apos;t receive a code? Resend
                     </Text>
                   </TouchableOpacity>
-
-                  {/* Back Button */}
                   <TouchableOpacity
-                    onPress={handleBackToEmail}
+                    onPress={() => {
+                      setScreen("email");
+                      setOtp("");
+                      setError("");
+                    }}
                     disabled={loading}
                   >
                     <Text style={[styles.backButton, { color: textColor }]}>
@@ -259,9 +318,7 @@ export default function LoginScreen() {
               )}
             </View>
 
-            {/* Button and Footer */}
             <View style={styles.bottomSection}>
-              {/* Footer */}
               <View style={styles.footer}>
                 <Text style={[styles.footerText, { color: textColor }]}>
                   By registering, you accept our{" "}
@@ -299,8 +356,6 @@ export default function LoginScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
-
-              {/* Continue/Verify Button */}
               <TouchableOpacity
                 style={[
                   styles.continueButton,
@@ -326,6 +381,51 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  // welcome
+  welcomeContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  logoContainer: {
+    flex: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  descriptionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  descriptionText: {
+    fontSize: 25,
+    fontFamily: Fonts.body,
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  button: {
+    marginTop: 30,
+    height: 52,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 110,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 15,
+    fontFamily: Fonts.body,
+  },
+  signInText: {
+    marginTop: 5,
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    textAlign: "center",
+  },
+  signInLink: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    textDecorationLine: "underline",
+  },
+  // login
   container: {
     flex: 1,
   },
@@ -341,12 +441,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 16,
   },
-  closeButtonText: {
-    fontSize: 32,
-    color: "#000000",
-    lineHeight: 32,
-    fontFamily: Fonts.body,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
@@ -359,14 +453,18 @@ const styles = StyleSheet.create({
   bottomSection: {
     gap: 24,
   },
-  header: {
-    marginBottom: 40,
-  },
   title: {
     fontSize: 32,
     fontFamily: Fonts.heading,
     lineHeight: 40,
     marginBottom: 24,
+  },
+  subtitle: {
+    fontSize: 16,
+    fontFamily: Fonts.body,
+    marginBottom: 16,
+    marginTop: -16,
+    opacity: 0.6,
   },
   errorContainer: {
     backgroundColor: "#fee",
@@ -381,9 +479,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     fontFamily: Fonts.body,
-  },
-  form: {
-    marginBottom: 30,
   },
   inputGroup: {
     marginBottom: 24,
@@ -443,7 +538,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
   },
   link: {
-    color: "#000000",
     fontSize: 13,
     fontFamily: Fonts.heading,
     textDecorationLine: "underline",
