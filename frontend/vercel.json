@@ -27,7 +27,7 @@
       "destination": "/terms/$1"
     },
     {
-      "source": "/((?!landing|privacy|terms).+)",
+      "source": "/((?!landing|privacy|terms|static|_next).*)",
       "destination": "/index.html"
     }
   ]
