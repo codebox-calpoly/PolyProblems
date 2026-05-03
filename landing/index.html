@@ -1,633 +1,1148 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Poly Problems — The smarter way to handle campus issues.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --cream:#edeae2;
-  --cream-light:#f2efe8;
-  --green-dark:#1c3527;
-  --green-deeper:#162d21;
-  --near-black:#0d1710;
-  --pitch:#09100c;
-  --text-dark:#1a1a14;
-  --text-muted:#737368;
-  --serif:'Playfair Display',Georgia,serif;
-  --sans:'DM Sans',system-ui,sans-serif;
-}
-html{scroll-behavior:smooth;}
-body{font-family:var(--sans);background:var(--cream);color:var(--text-dark);overflow-x:hidden;line-height:1.6;}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poly Problems — The smarter way to handle campus issues.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --cream: #edeae2;
+        --cream-light: #f2efe8;
+        --green-dark: #1c3527;
+        --green-deeper: #162d21;
+        --near-black: #0d1710;
+        --pitch: #09100c;
+        --text-dark: #1a1a14;
+        --text-muted: #737368;
+        --serif: "Playfair Display", Georgia, serif;
+        --sans: "DM Sans", system-ui, sans-serif;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-snap-type: y proximity;
+      }
+      body {
+        font-family: var(--sans);
+        background: var(--cream);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        line-height: 1.6;
+      }
 
-/* ── NAV ── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:1rem 2.5rem;
-  background:rgba(237,234,226,0.85);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-}
-.nav-logo{
-  display:flex;align-items:center;gap:10px;
-  font-family:var(--sans);font-weight:500;font-size:0.92rem;
-  color:var(--text-dark);text-decoration:none;
-}
-.nav-logo svg{width:22px;height:21px;color:var(--green-dark);}
-.btn-dl{
-  background:var(--green-dark);color:#fff;border:none;
-  padding:0.5rem 1.35rem;border-radius:50px;
-  font-family:var(--sans);font-size:0.82rem;font-weight:500;
-  cursor:pointer;text-decoration:none;letter-spacing:0.01em;
-  transition:opacity .18s;
-}
-.btn-dl:hover{opacity:.82;}
+      section, footer {
+        scroll-snap-align: start;
+      }
 
-/* ── HERO ── */
-.hero{
-  min-height:100vh;background:var(--cream);
-  display:flex;flex-direction:column;align-items:center;
-  position:relative;overflow:hidden;padding-top:4.5rem;
-}
-.hero-content{
-  position:relative;z-index:3;
-  text-align:center;padding:4.5rem 2rem 0;
-}
-.badge{
-  display:inline-block;
-  border:1px solid rgba(0,0,0,0.18);border-radius:50px;
-  padding:0.28rem 0.95rem;margin-bottom:1.5rem;
-  font-size:0.75rem;color:var(--text-muted);font-weight:400;
-}
-.hero h1{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(2.6rem,5.5vw,3.8rem);
-  color:var(--text-dark);line-height:1.12;letter-spacing:-0.015em;
-  max-width:520px;margin:0 auto 1rem;
-}
-.cb-credit{
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-size:0.76rem;color:var(--text-muted);margin-bottom:1.75rem;
-}
-.cb-icon{
-  width:17px;height:17px;border-radius:4px;
-  background:linear-gradient(135deg,#33c458,#1e8bc3);
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.5rem;font-weight:700;color:#fff;letter-spacing:-0.03em;
-}
-.hero-btns{display:flex;align-items:center;justify-content:center;gap:.7rem;}
-.btn-solid{
-  background:var(--green-dark);color:#fff;
-  border:1.5px solid var(--green-dark);
-  padding:.62rem 1.55rem;border-radius:50px;
-  font-family:var(--sans);font-size:.86rem;font-weight:500;
-  text-decoration:none;transition:opacity .18s;
-}
-.btn-solid:hover{opacity:.82;}
-.btn-ghost{
-  background:transparent;color:var(--text-dark);
-  border:1.5px solid rgba(0,0,0,.22);
-  padding:.62rem 1.55rem;border-radius:50px;
-  font-family:var(--sans);font-size:.86rem;font-weight:500;
-  text-decoration:none;transition:border-color .18s;
-}
-.btn-ghost:hover{border-color:rgba(0,0,0,.5);}
-.hero-mountains{
-  position:absolute;bottom:0;left:0;right:0;width:100%;
-  pointer-events:none;z-index:1;
-}
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2.5rem;
+        background: rgba(237, 234, 226, 0.85);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 0.92rem;
+        color: var(--text-dark);
+        text-decoration: none;
+      }
+      .nav-logo svg {
+        width: 22px;
+        height: 21px;
+        color: var(--green-dark);
+      }
+      .btn-dl {
+        background: var(--green-dark);
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1.35rem;
+        border-radius: 50px;
+        font-family: var(--sans);
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        letter-spacing: 0.01em;
+        transition: opacity 0.18s;
+      }
+      .btn-dl:hover {
+        opacity: 0.82;
+      }
 
-/* ── TAKE ACTION ── */
-.s-action{background:var(--green-dark);padding:5.5rem 6vw 5rem;}
-.s-action-inner{
-  max-width:1060px;margin:0 auto;
-  display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;
-}
-.action-headline{
-  font-family:var(--sans);font-weight:700;
-  font-size:clamp(2.4rem,4.5vw,3.4rem);
-  color:#fff;line-height:1.05;letter-spacing:-0.02em;
-  text-transform:uppercase;margin-bottom:2.5rem;
-}
-.action-headline em{font-style:italic;font-weight:400;}
-.action-card{
-  border:1px solid rgba(255,255,255,.1);border-radius:12px;
-  padding:1.75rem;background:rgba(255,255,255,.04);
-}
-.action-card p{
-  font-size:.88rem;color:rgba(255,255,255,.6);
-  line-height:1.8;font-weight:300;margin-bottom:1rem;
-}
-.action-card p:last-child{margin-bottom:0;}
+      /* ── HERO ── */
+      .hero {
+        min-height: 100vh;
+        background: #F3F0E8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+        padding-top: 4.5rem;
+      }
 
-/* phone mockup - coded report form */
-.phone-col{display:flex;justify-content:center;align-items:flex-start;padding-top:.5rem;}
-.phone-tilt{transform:rotate(-7deg) translateX(24px);}
-.phone-shell{
-  width:230px;background:#1a1a1a;
-  border-radius:40px;padding:13px 9px;
-  border:1.5px solid rgba(255,255,255,.1);
-  box-shadow:0 36px 90px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04);
-}
-.phone-notch{
-  width:68px;height:19px;background:#1a1a1a;
-  border-radius:0 0 13px 13px;margin:0 auto 7px;
-}
-.phone-screen{
-  background:#f5f5f3;border-radius:28px;overflow:hidden;
-  display:flex;flex-direction:column;
-}
-.ps-topbar{
-  padding:12px 14px 6px;
-  background:#f5f5f3;
-}
-.ps-back{
-  display:flex;align-items:center;gap:5px;
-  font-size:.58rem;color:#333;font-family:var(--sans);margin-bottom:5px;
-}
-.ps-page-title{
-  font-size:.82rem;font-weight:700;color:#111;font-family:var(--sans);
-}
-.ps-body{
-  padding:8px 12px;display:flex;flex-direction:column;gap:7px;flex:1;
-}
-.ps-input{
-  border:1px solid #e0e0de;border-radius:10px;
-  padding:8px 10px;font-size:.58rem;color:#aaa;
-  background:#fff;font-family:var(--sans);
-}
-.ps-upload{
-  border:1.5px dashed #c8c8c5;border-radius:10px;
-  padding:16px 10px;text-align:center;background:#fff;
-}
-.ps-upload-icon{margin-bottom:4px;}
-.ps-upload-label{font-size:.55rem;color:#888;font-family:var(--sans);margin-bottom:6px;}
-.ps-browse{
-  background:#1c3527;color:#fff;border:none;
-  border-radius:50px;padding:4px 12px;
-  font-size:.55rem;font-weight:600;font-family:var(--sans);
-  display:inline-block;
-}
-.ps-location{
-  background:#1c3527;border-radius:10px;
-  padding:9px 12px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.ps-location-left{display:flex;align-items:center;gap:5px;}
-.ps-location-text{font-size:.58rem;color:#fff;font-family:var(--sans);}
-.ps-enable{
-  background:rgba(255,255,255,.18);color:#fff;
-  border-radius:50px;padding:3px 8px;
-  font-size:.52rem;font-weight:600;font-family:var(--sans);
-}
-.ps-textarea{
-  border:1px solid #e0e0de;border-radius:10px;
-  padding:8px 10px;font-size:.58rem;color:#aaa;
-  background:#fff;font-family:var(--sans);min-height:42px;
-}
-.ps-labels-label{font-size:.6rem;font-weight:700;color:#111;font-family:var(--sans);}
-.ps-labels-row{display:flex;gap:4px;overflow:hidden;}
-.ps-label-pill{
-  font-size:.48rem;padding:3px 8px;border-radius:50px;
-  border:1px solid #e0e0de;color:#555;white-space:nowrap;font-family:var(--sans);
-  background:#fff;
-}
-.ps-label-pill.active{background:#1c3527;color:#fff;border-color:#1c3527;}
-.ps-navbar{
-  background:#f5f5f3;border-top:1px solid #e8e8e5;
-  padding:7px 0 8px;
-  display:flex;align-items:center;justify-content:space-around;
-}
-.ps-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.44rem;color:#aaa;font-family:var(--sans);}
-.ps-fab{
-  width:32px;height:32px;border-radius:50%;background:#1c3527;
-  display:flex;align-items:center;justify-content:center;margin-top:-6px;
-}
+      .hero-content {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        padding: 4.5rem 2rem 0;
+        margin-bottom: 0; /* remove the margin-bottom we added earlier */
+      }
+      .badge {
+        display: inline-block;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        border-radius: 50px;
+        padding: 0.28rem 0.95rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+      .hero h1 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(2.6rem, 5.5vw, 3.8rem);
+        color: var(--text-dark);
+        line-height: 1.12;
+        letter-spacing: -0.015em;
+        max-width: 520px;
+        margin: 0 auto 1rem;
+      }
+      .cb-credit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+        margin-bottom: 1.75rem;
+      }
+      .cb-icon {
+        width: 17px;
+        height: 17px;
+        border-radius: 4px;
+        background: linear-gradient(135deg, #33c458, #1e8bc3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.5rem;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.03em;
+      }
+      .hero-btns {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+      }
+      .btn-solid {
+        background: var(--green-dark);
+        color: #fff;
+        border: 1.5px solid var(--green-dark);
+        padding: 0.62rem 1.55rem;
+        border-radius: 50px;
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: opacity 0.18s;
+      }
+      .btn-solid:hover {
+        opacity: 0.82;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-dark);
+        border: 1.5px solid rgba(0, 0, 0, 0.22);
+        padding: 0.62rem 1.55rem;
+        border-radius: 50px;
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: border-color 0.18s;
+      }
+      .btn-ghost:hover {
+        border-color: rgba(0, 0, 0, 0.5);
+      }
+      .hero-mountains {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        pointer-events: none;
+        z-index: 1;
+        display: block;
+        object-fit: cover;
+        object-position: bottom;
+      }
 
-/* ── HOW IT WORKS ── */
-.s-how{background:var(--near-black);padding:5.5rem 6vw;}
-.s-how-inner{
-  max-width:1060px;margin:0 auto;
-  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;
-}
-.how-eyebrow{
-  font-size:.68rem;font-weight:600;letter-spacing:.16em;
-  text-transform:uppercase;color:rgba(255,255,255,.35);
-  margin-bottom:2.25rem;
-}
-.step{
-  display:flex;gap:1rem;margin-bottom:1rem;
-  padding:.9rem 1rem;border-radius:10px;cursor:pointer;
-  transition:background .18s;
-}
-.step:hover{background:rgba(255,255,255,.03);}
-.step.active{background:rgba(255,255,255,.04);}
-.sn{
-  width:26px;height:26px;min-width:26px;
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:6px;display:flex;align-items:center;justify-content:center;
-  font-size:.72rem;font-weight:600;color:rgba(255,255,255,.3);
-  margin-top:1px;transition:all .18s;
-}
-.step.active .sn{
-  border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;
-}
-.st{
-  font-size:.95rem;font-weight:500;color:rgba(255,255,255,.3);
-  margin-bottom:.3rem;transition:color .18s;
-}
-.step.active .st{font-size:1.05rem;font-weight:600;color:#fff;}
-.sd{
-  font-size:.82rem;color:rgba(255,255,255,.42);
-  line-height:1.65;display:none;
-}
-.step.active .sd{display:block;}
-.how-phone-side{display:flex;justify-content:flex-end;}
-.how-phone{
-  width:196px;background:#0d1812;
-  border-radius:32px;padding:10px 7px;
-  border:1.5px solid rgba(255,255,255,.07);
-  box-shadow:0 20px 55px rgba(0,0,0,.55);
-}
-.how-phone-screen{
-  background:#111a14;border-radius:24px;min-height:330px;
-}
+      /* ── TAKE ACTION ── */
+      .s-action {
+        background: #324031;
+        padding: 5.5rem 6vw 5rem;
+      }
+      .s-action-inner {
+        max-width: 1060px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+      }
+      .action-headline {
+        font-family: var(--sans);
+        font-weight: 700;
+        font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+        color: #fff;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        margin-bottom: 2.5rem;
+      }
+      .action-headline em {
+        font-style: italic;
+        font-weight: 400;
+      }
+      .action-card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.75rem;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .action-card p {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.8;
+        font-weight: 300;
+        margin-bottom: 1rem;
+      }
+      .action-card p:last-child {
+        margin-bottom: 0;
+      }
 
-/* ── FILTER ── */
-.s-filter{background:var(--pitch);padding:5rem 6vw;}
-.s-filter-inner{max-width:1060px;margin:0 auto;}
-.filter-h{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(1.9rem,3.5vw,2.7rem);
-  color:#fff;margin-bottom:2rem;
-}
-.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
-.fc{
-  border:1px solid rgba(255,255,255,.09);border-radius:16px;
-  padding:1.35rem 1.5rem 4.5rem;
-  background:rgba(255,255,255,.025);cursor:pointer;
-  position:relative;overflow:hidden;
-  transition:background .18s,border-color .18s;
-}
-.fc:hover{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.18);}
-.fc-label{
-  font-size:.68rem;font-weight:600;letter-spacing:.13em;
-  text-transform:uppercase;color:rgba(255,255,255,.55);
-}
-.fc-glow{
-  position:absolute;bottom:-50px;right:-50px;
-  width:150px;height:150px;border-radius:50%;
-  filter:blur(38px);opacity:.07;pointer-events:none;
-}
-.fc-facilities .fc-glow{background:#4ade80;}
-.fc-safety .fc-glow{background:#f87171;}
-.fc-dining .fc-glow{background:#fbbf24;}
-.fc-tech .fc-glow{background:#60a5fa;}
+      /* phone mockup - coded report form */
+      .phone-col {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 0.5rem;
+      }
+      .phone-tilt {
+        transform: rotate(-7deg) translateX(24px);
+      }
+      .phone-shell {
+        width: 230px;
+        background: #1a1a1a;
+        border-radius: 40px;
+        padding: 13px 9px;
+        border: 1.5px solid rgba(255, 255, 255, 0.1);
+        box-shadow:
+          0 36px 90px rgba(0, 0, 0, 0.65),
+          0 0 0 1px rgba(255, 255, 255, 0.04);
+      }
+      .phone-notch {
+        width: 68px;
+        height: 19px;
+        background: #1a1a1a;
+        border-radius: 0 0 13px 13px;
+        margin: 0 auto 7px;
+      }
+      .phone-screen {
+        background: #f5f5f3;
+        border-radius: 28px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .ps-topbar {
+        padding: 12px 14px 6px;
+        background: #f5f5f3;
+      }
+      .ps-back {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.58rem;
+        color: #333;
+        font-family: var(--sans);
+        margin-bottom: 5px;
+      }
+      .ps-page-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #111;
+        font-family: var(--sans);
+      }
+      .ps-body {
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        flex: 1;
+      }
+      .ps-input {
+        border: 1px solid #e0e0de;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 0.58rem;
+        color: #aaa;
+        background: #fff;
+        font-family: var(--sans);
+      }
+      .ps-upload {
+        border: 1.5px dashed #c8c8c5;
+        border-radius: 10px;
+        padding: 16px 10px;
+        text-align: center;
+        background: #fff;
+      }
+      .ps-upload-icon {
+        margin-bottom: 4px;
+      }
+      .ps-upload-label {
+        font-size: 0.55rem;
+        color: #888;
+        font-family: var(--sans);
+        margin-bottom: 6px;
+      }
+      .ps-browse {
+        background: #1c3527;
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 4px 12px;
+        font-size: 0.55rem;
+        font-weight: 600;
+        font-family: var(--sans);
+        display: inline-block;
+      }
+      .ps-location {
+        background: #1c3527;
+        border-radius: 10px;
+        padding: 9px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .ps-location-left {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .ps-location-text {
+        font-size: 0.58rem;
+        color: #fff;
+        font-family: var(--sans);
+      }
+      .ps-enable {
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        border-radius: 50px;
+        padding: 3px 8px;
+        font-size: 0.52rem;
+        font-weight: 600;
+        font-family: var(--sans);
+      }
+      .ps-textarea {
+        border: 1px solid #e0e0de;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 0.58rem;
+        color: #aaa;
+        background: #fff;
+        font-family: var(--sans);
+        min-height: 42px;
+      }
+      .ps-labels-label {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #111;
+        font-family: var(--sans);
+      }
+      .ps-labels-row {
+        display: flex;
+        gap: 4px;
+        overflow: hidden;
+      }
+      .ps-label-pill {
+        font-size: 0.48rem;
+        padding: 3px 8px;
+        border-radius: 50px;
+        border: 1px solid #e0e0de;
+        color: #555;
+        white-space: nowrap;
+        font-family: var(--sans);
+        background: #fff;
+      }
+      .ps-label-pill.active {
+        background: #1c3527;
+        color: #fff;
+        border-color: #1c3527;
+      }
+      .ps-navbar {
+        background: #f5f5f3;
+        border-top: 1px solid #e8e8e5;
+        padding: 7px 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+      .ps-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        font-size: 0.44rem;
+        color: #aaa;
+        font-family: var(--sans);
+      }
+      .ps-fab {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #1c3527;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: -6px;
+      }
 
-/* ── TEAM ── */
-.s-team{background:var(--green-deeper);padding:5.5rem 6vw;}
-.s-team-inner{max-width:1060px;margin:0 auto;}
-.team-h{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(1.9rem,3.5vw,2.7rem);
-  color:#fff;margin-bottom:.7rem;
-}
-.team-sub{
-  font-size:.86rem;color:rgba(255,255,255,.42);
-  font-weight:300;line-height:1.7;max-width:370px;margin-bottom:2.75rem;
-}
-.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
-.tm-photo{
-  width:100%;aspect-ratio:1;background:rgba(255,255,255,.08);
-  border-radius:8px;display:flex;align-items:flex-end;
-  justify-content:center;padding-bottom:12px;margin-bottom:.55rem;
-  overflow:hidden;
-}
-.tm-initials{
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(255,255,255,.13);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.8rem;font-weight:600;color:rgba(255,255,255,.7);
-}
-.tm-name{font-size:.78rem;font-weight:500;color:#fff;margin-bottom:2px;}
-.tm-role{font-size:.7rem;color:rgba(255,255,255,.38);font-weight:300;}
-.team-row2{margin-top:.9rem;}
-.tm-empty .tm-photo{opacity:.25;}
+      /* ── HOW IT WORKS ── */
+      .s-how {
+        background: var(--near-black);
+        padding: 5.5rem 6vw;
+      }
+      .s-how-inner {
+        max-width: 1060px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+      }
+      .how-eyebrow {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 2.25rem;
+      }
+      .step {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.18s;
+      }
+      .step:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .step.active {
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .sn {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.3);
+        margin-top: 1px;
+        transition: all 0.18s;
+      }
+      .step.active .sn {
+        border-color: rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      .st {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: 0.3rem;
+        transition: color 0.18s;
+      }
+      .step.active .st {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #fff;
+      }
+      .sd {
+        font-size: 0.82rem;
+        color: rgba(255, 255, 255, 0.42);
+        line-height: 1.65;
+        display: none;
+      }
+      .step.active .sd {
+        display: block;
+      }
+      .how-phone-side {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .how-phone {
+        width: 196px;
+        background: #0d1812;
+        border-radius: 32px;
+        padding: 10px 7px;
+        border: 1.5px solid rgba(255, 255, 255, 0.07);
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.55);
+      }
+      .how-phone-screen {
+        background: #111a14;
+        border-radius: 24px;
+        min-height: 330px;
+      }
 
-/* ── CTA ── */
-.s-cta{background:var(--cream);padding:7rem 2rem;text-align:center;}
-.cta-h{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(2rem,4vw,3.1rem);
-  color:var(--text-dark);margin-bottom:.7rem;letter-spacing:-.015em;
-}
-.store-row{display:flex;align-items:center;justify-content:center;gap:.7rem;flex-wrap:wrap;margin-top:2rem;}
+      /* ── FILTER ── */
+      .s-filter {
+        background: var(--pitch);
+        padding: 5rem 6vw;
+      }
+      .s-filter-inner {
+        max-width: 1060px;
+        margin: 0 auto;
+      }
+      .filter-h {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.9rem, 3.5vw, 2.7rem);
+        color: #fff;
+        margin-bottom: 2rem;
+      }
+      .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.9rem;
+      }
+      .fc {
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 16px;
+        padding: 1.35rem 1.5rem 4.5rem;
+        background: rgba(255, 255, 255, 0.025);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition:
+          background 0.18s,
+          border-color 0.18s;
+      }
+      .fc:hover {
+        background: rgba(255, 255, 255, 0.055);
+        border-color: rgba(255, 255, 255, 0.18);
+      }
+      .fc-label {
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .fc-desc {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.65);
+        font-weight: 300;
+        line-height: 1.6;
+        margin-top: 0.5rem;
+      }
+      .fc-examples {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.45);
+        font-weight: 300;
+        line-height: 1.6;
+        margin-top: 0.4rem;
+      }
+      .fc-glow {
+        position: absolute;
+        bottom: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        filter: blur(38px);
+        opacity: 0.07;
+        pointer-events: none;
+      }
+      .fc-facilities .fc-glow {
+        background: #4ade80;
+      }
+      .fc-safety .fc-glow {
+        background: #f87171;
+      }
+      .fc-dining .fc-glow {
+        background: #fbbf24;
+      }
+      .fc-tech .fc-glow {
+        background: #60a5fa;
+      }
 
-/* Real Apple App Store badge */
-.appstore-btn{
-  display:inline-block;transition:opacity .18s;
-  height:44px;
-}
-.appstore-btn:hover{opacity:.8;}
-.appstore-btn svg{height:44px;width:auto;}
+      /* ── TEAM ── */
+      .s-team {
+        background: var(--green-deeper);
+        padding: 5.5rem 6vw;
+      }
+      .s-team-inner {
+        max-width: 1060px;
+        margin: 0 auto;
+      }
+      .team-h {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.9rem, 3.5vw, 2.7rem);
+        color: #fff;
+        margin-bottom: 0.7rem;
+      }
+      .team-sub {
+        font-size: 0.86rem;
+        color: rgba(255, 255, 255, 0.42);
+        font-weight: 300;
+        line-height: 1.7;
+        max-width: 370px;
+        margin-bottom: 2.75rem;
+      }
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+      }
+      .tm-photo {
+        width: 100%;
+        aspect-ratio: 1;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 12px;
+        margin-bottom: 0.55rem;
+        overflow: hidden;
+      }
+      .tm {
+        cursor: pointer;
+        transition: opacity 0.18s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .tm:hover {
+        opacity: 0.7;
+      }
+      .tm-initials {
+        width: 104px;
+        height: 104px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.55rem;
+      }
+      .tm-name {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 2px;
+        text-align: center;
+      }
 
-/* ── FOOTER ── */
-footer{
-  background:var(--cream-light);
-  border-top:1px solid rgba(0,0,0,.07);
-  padding:2.5rem 6vw 1.5rem;
-}
-.ft-inner{max-width:1060px;margin:0 auto;}
-.ft-top{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  gap:2rem;margin-bottom:2rem;flex-wrap:wrap;
-}
-.ft-logo{
-  display:flex;align-items:center;gap:9px;
-  font-size:.9rem;font-weight:500;color:var(--text-dark);margin-bottom:.55rem;
-}
-.ft-logo svg{width:20px;height:19px;color:var(--green-dark);}
-.ft-tagline{font-size:.78rem;color:var(--text-muted);font-weight:300;line-height:1.65;max-width:250px;}
-.ft-links{display:flex;gap:2rem;align-items:center;}
-.ft-links a{
-  font-size:.82rem;color:var(--text-dark);text-decoration:none;
-  transition:opacity .18s;
-}
-.ft-links a:hover{opacity:.55;}
-.ft-bottom{
-  border-top:1px solid rgba(0,0,0,.07);padding-top:1.2rem;
-  display:flex;justify-content:center;
-}
-.ft-cb{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text-muted);}
+      .tm-role {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.38);
+        font-weight: 300;
+        text-align: center;
+      }
+      .team-row2 {
+        margin-top: 0.9rem;
+      }
+      .tm-empty .tm-photo {
+        opacity: 0.25;
+      }
 
-@media(max-width:780px){
-  .s-action-inner,.s-how-inner{grid-template-columns:1fr;}
-  .phone-tilt{transform:none;}
-  .how-phone-side{display:none;}
-  .filter-grid{grid-template-columns:1fr;}
-  .team-grid{grid-template-columns:repeat(2,1fr);}
-  nav{padding:1rem 1.25rem;}
-  .phone-col{justify-content:center;margin-top:1.5rem;}
-}
-</style>
-</head>
-<body>
+      /* ── CTA ── */
+      .s-cta {
+        background: var(--cream);
+        padding: 7rem 2rem;
+        text-align: center;
+      }
+      .cta-h {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(2rem, 4vw, 3.1rem);
+        color: var(--text-dark);
+        margin-bottom: 0.7rem;
+        letter-spacing: -0.015em;
+      }
+      .store-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">
-    <svg viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z" fill="currentColor"/>
-      <path d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z" fill="currentColor"/>
-    </svg>
-    Poly Problems
-  </a>
-  <a href="#cta" class="btn-dl">Download</a>
-</nav>
+      /* Real Apple App Store badge */
+      .appstore-btn {
+        display: inline-block;
+        transition: opacity 0.18s;
+        height: 44px;
+      }
+      .appstore-btn:hover {
+        opacity: 0.8;
+      }
+      .appstore-btn svg {
+        height: 44px;
+        width: auto;
+      }
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="badge">Launch day is on April ..., 2026!</div>
-    <h1>The smarter way to handle campus issues.</h1>
-    <div class="cb-credit">
-      <div class="cb-icon">cb</div>
-      Developed by CodeBox
-    </div>
-    <div class="hero-btns">
-      <a href="#cta" class="btn-solid">Download</a>
-      <a href="#how" class="btn-ghost">Learn more</a>
-    </div>
-  </div>
+      /* ── FOOTER ── */
+      footer {
+        background: var(--cream-light);
+        border-top: 1px solid rgba(0, 0, 0, 0.07);
+        padding: 2.5rem 6vw 1.5rem;
+      }
+      .ft-inner {
+        max-width: 1060px;
+        margin: 0 auto;
+      }
+      .ft-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+      .ft-logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 0.55rem;
+      }
+      .ft-logo svg {
+        width: 20px;
+        height: 19px;
+        color: var(--green-dark);
+      }
+      .ft-tagline {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.65;
+        max-width: 250px;
+      }
+      .ft-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+      }
+      .ft-links a {
+        font-size: 0.82rem;
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: opacity 0.18s;
+      }
+      .ft-links a:hover {
+        opacity: 0.55;
+      }
+      .ft-bottom {
+        border-top: 1px solid rgba(0, 0, 0, 0.07);
+        padding-top: 1.2rem;
+        display: flex;
+        justify-content: center;
+      }
+      .ft-cb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+        .phone-img-col img {
+          width:200%;
+          display:block;
+          margin-left: -10rem;
+        }
 
-  <svg class="hero-mountains" viewBox="0 0 1440 560" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <filter id="wc1"><feGaussianBlur stdDeviation="9"/></filter>
-      <filter id="wc2"><feGaussianBlur stdDeviation="6"/></filter>
-      <filter id="blur4"><feGaussianBlur stdDeviation="7"/></filter>
-      <filter id="blur2"><feGaussianBlur stdDeviation="3"/></filter>
-    </defs>
-    <path opacity="0.14" filter="url(#blur4)" d="M0 390 Q200 230 420 270 Q640 310 800 190 Q960 70 1200 160 Q1380 230 1440 200 L1440 560 L0 560Z" fill="#5a8870"/>
-    <path opacity="0.2" filter="url(#wc1)" d="M0 420 Q180 290 380 330 Q580 370 740 250 Q900 130 1100 220 Q1280 300 1440 270 L1440 560 L0 560Z" fill="#3d6b52"/>
-    <path opacity="0.27" filter="url(#wc2)" d="M0 445 Q220 330 420 365 Q620 400 780 300 Q940 200 1120 275 Q1300 350 1440 320 L1440 560 L0 560Z" fill="#2d5a3e"/>
-    <path opacity="0.38" filter="url(#blur2)" d="M0 468 Q240 370 440 400 Q640 430 800 345 Q960 260 1120 325 Q1260 375 1380 345 Q1420 330 1440 355 L1440 560 L0 560Z" fill="#244d35"/>
-    <path opacity="0.55" d="M0 490 Q200 420 420 445 Q640 470 820 405 Q1000 340 1160 395 Q1300 440 1440 415 L1440 560 L0 560Z" fill="#1c3d2c"/>
-    <path opacity="0.78" d="M0 514 Q300 465 520 482 Q740 499 920 452 Q1100 405 1260 455 Q1380 488 1440 470 L1440 560 L0 560Z" fill="#1c3527"/>
-    <rect x="0" y="540" width="1440" height="20" fill="#1c3527"/>
-  </svg>
-</section>
+      @media (max-width: 780px) {
+          html {
+            scroll-snap-type: none;
+          }
+        .s-action-inner,
+        .s-how-inner {
+          grid-template-columns: 1fr;
+        }
+        .phone-tilt {
+          transform: none;
+        }
+        .how-phone-side {
+          display: none;
+        }
+        .filter-grid {
+          grid-template-columns: 1fr;
+        }
+        .team-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        nav {
+          padding: 1rem 1.25rem;
+        }
+        .phone-col {
+          justify-content: center;
+          margin-top: 1.5rem;
+        }
+        .hero-mountains {
+          height: 100vh;
+          object-position: top;
+        }
+        .hero-content {
+          margin-bottom: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAV -->
+    <nav>
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z"
+            fill="currentColor"
+          />
+          <path
+            d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z"
+            fill="currentColor"
+          />
+        </svg>
+        Poly Problems
+      </a>
+      <a href="#cta" class="btn-dl">Download</a>
+    </nav>
 
-<!-- TAKE ACTION -->
-<section class="s-action">
-  <div class="s-action-inner">
-    <div>
-      <div class="action-headline">TAKE ACTION<br><em>FASTER</em></div>
-      <div class="action-card">
-        <p>Poly Problems is a community-powered app that lets Cal Poly students and staff report campus issues — from broken HVAC units and faulty door locks to dining outages and Wi-Fi dead zones — directly to the departments that can fix them.</p>
-        <p>Every report gets upvoted by the community, so the most impactful issues rise to the top. No more lost emails. No more wondering if anyone noticed. Just fast, transparent action on the things that matter most to campus life.</p>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>The smarter way to handle campus issues.</h1>
+        <div class="cb-credit">
+          <div class="cb-icon">cb</div>
+          Developed by CodeBox
+        </div>
+        <div class="hero-btns">
+          <a href="#cta" class="btn-solid">Download</a>
+          <a href="#action" class="btn-ghost">Learn more</a>
+        </div>
       </div>
-    </div>
 
-    <div class="phone-col">
-      <div class="phone-tilt">
-        <div class="phone-shell">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="ps-topbar">
-              <div class="ps-back">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-                Reporting Issues
+      <img class="hero-mountains" src="hero.svg" alt="">
+    </section>
+
+    <!-- TAKE ACTION -->
+    <section class="s-action" id="action">
+      <div class="s-action-inner">
+        <div>
+          <div class="action-headline">TAKE ACTION<br /><em>FASTER</em></div>
+          <div class="action-card">
+            <p>
+              Poly Problems is a community-powered app that lets Cal Poly
+              students and staff report campus issues — from broken HVAC units
+              and faulty door locks to dining outages and Wi-Fi dead zones —
+              directly to the departments that can fix them.
+            </p>
+            <p>
+              Every report gets upvoted by the community, so the most impactful
+              issues rise to the top. No more lost emails. No more wondering if
+              anyone noticed. Just fast, transparent action on the things that
+              matter most to campus life.
+            </p>
+          </div>
+        </div>
+
+        <div class="phone-img-col">
+          <img src="phone.svg" alt="Poly Problems app screenshot">
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="s-how" id="how">
+      <div class="s-how-inner">
+        <div>
+          <div class="how-eyebrow">How it works</div>
+          <div class="step active" onclick="setStep(1)">
+            <div class="sn">1</div>
+            <div>
+              <div class="st">Hit the report button</div>
+              <div class="sd">
+                Open Poly Problems and tap the report button from the main feed.
+                It's always one tap away — no navigating through menus.
               </div>
-              <div class="ps-page-title">Issue Details</div>
             </div>
-            <div class="ps-body">
-              <div class="ps-input">Report Title</div>
-              <div class="ps-upload">
-                <div class="ps-upload-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </div>
-                <div class="ps-upload-label">Upload Images</div>
-                <div class="ps-browse">Browse</div>
-              </div>
-              <div class="ps-location">
-                <div class="ps-location-left">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-                  <span class="ps-location-text">Add location</span>
-                </div>
-                <div class="ps-enable">Enable</div>
-              </div>
-              <div class="ps-textarea">Describe the issue</div>
-              <div class="ps-labels-label">Select labels</div>
-              <div class="ps-labels-row">
-                <div class="ps-label-pill active">Facilities</div>
-                <div class="ps-label-pill">Safety</div>
-                <div class="ps-label-pill">Dining</div>
-                <div class="ps-label-pill">Tech</div>
+          </div>
+          <div class="step" onclick="setStep(2)">
+            <div class="sn">2</div>
+            <div>
+              <div class="st">Fill out the details</div>
+              <div class="sd">
+                Describe the issue, pin the location on campus, and attach
+                photos if you have them. The more detail you add, the faster
+                facilities, safety, dining, or IT staff can diagnose and resolve
+                the problem.
               </div>
             </div>
-            <div class="ps-navbar">
-              <div class="ps-nav-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Feed
-              </div>
-              <div class="ps-fab">
-                <svg width="14" height="14" viewBox="0 0 44 43" fill="none"><path d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926Z" fill="white"/><path d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z" fill="white"/></svg>
-              </div>
-              <div class="ps-nav-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                Profile
+          </div>
+          <div class="step" onclick="setStep(3)">
+            <div class="sn">3</div>
+            <div>
+              <div class="st">Confirm and submit</div>
+              <div class="sd">
+                Review your report and submit. It goes through a quick approval process before appearing on the community feed, where other students can upvote it — pushing the most important issues to the front of the line.
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- HOW IT WORKS -->
-<section class="s-how" id="how">
-  <div class="s-how-inner">
-    <div>
-      <div class="how-eyebrow">How it works</div>
-      <div class="step active" onclick="setStep(1)">
-        <div class="sn">1</div>
-        <div>
-          <div class="st">Hit the report button</div>
-          <div class="sd">Open Poly Problems and tap the report button from the main feed. It's always one tap away — no navigating through menus. Select the category that best fits your issue to get it to the right team immediately.</div>
+        <div class="how-phone-side">
+          <div class="how-phone">
+            <div class="how-phone-screen">
+              <img id="how-screenshot" src="step-1.png" alt="App screenshot" style="width:100%;display:block;border-radius:24px;">
+            </div>
+          </div>
         </div>
       </div>
-      <div class="step" onclick="setStep(2)">
-        <div class="sn">2</div>
-        <div>
-          <div class="st">Fill out the details</div>
-          <div class="sd">Describe the issue, pin the location on campus, and attach photos if you have them. The more detail you add, the faster facilities, safety, dining, or IT staff can diagnose and resolve the problem.</div>
+    </section>
+
+    <!-- FILTER BY TYPE -->
+    <section class="s-filter">
+      <div class="s-filter-inner">
+        <h2 class="filter-h">Filter by type</h2>
+        <div class="filter-grid">
+          <div class="fc fc-facilities">
+            <div class="fc-label">Facilities</div>
+            <p class="fc-desc">Physical campus infrastructure and maintenance issues.</p>
+            <p class="fc-examples">Broken HVAC · Faulty door locks · Leaking pipes · Damaged furniture</p>
+            <div class="fc-glow"></div>
+          </div>
+          <div class="fc fc-safety">
+            <div class="fc-label">Safety</div>
+            <p class="fc-desc">Hazards and concerns affecting the wellbeing of students and staff.</p>
+            <p class="fc-examples">Mold · Pests · Slippery walkways · Unsecured areas</p>
+            <div class="fc-glow"></div>
+          </div>
+          <div class="fc fc-dining">
+            <div class="fc-label">Dining</div>
+            <p class="fc-desc">Issues with campus dining halls, cafes, and food services.</p>
+            <p class="fc-examples">Closed food stations · Long wait times · Menu errors · Cleanliness concerns</p>
+            <div class="fc-glow"></div>
+          </div>
+          <div class="fc fc-tech">
+            <div class="fc-label">Tech</div>
+            <p class="fc-desc">Campus technology and connectivity problems.</p>
+            <p class="fc-examples">Wi-Fi dead zones · Broken displays · Printer outages · Lab equipment</p>
+            <div class="fc-glow"></div>
+          </div>
         </div>
       </div>
-      <div class="step" onclick="setStep(3)">
-        <div class="sn">3</div>
-        <div>
-          <div class="st">Confirm and submit</div>
-          <div class="sd">Review your report and submit. It's instantly routed to the right department and posted to the community feed where other students can upvote it — pushing high-priority issues to the front of the line.</div>
+    </section>
+
+    <!-- TEAM -->
+    <section class="s-team">
+      <div class="s-team-inner">
+        <h2 class="team-h">Meet our dedicated team</h2>
+        <p class="team-sub">
+          We're a group of Cal Poly students building tools to make campus life
+          better. Poly Problems is developed by CodeBox, a student-led software
+          team passionate about solving real problems for the Mustang community.
+        </p>
+        <div class="team-grid">
+          <div class="tm" onclick="window.open('https://linkedin.com/in/peterchinh','_blank')">
+            <div class="tm-initials">PC</div>
+            <div class="tm-name">Peter Chinh</div>
+            <div class="tm-role">Technical Lead</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/namish-mannepalli','_blank')">
+            <div class="tm-initials">NM</div>
+            <div class="tm-name">Namish Mannepali</div>
+            <div class="tm-role">Technical Lead</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/harry-obraztsov','_blank')">
+            <div class="tm-initials">HO</div>
+            <div class="tm-name">Harry Obraztsov</div>
+            <div class="tm-role">Product Manager</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/isaac-m-tsai','_blank')">
+            <div class="tm-initials">IT</div>
+            <div class="tm-name">Isaac Tsai</div>
+            <div class="tm-role">Designer</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/stelladaoud','_blank')">
+            <div class="tm-initials">SD</div>
+            <div class="tm-name">Stella Daoud</div>
+            <div class="tm-role">Developer</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/arin-johar','_blank')">
+            <div class="tm-initials">AJ</div>
+            <div class="tm-name">Arin Johar</div>
+            <div class="tm-role">Developer</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/chloe-low-12a883389','_blank')">
+            <div class="tm-initials">CL</div>
+            <div class="tm-name">Chloe Low</div>
+            <div class="tm-role">Developer</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/emiokumoto','_blank')">
+            <div class="tm-initials">EO</div>
+            <div class="tm-name">Emi Okumoto</div>
+            <div class="tm-role">Developer</div>
+          </div>
+          <div class="tm" onclick="window.open('https://linkedin.com/in/scott-eisenberg2','_blank')">
+            <div class="tm-initials">SE</div>
+            <div class="tm-name">Scott Eisenberg</div>
+            <div class="tm-role">Developer</div>
+          </div>
+          <div class="tm">
+            <div class="tm-initials">SG</div>
+            <div class="tm-name">Sai Deekshitha Ganji</div>
+            <div class="tm-role">Developer</div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="how-phone-side">
-      <div class="how-phone">
-        <div class="how-phone-screen"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FILTER BY TYPE -->
-<section class="s-filter">
-  <div class="s-filter-inner">
-    <h2 class="filter-h">Filter by type</h2>
-    <div class="filter-grid">
-      <div class="fc fc-facilities"><div class="fc-label">Facilities</div><div class="fc-glow"></div></div>
-      <div class="fc fc-safety"><div class="fc-label">Safety</div><div class="fc-glow"></div></div>
-      <div class="fc fc-dining"><div class="fc-label">Dining</div><div class="fc-glow"></div></div>
-      <div class="fc fc-tech"><div class="fc-label">Tech</div><div class="fc-glow"></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- TEAM -->
-<section class="s-team">
-  <div class="s-team-inner">
-    <h2 class="team-h">Meet our dedicated team</h2>
-    <p class="team-sub">We're a group of Cal Poly students building tools to make campus life better. Poly Problems is developed by CodeBox, a student-led software team passionate about solving real problems for the Mustang community.</p>
-    <div class="team-grid">
-      <div>
-        <div class="tm-photo"><div class="tm-initials">PC</div></div>
-        <div class="tm-name">Peter Chinh</div>
-        <div class="tm-role">Technical Lead</div>
-      </div>
-      <div>
-        <div class="tm-photo"><div class="tm-initials">NM</div></div>
-        <div class="tm-name">Namish Mannepali</div>
-        <div class="tm-role">Technical Lead</div>
-      </div>
-      <div>
-        <div class="tm-photo"><div class="tm-initials">H</div></div>
-        <div class="tm-name">Harry</div>
-        <div class="tm-role">Product Manager</div>
-      </div>
-      <div class="tm-empty">
-        <div class="tm-photo"></div>
-      </div>
-    </div>
-    <div class="team-grid team-row2">
-      <div class="tm-empty"><div class="tm-photo"></div></div>
-      <div class="tm-empty"><div class="tm-photo"></div></div>
-      <div class="tm-empty"><div class="tm-photo"></div></div>
-      <div class="tm-empty"><div class="tm-photo"></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="s-cta" id="cta">
-  <div class="badge">Launch day is on April ..., 2026!</div>
-  <h2 class="cta-h">Ready to get started?</h2>
-  <div class="cb-credit">
-    <div class="cb-icon">cb</div>
-    Developed by CodeBox
-  </div>
-  <div class="store-row">
-    <!-- Official Apple App Store badge SVG -->
-    <a href="#" class="appstore-btn" aria-label="Download on the App Store">
-      <svg viewBox="0 0 119.66 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Download on the App Store">
-        <rect width="119.66" height="40" rx="5" ry="5" fill="#000"/>
-        <path d="M24.76 20.3a4.92 4.92 0 0 1 2.35-4.13 5.05 5.05 0 0 0-3.98-2.15c-1.67-.17-3.3 1-4.16 1s-2.19-1-3.6-.97a5.3 5.3 0 0 0-4.46 2.72c-1.93 3.34-.49 8.24 1.36 10.94.92 1.32 2 2.8 3.42 2.75 1.38-.06 1.9-.88 3.57-.88s2.14.88 3.59.85c1.49-.02 2.42-1.33 3.32-2.66a10.92 10.92 0 0 0 1.51-3.09 4.76 4.76 0 0 1-2.92-4.38z" fill="#fff"/>
-        <path d="M22.03 12.21a4.86 4.86 0 0 0 1.11-3.48 4.95 4.95 0 0 0-3.2 1.65 4.63 4.63 0 0 0-1.14 3.35 4.1 4.1 0 0 0 3.23-1.52z" fill="#fff"/>
-        <path d="M42.3 27.14h-4.73l-1.14 3.35h-2l4.48-12.41h2.08l4.48 12.41h-2.06zm-4.23-1.55h3.73l-1.84-5.42h-.05zM55.16 25.97c0 2.8-1.5 4.6-3.77 4.6a3.06 3.06 0 0 1-2.84-1.58h-.04v4.47h-1.86V21.44h1.8v1.5h.03a3.2 3.2 0 0 1 2.87-1.6c2.3 0 3.81 1.81 3.81 4.63zm-1.91 0c0-1.82-.94-3.02-2.38-3.02-1.41 0-2.36 1.23-2.36 3.02 0 1.81.95 3.03 2.36 3.03 1.44 0 2.38-1.19 2.38-3.03zM65.1 25.97c0 2.8-1.5 4.6-3.77 4.6a3.06 3.06 0 0 1-2.84-1.58h-.04v4.47h-1.86V21.44h1.8v1.5h.03a3.2 3.2 0 0 1 2.87-1.6c2.3 0 3.81 1.81 3.81 4.63zm-1.91 0c0-1.82-.94-3.02-2.38-3.02-1.41 0-2.36 1.23-2.36 3.02 0 1.81.95 3.03 2.36 3.03 1.44 0 2.38-1.19 2.38-3.03zM71.72 27.03c.14 1.22 1.33 2.03 2.96 2.03 1.56 0 2.68-.81 2.68-1.92 0-.96-.68-1.54-2.28-1.93l-1.6-.39c-2.28-.55-3.33-1.61-3.33-3.34 0-2.14 1.86-3.61 4.51-3.61 2.62 0 4.41 1.47 4.47 3.61h-1.88c-.11-1.23-1.12-1.97-2.62-1.97s-2.5.75-2.5 1.85c0 .87.65 1.39 2.24 1.78l1.36.33c2.55.6 3.6 1.62 3.6 3.44 0 2.32-1.85 3.77-4.78 3.77-2.75 0-4.6-1.42-4.72-3.65zM83.48 19.3v2.14h1.72v1.47h-1.72v4.99c0 .78.34 1.13 1.1 1.13.2 0 .41-.01.61-.05v1.46a5.1 5.1 0 0 1-1.03.09c-1.83 0-2.54-.69-2.54-2.44v-5.18h-1.31v-1.47h1.31V19.3zM86.24 25.97c0-2.86 1.68-4.65 4.3-4.65 2.63 0 4.31 1.79 4.31 4.65 0 2.87-1.67 4.65-4.31 4.65-2.63 0-4.3-1.78-4.3-4.65zm6.71 0c0-1.96-.9-3.12-2.41-3.12s-2.4 1.17-2.4 3.12c0 1.97.89 3.12 2.4 3.12s2.41-1.15 2.41-3.12zM96.76 21.44h1.77v1.53h.04a2.16 2.16 0 0 1 2.18-1.63 2.86 2.86 0 0 1 .64.07v1.74a2.6 2.6 0 0 0-.84-.11 1.87 1.87 0 0 0-1.94 2.08v5.37h-1.85zM109.22 27.84c-.25 1.64-1.85 2.77-3.9 2.77-2.63 0-4.27-1.76-4.27-4.61 0-2.86 1.65-4.69 4.19-4.69 2.5 0 4.08 1.72 4.08 4.48v.64h-6.4v.11a2.36 2.36 0 0 0 2.44 2.57 2.05 2.05 0 0 0 2.09-1.27zm-6.28-2.71h4.52a2.17 2.17 0 0 0-2.22-2.29 2.29 2.29 0 0 0-2.3 2.29z" fill="#fff"/>
-        <path d="M37.83 8.73a2.65 2.65 0 0 1 2.82 2.98c0 1.92-1.04 3.02-2.82 3.02h-2.16V8.73zm-1.23 5.11h1.13a1.88 1.88 0 0 0 1.98-2.14 1.87 1.87 0 0 0-1.98-2.12h-1.13zM41.68 13.08a2.13 2.13 0 1 1 4.25 0 2.13 2.13 0 1 1-4.25 0zm3.33 0c0-.97-.44-1.54-1.21-1.54s-1.2.57-1.2 1.54.43 1.54 1.2 1.54 1.21-.57 1.21-1.54zM51.57 14.73h-.93l-.94-3.35h-.07l-.93 3.35h-.92l-1.26-4.58h.91l.82 3.47h.07l.93-3.47h.86l.93 3.47h.07l.81-3.47h.9zM53.85 10.15h.87v.72h.07a1.37 1.37 0 0 1 1.37-.81 1.49 1.49 0 0 1 1.59 1.7v2.97h-.91v-2.74c0-.72-.31-1.08-.97-1.08a1.03 1.03 0 0 0-1.07 1.14v2.68h-.91zM59.32 8.44h.91v6.29h-.91zM61.49 13.08a2.13 2.13 0 1 1 4.25 0 2.13 2.13 0 1 1-4.25 0zm3.33 0c0-.97-.44-1.54-1.21-1.54s-1.2.57-1.2 1.54.43 1.54 1.2 1.54 1.21-.57 1.21-1.54zM66.8 14.05c0-.83.62-1.31 1.72-1.37l1.25-.07v-.4c0-.49-.32-.76-.94-.76-.51 0-.86.19-.96.52h-.88c.09-.79.83-1.3 1.88-1.3 1.16 0 1.81.58 1.81 1.54v3.12h-.87v-.64h-.07a1.54 1.54 0 0 1-1.38.72 1.38 1.38 0 0 1-1.56-1.36zm2.97-.4v-.39l-1.13.07c-.63.04-.92.27-.92.68s.35.65.89.65a1.13 1.13 0 0 0 1.16-1.01zM71.77 13.08c0-1.45.74-2.36 1.9-2.36a1.51 1.51 0 0 1 1.41.8h.07V8.44h.91v6.29h-.87v-.72h-.07a1.59 1.59 0 0 1-1.45.8c-1.17 0-1.9-.91-1.9-2.36zm.94 0c0 .97.46 1.55 1.22 1.55s1.23-.59 1.23-1.55-.47-1.55-1.23-1.55-1.22.58-1.22 1.55zM80.24 13.08a2.13 2.13 0 1 1 4.25 0 2.13 2.13 0 1 1-4.25 0zm3.33 0c0-.97-.44-1.54-1.21-1.54s-1.2.57-1.2 1.54.43 1.54 1.2 1.54 1.21-.57 1.21-1.54zM85.68 10.15h.87v.72h.07a1.37 1.37 0 0 1 1.37-.81 1.49 1.49 0 0 1 1.59 1.7v2.97h-.91v-2.74c0-.72-.31-1.08-.97-1.08a1.03 1.03 0 0 0-1.07 1.14v2.68h-.91z" fill="#fff"/>
-      </svg>
-    </a>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="ft-inner">
-    <div class="ft-top">
-      <div>
-        <div class="ft-logo">
-          <svg viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z" fill="currentColor"/>
-            <path d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z" fill="currentColor"/>
-          </svg>
-          Poly Problems
-        </div>
-        <p class="ft-tagline">A smarter system for collecting, organizing, and resolving campus concerns at scale.</p>
-      </div>
-      <div class="ft-links">
-        <a href="#">Site map</a>
-        <a href="#">Contact</a>
-      </div>
-    </div>
-    <div class="ft-bottom">
-      <div class="ft-cb">
-        <div class="cb-icon" style="width:15px;height:15px;font-size:.46rem;">cb</div>
+    <!-- CTA -->
+    <section class="s-cta" id="cta">
+      <h2 class="cta-h">Ready to get started?</h2>
+      <div class="cb-credit">
+        <div class="cb-icon">cb</div>
         Developed by CodeBox
       </div>
-    </div>
-  </div>
-</footer>
+      <div class="store-row">
+        <!-- Official Apple App Store badge SVG -->
+        <a
+          href="https://apps.apple.com/us/app/polyproblems/id6762303809"
+          class="appstore-btn"
+          aria-label="Download on the App Store"
+        >
+          <img
+            src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"
+            alt="Download on the App Store"
+            height="44"
+          />
+        </a>
+      </div>
+      <p
+        style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted)"
+      >
+        Or
+        <a href="https://www.polyproblems.com/" style="color: var(--text-dark)"
+          >open in browser ↗</a
+        >
+      </p>
+    </section>
 
-<script>
-function setStep(n){
-  document.querySelectorAll('.step').forEach((s,i)=>{
-    s.classList.toggle('active',i+1===n);
-  });
-}
-</script>
-</body>
+    <!-- FOOTER -->
+    <footer>
+      <div class="ft-inner">
+        <div class="ft-top">
+          <div>
+            <div class="ft-logo">
+              <svg
+                viewBox="0 0 44 43"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z"
+                  fill="currentColor"
+                />
+              </svg>
+              Poly Problems
+            </div>
+            <p class="ft-tagline">
+              A smarter system for collecting, organizing, and resolving campus
+              concerns at scale.
+            </p>
+          </div>
+          <div class="ft-links">
+            <a href="#">Site map</a>
+            <a
+              href="https://github.com/codebox-calpoly/PolyProblems/blob/main/SUPPORT.md"
+              >Contact</a
+            >
+          </div>
+        </div>
+        <div class="ft-bottom">
+          <div class="ft-cb">
+            <div
+              class="cb-icon"
+              style="width: 15px; height: 15px; font-size: 0.46rem"
+            >
+              cb
+            </div>
+            Developed by CodeBox
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const stepScreenshots = {
+        1: 'step-1.png',
+        2: 'step-2.png',
+        3: 'step-3.png',
+      };
+
+      function setStep(n) {
+        document.querySelectorAll('.step').forEach((s, i) => {
+          s.classList.toggle('active', i + 1 === n);
+        });
+        document.getElementById('how-screenshot').src = stepScreenshots[n];
+      }
+    </script>
+  </body>
 </html>
