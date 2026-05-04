@@ -1,4 +1,4 @@
-import { Slot, Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Image, Platform } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
@@ -40,8 +40,14 @@ export default function TabLayout() {
   const iconSize = isWeb ? 32 : 26;
   const fontSize = isWeb ? 14 : 12;
 
-  if (isSessionLoading || !session) {
-    return <Slot />;
+  // 1. While we are checking if the user is logged in, show nothing or a splash
+  if (isSessionLoading) {
+    return null; // Or a loading spinner
+  }
+
+  // 2. If the user is NOT authenticated, kick them to the login screen
+  if (!session) {
+    return <Redirect href="/login" />;
   }
 
   return (
@@ -118,6 +124,28 @@ export default function TabLayout() {
               color={focused ? activeColor : inactiveColor}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          href: null, // This hides the tab icon from the bottom bar
+        }}
+      />
+
+      <Tabs.Screen
+        name="[id]"
+        options={{
+          title: "Report Details",
+          href: null, // Users can navigate here, but there's no "button" for it
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notification",
+          href: null, // Users can navigate here, but there's no "button" for it
         }}
       />
     </Tabs>
