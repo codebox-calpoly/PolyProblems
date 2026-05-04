@@ -126,34 +126,30 @@
       .hero h1 {
         font-family: var(--serif);
         font-weight: 400;
-        font-size: clamp(2.6rem, 5.5vw, 3.8rem);
+        font-size: clamp(4rem, 9vw, 6.5rem); 
         color: var(--text-dark);
-        line-height: 1.12;
-        letter-spacing: -0.015em;
-        max-width: 520px;
-        margin: 0 auto 1rem;
+        line-height: 1.05; 
+        letter-spacing: -0.03em;
+        max-width: 1000px; 
+        margin: 0 auto 1.5rem;
       }
       .cb-credit {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
-        font-size: 0.76rem;
+        font-size: 1.5rem;
         color: var(--text-muted);
         margin-bottom: 1.75rem;
       }
       .cb-icon {
-        width: 17px;
-        height: 17px;
+        width: 22px;
+        height: 22px;
         border-radius: 4px;
-        background: linear-gradient(135deg, #33c458, #1e8bc3);
+        background: black;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.5rem;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: -0.03em;
       }
       .hero-btns {
         display: flex;
@@ -556,7 +552,6 @@
         border-radius: 16px;
         padding: 1.35rem 1.5rem 4.5rem;
         background: rgba(255, 255, 255, 0.025);
-        cursor: pointer;
         position: relative;
         overflow: hidden;
         transition:
@@ -867,7 +862,7 @@
       <div class="hero-content">
         <h1>The smarter way to handle campus issues.</h1>
         <div class="cb-credit">
-          <div class="cb-icon">cb</div>
+          <img class="cb-icon" src="/landing/codebox.png" alt="">
           Developed by CodeBox
         </div>
         <div class="hero-btns">
@@ -1054,9 +1049,9 @@
     <section class="s-cta" id="cta">
       <h2 class="cta-h">Ready to get started?</h2>
       <div class="cb-credit">
-        <div class="cb-icon">cb</div>
-        Developed by CodeBox
-      </div>
+          <img class="cb-icon" src="/landing/codebox.png" alt="">
+          Developed by CodeBox
+        </div>
       <div class="store-row">
         <!-- Official Apple App Store badge SVG -->
         <a
@@ -1118,12 +1113,7 @@
         </div>
         <div class="ft-bottom">
           <div class="ft-cb">
-            <div
-              class="cb-icon"
-              style="width: 15px; height: 15px; font-size: 0.46rem"
-            >
-              cb
-            </div>
+            <img class="cb-icon" src="/landing/codebox.png" alt="" style="width: 15px; height: 15px;">
             Developed by CodeBox
           </div>
         </div>
