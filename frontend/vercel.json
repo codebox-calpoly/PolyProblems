@@ -1,14 +1,7 @@
 {
-  "buildCommand": "npx expo export -p web && cp -r ../landing ./dist/landing && cp -r ../privacy ./dist/privacy && cp -r ../terms ./dist/terms",
+  "buildCommand": "npx expo export -p web && cp dist/index.html dist/app.html && cp -r ../landing ./dist/landing && cp -r ../privacy ./dist/privacy && cp -r ../terms ./dist/terms && cp ../landing/index.html ./dist/index.html",
   "outputDirectory": "dist",
-  "redirects": [
-    { "source": "/", "destination": "/landing", "permanent": false }
-  ],
   "rewrites": [
-    {
-      "source": "/landing",
-      "destination": "/landing/index.html"
-    },
     {
       "source": "/privacy",
       "destination": "/privacy/index.html"
@@ -26,8 +19,8 @@
       "destination": "/terms/$1"
     },
     {
-      "source": "/((?!landing|privacy|terms).*)",
-      "destination": "/index.html"
+      "source": "/((?!privacy|terms|landing|_expo|assets).*)",
+      "destination": "/app.html"
     }
   ]
 }
