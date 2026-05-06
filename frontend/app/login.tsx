@@ -526,6 +526,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     textDecorationLine: "underline",
   },
+  resendButton: {
+    marginTop: 8,
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+  },
   footer: {
     flexDirection: "row",
     flexWrap: "wrap",
