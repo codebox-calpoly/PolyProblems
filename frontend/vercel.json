@@ -1,5 +1,26 @@
 {
-  "buildCommand": "npx expo export -p web",
+  "buildCommand": "npx expo export -p web && cp dist/index.html dist/app.html && cp -r ../landing ./dist/landing && cp -r ../privacy ./dist/privacy && cp -r ../terms ./dist/terms && cp ../landing/index.html ./dist/index.html",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/privacy",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/privacy/(.*)",
+      "destination": "/privacy/$1"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms/index.html"
+    },
+    {
+      "source": "/terms/(.*)",
+      "destination": "/terms/$1"
+    },
+    {
+      "source": "/((?!privacy|terms|landing|_expo|assets).*)",
+      "destination": "/app.html"
+    }
+  ]
 }

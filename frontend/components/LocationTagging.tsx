@@ -119,8 +119,11 @@ export function LocationTagging({
       ]}
     >
       {/* ── Map preview (only when a location is attached) ───────────── */}
-      {isAttached && value && <LocationPreview value={value} />}
-
+      {isAttached && value && (
+        <View style={styles.mapContainer}>
+          <LocationPreview value={value} />
+        </View>
+      )}
       {/* ── Status bar ────────────────────────────────────────────────── */}
       <View style={styles.bar}>
         <View style={styles.barLeft}>
@@ -189,6 +192,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
+  },
+  mapContainer: {
+    height: 150, // This controls how tall the map is in the tagging tool
+    width: "100%",
   },
   bar: {
     backgroundColor: "#2D4635",

@@ -52,14 +52,14 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them.",
-          "cameraPermission": "The app accesses your camera to let you take photos."
+          "photosPermission": "PolyProblems uses your photo library to let you select and upload images of campus issues, such as a photo of a broken streetlight, to include with your report.",
+          "cameraPermission": "PolyProblems uses your camera to allow you to take and upload photos of campus issues, such as a photo of a broken streetlight, directly to your report."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "PolyProblems uses your location to tag reports with where the issue occurred."
+          "locationWhenInUsePermission": "PolyProblems uses your location to accurately tag reports with where the issue occurred, such as marking the exact location of a broken streetlight on campus."
         }
       ]
     ],

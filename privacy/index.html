@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - CodeBox</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --section-bg: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #111827;
+            margin: 0;
+        }
+
+        .last-updated {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-top: 25px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background-color: var(--section-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Privacy Policy</h1>
+            <p class="last-updated">Last Updated: April 20, 2026</p>
+        </header>
+
+        <section>
+            <p>This Privacy Policy describes how <strong>CodeBox</strong> ("we", "us", or "our") collects, uses, and shares your information when you use our mobile application. We are committed to protecting your personal data and your right to privacy.</p>
+        </section>
+
+        <section>
+            <h2>1. Information We Collect</h2>
+            <p>We collect information that you provide directly to us through the use of the app:</p>
+            
+            <div class="highlight-box">
+                <h3>Personal & Account Data</h3>
+                <ul>
+                    <li><strong>Email Address:</strong> Required for account creation, authentication, and unique user identification via Supabase.</li>
+                    <li><strong>User Name:</strong> Associated with your account for display within the community.</li>
+                </ul>
+
+                <h3>User Content & Media</h3>
+                <ul>
+                    <li><strong>Photos:</strong> Required for the "Report Flow." Photos you upload are stored in our database and shared publicly within the app.</li>
+                    <li><strong>Location Data:</strong> Optional. If provided, geographical coordinates are stored to give context to your reports.</li>
+                </ul>
+
+                <h3>Usage Data</h3>
+                <ul>
+                    <li><strong>Engagement:</strong> We track interactions such as voting on posts to manage community features and calculate totals.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. How We Use Your Information</h2>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+                <li><strong>Authentication:</strong> To securely manage your account and profile.</li>
+                <li><strong>Core Services:</strong> To facilitate the reporting and voting system that drives the CodeBox experience.</li>
+                <li><strong>Public Feedback:</strong> To display user-generated reports and photos to other members of the community.</li>
+                <li><strong>Relational Mapping:</strong> To connect your user ID to your specific contributions (reports/votes) in our database.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Data Storage & Third-Parties</h2>
+            <p>Your data is processed and stored using industry-standard service providers:</p>
+            <ul>
+                <li><strong>Supabase:</strong> Used for database management, storage of media, and user authentication.</li>
+                <li><strong>Vercel:</strong> Used for hosting our application services and API.</li>
+            </ul>
+            <p>These providers have access to your information only to perform specific tasks on our behalf and are obligated to protect your data.</p>
+        </section>
+
+        <section>
+            <h2>4. Data Safety Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Linked to You?</th>
+                        <th>Used for Tracking?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Email / Account ID</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Photos & Media</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Location (Optional)</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Usage Data (Votes)</td>
+                        <td>Yes</td>
+                        <td>No</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>5. Your Rights & Data Deletion</h2>
+            <p>Apple and global privacy regulations grant you specific rights regarding your data:</p>
+            <ul>
+                <li><strong>Account Deletion:</strong> You can delete your account and all associated personal data directly within the app's Settings menu.</li>
+                <li><strong>Data Access:</strong> You may request a copy of the data we have stored about you.</li>
+                <li><strong>Location Opt-out:</strong> You can revoke location permissions at any time through your device system settings.</li>
+            </ul>
+            <p>Upon deletion, your personal information will be permanently removed from our production databases within 30 days.</p>
+        </section>
+
+        <section>
+            <h2>6. Contact Us</h2>
+            <p>If you have questions or concerns about this policy, please reach out to us via our GitHub repository or project support channels.</p>
+        </section>
+
+        <div class="footer">
+            &copy; 2026 CodeBox. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

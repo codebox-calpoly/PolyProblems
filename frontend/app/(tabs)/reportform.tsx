@@ -312,8 +312,8 @@ export default function ReportForm() {
             color={isAcknowledged ? "#2D4635" : "#999"}
           />
           <ThemedText style={styles.acknowledgeText}>
-            I acknowledge that this report is accurate to the best of my
-            knowledge and understand it may be reviewed or shared with relevant
+            I acknowledge that this report is accurate and understand that, once
+            approved, it will be publicly posted and may be shared with relevant
             university departments.
           </ThemedText>
         </Pressable>

@@ -17,11 +17,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
 import { supabase } from "@/lib/supabase";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 
 export default function FeedPost({ reportId }: { reportId: string }) {
   const scheme = useColorScheme();
   const queryClient = useQueryClient();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
+  const router = useRouter();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -37,6 +39,11 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   // Adjusted width calculation: screen width minus FeedPost/FeedScene padding
   const cardPadding = 48; // paddingHorizontal: 24 * 2
   const imageWidth = Math.min(windowWidth, 600) - cardPadding;
+
+  // Add this helper inside FeedPost
+  const handleNavigate = () => {
+    router.push(`/${reportId}`);
+  };
 
   const { data: reportData, isLoading } = useQuery({
     queryKey: ["report", reportId],
@@ -89,7 +96,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       }
 
       // Return all together
-      return { ...report, imageUrls: signedUrls, userVote };
+      return { report, imageUrls: signedUrls, userVote };
     },
     enabled: !!reportId, // Only run if we have an ID
     // Set to 5 minutes
@@ -101,7 +108,8 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   });
 
   // Use reportData instead of the local report state
-  const report = reportData;
+  const report = reportData?.report;
+  const userVote = reportData?.userVote;
   const imageUrls = reportData?.imageUrls || [];
   const loading = isLoading;
 
@@ -150,21 +158,23 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       if (error) throw error;
     },
     onSuccess: (_data, variables) => {
-      // Manually update the cache without a network request
       queryClient.setQueryData(["report", reportId], (oldData: any) => {
         if (!oldData) return oldData;
 
-        // Logic: If user clicks the same vote again, it becomes 0 (unvote)
-        // Otherwise, it becomes the new type (1 or -1)
+        // 1. Calculate the new vote (flip to 0 if clicking the same button)
         const newVote = oldData.userVote === variables ? 0 : variables;
 
-        // Calculate the score change
-        const scoreAdjustment = newVote - oldData.userVote;
+        // 2. Calculate the difference (e.g., going from -1 to 1 is a +2 change)
+        const scoreAdjustment = newVote - (oldData.userVote || 0);
 
         return {
           ...oldData,
-          userVote: newVote,
-          total_score: (oldData.total_score || 0) + scoreAdjustment,
+          userVote: newVote, // Updates the "light up" color
+          report: {
+            ...oldData.report,
+            // Update the score INSIDE the report object where it actually lives
+            total_score: (oldData.report?.total_score || 0) + scoreAdjustment,
+          },
         };
       });
     },
@@ -287,12 +297,25 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   if (!report) return null;
 
   const activeCategoryColor = feedTabs[report.category] || theme.tint;
+  const statusConfig = {
+    unresolved: { label: "Unresolved", color: "#2D7A53" },
+    pending: { label: "Pending Approval", color: "#C9922F" },
+    rejected: { label: "Rejected", color: "#C95C4B" },
+  } as const;
+  const normalizedStatus = (report.status || "pending").toLowerCase();
+  const statusBadge =
+    statusConfig[normalizedStatus as keyof typeof statusConfig] ||
+    statusConfig.pending;
 
   return (
-    <View
-      style={[
+    <Pressable
+      onPress={handleNavigate}
+      style={({ pressed }) => [
         styles.card,
-        { borderBottomColor: theme.line || "rgba(0,0,0,0.1)" },
+        {
+          backgroundColor: pressed ? theme.background + "90" : theme.background,
+          borderBottomColor: theme.line || "rgba(0,0,0,0.1)",
+        },
       ]}
     >
       {/* Header */}
@@ -317,6 +340,11 @@ export default function FeedPost({ reportId }: { reportId: string }) {
         </Text>
         <View style={[styles.tag, { backgroundColor: activeCategoryColor }]}>
           <Text style={styles.tagText}>{report.category}</Text>
+        </View>
+        <View
+          style={[styles.statusBadge, { backgroundColor: statusBadge.color }]}
+        >
+          <Text style={styles.statusText}>{statusBadge.label}</Text>
         </View>
       </View>
 
@@ -367,7 +395,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
             <Ionicons
               name="arrow-up"
               size={18}
-              color={report?.userVote === 1 ? theme.tint : theme.icon}
+              color={userVote === 1 ? theme.tint : theme.icon}
             />
           </TouchableOpacity>
 
@@ -382,7 +410,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
             <Ionicons
               name="arrow-down"
               size={18}
-              color={report?.userVote === -1 ? "#FF4500" : theme.icon}
+              color={userVote === -1 ? "#FF4500" : theme.icon}
             />
           </TouchableOpacity>
         </View>
@@ -447,7 +475,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
           <Ionicons name="ellipsis-horizontal" size={20} color={theme.icon} />
         </TouchableOpacity> */}
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -491,6 +519,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   tagText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  statusText: {
     color: "white",
     fontSize: 11,
     fontWeight: "800",
@@ -597,5 +636,11 @@ const styles = StyleSheet.create({
   absoluteCenter: {
     position: "absolute",
     zIndex: 10,
+  },
+  scrollContent: {
+    // Flex grow ensures it fills the ScrollView even if the image is small
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

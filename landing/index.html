@@ -3,7 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Poly Problems — The smarter way to handle campus issues.</title>
+    <meta property="og:title" content="Poly Problems" />
+    <meta
+      property="og:description"
+      content="The smarter way to handle campus issues."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://polyproblems.com/landing/icon.png"
+    />
+    <meta property="og:url" content="https://polyproblems.com" />
+    <meta name="theme-color" content="#174735" />
+    <title>Poly Problems</title>
+    <meta
+      name="description"
+      content="The smarter way to handle campus issues."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
@@ -40,7 +56,8 @@
         line-height: 1.6;
       }
 
-      section, footer {
+      section,
+      footer {
         scroll-snap-align: none;
       }
 
@@ -91,7 +108,10 @@
         cursor: pointer;
         text-decoration: none;
         letter-spacing: 0.01em;
-        transition: opacity 0.18s, transform 0.22s ease, box-shadow 0.22s ease;
+        transition:
+          opacity 0.18s,
+          transform 0.22s ease,
+          box-shadow 0.22s ease;
       }
       .btn-dl:hover {
         opacity: 0.86;
@@ -102,7 +122,7 @@
       /* ── HERO ── */
       .hero {
         min-height: 100vh;
-        background: #F3F0E8;
+        background: #f3f0e8;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -173,7 +193,10 @@
         font-size: 0.86rem;
         font-weight: 500;
         text-decoration: none;
-        transition: opacity 0.18s, transform 0.22s ease, box-shadow 0.22s ease;
+        transition:
+          opacity 0.18s,
+          transform 0.22s ease,
+          box-shadow 0.22s ease;
       }
       .btn-solid:hover {
         opacity: 0.86;
@@ -190,7 +213,10 @@
         font-size: 0.86rem;
         font-weight: 500;
         text-decoration: none;
-        transition: border-color 0.18s, transform 0.22s ease, box-shadow 0.22s ease;
+        transition:
+          border-color 0.18s,
+          transform 0.22s ease,
+          box-shadow 0.22s ease;
       }
       .btn-ghost:hover {
         border-color: rgba(0, 0, 0, 0.5);
@@ -242,7 +268,11 @@
         border-radius: 12px;
         padding: 1.75rem;
         background: rgba(255, 255, 255, 0.04);
-        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          border-color 0.25s ease,
+          background 0.25s ease;
       }
       .action-card:hover {
         transform: translateY(-6px);
@@ -487,8 +517,14 @@
         display: flex;
       }
       @keyframes fadeSlide {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       .sn {
         width: 26px;
@@ -536,7 +572,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.18s, transform 0.22s ease;
+        transition:
+          background 0.18s,
+          transform 0.22s ease;
         flex-shrink: 0;
       }
       .how-arrow:hover {
@@ -553,7 +591,9 @@
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.2);
         cursor: pointer;
-        transition: background 0.18s, transform 0.18s;
+        transition:
+          background 0.18s,
+          transform 0.18s;
       }
       .how-dot.active {
         background: #fff;
@@ -649,16 +689,26 @@
         filter: blur(38px);
         opacity: 0.07;
         pointer-events: none;
-        transition: opacity 0.25s ease, transform 0.25s ease;
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
       }
       .fc:hover .fc-glow {
         opacity: 0.16;
         transform: scale(1.2);
       }
-      .fc-facilities .fc-glow { background: #4ade80; }
-      .fc-safety .fc-glow    { background: #f87171; }
-      .fc-dining .fc-glow    { background: #fbbf24; }
-      .fc-tech .fc-glow      { background: #60a5fa; }
+      .fc-facilities .fc-glow {
+        background: #4ade80;
+      }
+      .fc-safety .fc-glow {
+        background: #f87171;
+      }
+      .fc-dining .fc-glow {
+        background: #fbbf24;
+      }
+      .fc-tech .fc-glow {
+        background: #60a5fa;
+      }
 
       /* ── TEAM ── */
       .s-team {
@@ -691,7 +741,9 @@
       }
       .tm {
         cursor: pointer;
-        transition: opacity 0.18s, transform 0.22s ease;
+        transition:
+          opacity 0.18s,
+          transform 0.22s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -711,7 +763,9 @@
         margin-bottom: 0.55rem;
         background: rgba(255, 255, 255, 0.08);
         display: block;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
       }
       .tm:hover .tm-photo-img,
       .tm:hover .tm-initials {
@@ -731,7 +785,9 @@
         font-weight: 600;
         color: rgba(255, 255, 255, 0.7);
         margin-bottom: 0.55rem;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
       }
       .tm-name {
         font-size: 0.78rem;
@@ -771,14 +827,19 @@
       }
       .appstore-btn {
         display: inline-block;
-        transition: opacity 0.18s, transform 0.22s ease;
+        transition:
+          opacity 0.18s,
+          transform 0.22s ease;
         height: 44px;
       }
       .appstore-btn:hover {
         opacity: 0.84;
         transform: translateY(-2px);
       }
-      .appstore-btn svg { height: 44px; width: auto; }
+      .appstore-btn svg {
+        height: 44px;
+        width: auto;
+      }
 
       /* ── FOOTER ── */
       footer {
@@ -830,7 +891,9 @@
         text-decoration: none;
         transition: opacity 0.18s;
       }
-      .ft-links a:hover { opacity: 0.55; }
+      .ft-links a:hover {
+        opacity: 0.55;
+      }
       .ft-bottom {
         border-top: 1px solid rgba(0, 0, 0, 0.07);
         padding-top: 1.2rem;
@@ -855,8 +918,12 @@
         animation: pageIn 0.55s ease both;
       }
       @keyframes pageIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
       .hero h1 {
         animation: heroRise 0.9s ease both;
@@ -887,16 +954,26 @@
       .fade-in {
         opacity: 0;
         transform: translateY(24px);
-        transition: opacity 0.7s ease, transform 0.7s ease;
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
       }
       .fade-in.visible {
         opacity: 1;
         transform: translateY(0);
       }
-      .delay-1 { transition-delay: 0.1s; }
-      .delay-2 { transition-delay: 0.2s; }
-      .delay-3 { transition-delay: 0.3s; }
-      .delay-4 { transition-delay: 0.4s; }
+      .delay-1 {
+        transition-delay: 0.1s;
+      }
+      .delay-2 {
+        transition-delay: 0.2s;
+      }
+      .delay-3 {
+        transition-delay: 0.3s;
+      }
+      .delay-4 {
+        transition-delay: 0.4s;
+      }
 
       @media (prefers-reduced-motion: reduce) {
         *,
@@ -914,16 +991,28 @@
       }
 
       @media (max-width: 780px) {
-        html { scroll-snap-type: none; }
+        html {
+          scroll-snap-type: none;
+        }
         .s-action-inner,
         .s-how-inner {
           grid-template-columns: 1fr;
         }
-        .phone-tilt { transform: none; }
-        .how-phone-side { display: none; }
-        .filter-grid { grid-template-columns: 1fr; }
-        .team-grid { grid-template-columns: repeat(2, 1fr); }
-        nav { padding: 1rem 1.25rem; }
+        .phone-tilt {
+          transform: none;
+        }
+        .how-phone-side {
+          display: none;
+        }
+        .filter-grid {
+          grid-template-columns: 1fr;
+        }
+        .team-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        nav {
+          padding: 1rem 1.25rem;
+        }
         .phone-col {
           justify-content: center;
           margin-top: 1.5rem;
@@ -932,7 +1021,9 @@
           height: 100vh;
           object-position: top;
         }
-        .hero-content { margin-bottom: 0; }
+        .hero-content {
+          margin-bottom: 0;
+        }
       }
     </style>
   </head>
@@ -941,8 +1032,14 @@
     <nav>
       <a href="#" class="nav-logo">
         <svg viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z" fill="currentColor"/>
-          <path d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z" fill="currentColor"/>
+          <path
+            d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z"
+            fill="currentColor"
+          />
+          <path
+            d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z"
+            fill="currentColor"
+          />
         </svg>
         Poly Problems
       </a>
@@ -958,7 +1055,7 @@
         <div class="hero-content">
           <h1>The smarter way to handle campus issues.</h1>
           <div class="cb-credit">
-            <img class="cb-icon" src="/landing/codebox.png" alt="">
+            <img class="cb-icon" src="/landing/codebox.png" alt="" />
             Developed by CodeBox
           </div>
           <div class="hero-btns">
@@ -966,7 +1063,12 @@
             <a href="#action" class="btn-ghost">Learn more</a>
           </div>
         </div>
-        <img class="hero-mountains" src="/landing/hero.svg" alt="" onload="this.classList.add('loaded')">
+        <img
+          class="hero-mountains"
+          src="/landing/hero.svg"
+          alt=""
+          onload="this.classList.add('loaded')"
+        />
       </section>
 
       <!-- TAKE ACTION -->
@@ -982,15 +1084,15 @@
                 directly to the departments that can fix them.
               </p>
               <p>
-                Every report gets upvoted by the community, so the most impactful
-                issues rise to the top. No more lost emails. No more wondering if
-                anyone noticed. Just fast, transparent action on the things that
-                matter most to campus life.
+                Every report gets upvoted by the community, so the most
+                impactful issues rise to the top. No more lost emails. No more
+                wondering if anyone noticed. Just fast, transparent action on
+                the things that matter most to campus life.
               </p>
             </div>
           </div>
           <div class="phone-img-col fade-in delay-1">
-            <img src="/landing/phone.svg" alt="Poly Problems app screenshot">
+            <img src="/landing/phone.svg" alt="Poly Problems app screenshot" />
           </div>
         </div>
       </section>
@@ -1007,41 +1109,72 @@
                 <div class="sn">1</div>
                 <div>
                   <div class="st">Hit the report button</div>
-                  <div class="sd">Open Poly Problems and tap the report button from the main feed. It's always one tap away — no navigating through menus.</div>
+                  <div class="sd">
+                    Open Poly Problems and tap the report button from the main
+                    feed. It's always one tap away — no navigating through
+                    menus.
+                  </div>
                 </div>
               </div>
               <div class="step">
                 <div class="sn">2</div>
                 <div>
                   <div class="st">Fill out the details</div>
-                  <div class="sd">Describe the issue, pin the location on campus, and attach photos if you have them. The more detail you add, the faster facilities, safety, dining, or IT staff can diagnose and resolve the problem.</div>
+                  <div class="sd">
+                    Describe the issue, pin the location on campus, and attach
+                    photos if you have them. The more detail you add, the faster
+                    facilities, safety, dining, or IT staff can diagnose and
+                    resolve the problem.
+                  </div>
                 </div>
               </div>
               <div class="step">
                 <div class="sn">3</div>
                 <div>
                   <div class="st">Confirm and submit</div>
-                  <div class="sd">Review your report and submit. It goes through a quick approval process before appearing on the community feed, where other students can upvote it — pushing the most important issues to the front of the line.</div>
+                  <div class="sd">
+                    Review your report and submit. It goes through a quick
+                    approval process before appearing on the community feed,
+                    where other students can upvote it — pushing the most
+                    important issues to the front of the line.
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- ARROWS + DOTS -->
             <div class="how-nav">
-              <button class="how-arrow" onclick="changeStep(-1)" aria-label="Previous step">&#8592;</button>
+              <button
+                class="how-arrow"
+                onclick="changeStep(-1)"
+                aria-label="Previous step"
+              >
+                &#8592;
+              </button>
               <div class="how-dots">
                 <span class="how-dot active" onclick="setStep(1)"></span>
                 <span class="how-dot" onclick="setStep(2)"></span>
                 <span class="how-dot" onclick="setStep(3)"></span>
               </div>
-              <button class="how-arrow" onclick="changeStep(1)" aria-label="Next step">&#8594;</button>
+              <button
+                class="how-arrow"
+                onclick="changeStep(1)"
+                aria-label="Next step"
+              >
+                &#8594;
+              </button>
             </div>
           </div>
 
           <div class="how-phone-side fade-in delay-1">
             <div class="how-phone">
               <div class="how-phone-screen">
-                <img id="how-screenshot" src="/landing/step-1.png" alt="App screenshot" style="width:100%;display:block;border-radius:24px;">
+                <img
+                  id="how-screenshot"
+                  src="/landing/step-1.png"
+                  alt="App screenshot"
+                  style="width: 100%; display: block; border-radius: 24px"
+                />
               </div>
             </div>
           </div>
@@ -1055,26 +1188,46 @@
           <div class="filter-grid">
             <div class="fc fc-facilities fade-in delay-1">
               <div class="fc-label">Facilities</div>
-              <p class="fc-desc">Physical campus infrastructure and maintenance issues.</p>
-              <p class="fc-examples">Broken HVAC · Faulty door locks · Leaking pipes · Damaged furniture</p>
+              <p class="fc-desc">
+                Physical campus infrastructure and maintenance issues.
+              </p>
+              <p class="fc-examples">
+                Broken HVAC · Faulty door locks · Leaking pipes · Damaged
+                furniture
+              </p>
               <div class="fc-glow"></div>
             </div>
             <div class="fc fc-safety fade-in delay-2">
               <div class="fc-label">Safety</div>
-              <p class="fc-desc">Hazards and concerns affecting the wellbeing of students and staff.</p>
-              <p class="fc-examples">Mold · Pests · Slippery walkways · Unsecured areas</p>
+              <p class="fc-desc">
+                Hazards and concerns affecting the wellbeing of students and
+                staff.
+              </p>
+              <p class="fc-examples">
+                Mold · Pests · Slippery walkways · Unsecured areas
+              </p>
               <div class="fc-glow"></div>
             </div>
             <div class="fc fc-dining fade-in delay-1">
               <div class="fc-label">Dining</div>
-              <p class="fc-desc">Issues with campus dining halls, cafes, and food services.</p>
-              <p class="fc-examples">Closed food stations · Long wait times · Menu errors · Cleanliness concerns</p>
+              <p class="fc-desc">
+                Issues with campus dining halls, cafes, and food services.
+              </p>
+              <p class="fc-examples">
+                Closed food stations · Long wait times · Menu errors ·
+                Cleanliness concerns
+              </p>
               <div class="fc-glow"></div>
             </div>
             <div class="fc fc-tech fade-in delay-2">
               <div class="fc-label">Tech</div>
-              <p class="fc-desc">Campus technology and connectivity problems.</p>
-              <p class="fc-examples">Wi-Fi dead zones · Broken displays · Printer outages · Lab equipment</p>
+              <p class="fc-desc">
+                Campus technology and connectivity problems.
+              </p>
+              <p class="fc-examples">
+                Wi-Fi dead zones · Broken displays · Printer outages · Lab
+                equipment
+              </p>
               <div class="fc-glow"></div>
             </div>
           </div>
@@ -1086,80 +1239,179 @@
         <div class="s-team-inner">
           <h2 class="team-h fade-in">Meet our dedicated team</h2>
           <p class="team-sub fade-in delay-1">
-            We're a group of Cal Poly students building tools to make campus life
-            better. Poly Problems is developed by CodeBox, a student-led software
-            team passionate about solving real problems for the Mustang community.
+            We're a group of Cal Poly students building tools to make campus
+            life better. Poly Problems is developed by CodeBox, a student-led
+            software team passionate about solving real problems for the Mustang
+            community.
           </p>
           <div class="team-grid">
-
-            <a class="tm fade-in delay-1" href="https://linkedin.com/in/peterchinh" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/peterchinh" alt="Peter Chinh"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">PC</div>
+            <a
+              class="tm fade-in delay-1"
+              href="https://linkedin.com/in/peterchinh"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/peterchinh"
+                alt="Peter Chinh"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">PC</div>
               <div class="tm-name">Peter Chinh</div>
               <div class="tm-role">Technical Lead</div>
             </a>
 
-            <a class="tm fade-in delay-2" href="https://linkedin.com/in/namish-mannepalli" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/namish-mannepalli" alt="Namish Mannepalli"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">NM</div>
+            <a
+              class="tm fade-in delay-2"
+              href="https://linkedin.com/in/namish-mannepalli"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/namish-mannepalli"
+                alt="Namish Mannepalli"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">NM</div>
               <div class="tm-name">Namish Mannepalli</div>
               <div class="tm-role">Technical Lead</div>
             </a>
 
-            <a class="tm fade-in delay-3" href="https://linkedin.com/in/harry-obraztsov" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/harry-obraztsov" alt="Harry Obraztsov"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">HO</div>
+            <a
+              class="tm fade-in delay-3"
+              href="https://linkedin.com/in/harry-obraztsov"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/harry-obraztsov"
+                alt="Harry Obraztsov"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">HO</div>
               <div class="tm-name">Harry Obraztsov</div>
               <div class="tm-role">Product Manager</div>
             </a>
 
-            <a class="tm fade-in delay-4" href="https://linkedin.com/in/isaac-m-tsai" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/isaac-m-tsai" alt="Isaac Tsai"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">IT</div>
+            <a
+              class="tm fade-in delay-4"
+              href="https://linkedin.com/in/isaac-m-tsai"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/isaac-m-tsai"
+                alt="Isaac Tsai"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">IT</div>
               <div class="tm-name">Isaac Tsai</div>
               <div class="tm-role">Designer</div>
             </a>
 
-            <a class="tm fade-in delay-1" href="https://linkedin.com/in/stelladaoud" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/stelladaoud" alt="Stella Daoud"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">SD</div>
+            <a
+              class="tm fade-in delay-1"
+              href="https://linkedin.com/in/stelladaoud"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/stelladaoud"
+                alt="Stella Daoud"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">SD</div>
               <div class="tm-name">Stella Daoud</div>
               <div class="tm-role">Developer</div>
             </a>
 
-            <a class="tm fade-in delay-2" href="https://linkedin.com/in/arin-johar" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/arin-johar" alt="Arin Johar"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">AJ</div>
+            <a
+              class="tm fade-in delay-2"
+              href="https://linkedin.com/in/arin-johar"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/arin-johar"
+                alt="Arin Johar"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">AJ</div>
               <div class="tm-name">Arin Johar</div>
               <div class="tm-role">Developer</div>
             </a>
 
-            <a class="tm fade-in delay-3" href="https://linkedin.com/in/chloe-low-12a883389" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/chloe-low-12a883389" alt="Chloe Low"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">CL</div>
+            <a
+              class="tm fade-in delay-3"
+              href="https://linkedin.com/in/chloe-low-12a883389"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/chloe-low-12a883389"
+                alt="Chloe Low"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">CL</div>
               <div class="tm-name">Chloe Low</div>
               <div class="tm-role">Developer</div>
             </a>
 
-            <a class="tm fade-in delay-4" href="https://linkedin.com/in/emiokumoto" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/emiokumoto" alt="Emi Okumoto"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">EO</div>
+            <a
+              class="tm fade-in delay-4"
+              href="https://linkedin.com/in/emiokumoto"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/emiokumoto"
+                alt="Emi Okumoto"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">EO</div>
               <div class="tm-name">Emi Okumoto</div>
               <div class="tm-role">Developer</div>
             </a>
 
-            <a class="tm fade-in delay-1" href="https://linkedin.com/in/scott-eisenberg2" target="_blank">
-              <img class="tm-photo-img" src="https://unavatar.io/linkedin/scott-eisenberg2" alt="Scott Eisenberg"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="tm-initials" style="display:none">SE</div>
+            <a
+              class="tm fade-in delay-1"
+              href="https://linkedin.com/in/scott-eisenberg2"
+              target="_blank"
+            >
+              <img
+                class="tm-photo-img"
+                src="https://unavatar.io/linkedin/scott-eisenberg2"
+                alt="Scott Eisenberg"
+                onerror="
+                  this.style.display = 'none';
+                  this.nextElementSibling.style.display = 'flex';
+                "
+              />
+              <div class="tm-initials" style="display: none">SE</div>
               <div class="tm-name">Scott Eisenberg</div>
               <div class="tm-role">Developer</div>
             </a>
@@ -1170,7 +1422,6 @@
               <div class="tm-name">Sai Deekshitha Ganji</div>
               <div class="tm-role">Developer</div>
             </div>
-
           </div>
         </div>
       </section>
@@ -1179,16 +1430,36 @@
       <section class="s-cta" id="cta">
         <h2 class="cta-h fade-in">Ready to get started?</h2>
         <div class="cb-credit fade-in delay-1">
-          <img class="cb-icon" src="/landing/codebox.png" alt="">
+          <img class="cb-icon" src="/landing/codebox.png" alt="" />
           Developed by CodeBox
         </div>
         <div class="store-row fade-in delay-2">
-          <a href="https://apps.apple.com/us/app/polyproblems/id6762303809" class="appstore-btn" aria-label="Download on the App Store">
-            <img src="/landing/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store" height="44" />
+          <a
+            href="https://apps.apple.com/us/app/polyproblems/id6762303809"
+            class="appstore-btn"
+            aria-label="Download on the App Store"
+          >
+            <img
+              src="/landing/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"
+              alt="Download on the App Store"
+              height="44"
+            />
           </a>
         </div>
-        <p class="fade-in delay-3" style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-muted)">
-          Or <a href="https://www.polyproblems.com/login" style="color: var(--text-dark)">open in browser ↗</a>
+        <p
+          class="fade-in delay-3"
+          style="
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+          "
+        >
+          Or
+          <a
+            href="https://www.polyproblems.com/login"
+            style="color: var(--text-dark)"
+            >open in browser ↗</a
+          >
         </p>
       </section>
 
@@ -1198,24 +1469,42 @@
           <div class="ft-top">
             <div>
               <div class="ft-logo">
-                <svg viewBox="0 0 44 43" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z" fill="currentColor"/>
-                  <path d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z" fill="currentColor"/>
+                <svg
+                  viewBox="0 0 44 43"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M43.4341 30.3926C43.5269 31.5697 43.6711 32.6618 43.6749 33.7544C43.6841 36.3352 41.7761 37.6691 39.2666 37.1669C36.3886 36.5908 33.462 36.254 30.5531 35.8376C28.7356 35.5774 26.9117 35.3622 25.1162 35.1302C25.1162 35.921 25.0636 36.6344 25.1251 37.3378C25.4339 40.8658 21.6769 44.1299 17.5063 42.6229C14.498 41.5359 12.5049 37.9591 13.0367 34.6512C13.2477 33.3387 13.2488 33.3076 11.9113 33.0907C10.4604 32.8554 8.99974 32.6805 7.54466 32.4701C7.13745 32.4112 6.8442 32.5638 6.52968 32.8198C4.59429 34.3949 2.05519 33.5069 1.53851 31.0735C0.90119 28.072 0.425705 25.0408 0.0351467 21.9993C-0.304454 19.3545 1.86879 17.738 4.31344 18.8064C4.88628 19.0567 5.26851 18.9802 5.7622 18.6675C14.704 13.0038 23.6556 7.35559 32.6095 1.71106C32.8536 1.55713 33.0529 1.3762 33.2416 1.16362C34.7628 -0.549963 37.1028 -0.354873 38.2866 1.64265C39.1963 3.17744 39.3848 4.96015 39.7488 6.66596C41.4156 14.4768 42.3682 22.4005 43.4341 30.3926ZM22.7152 32.3547C27.5019 33.0387 32.2886 33.7226 37.2242 34.4279C34.9733 24.5022 33.4163 14.6584 32.4984 4.68251C31.7731 4.85216 31.3253 5.20641 30.855 5.50276C25.3205 8.99022 19.7938 12.4901 14.2605 15.9794C11.9307 17.4485 9.58142 18.887 7.26027 20.3695C6.71481 20.7179 5.97816 20.9614 6.15695 21.902C6.58824 24.1711 7.04772 26.4388 7.35283 28.7261C7.49821 29.8159 7.97677 30.1623 8.99876 30.3057C13.5217 30.9404 18.034 31.6513 22.7152 32.3547ZM37.5261 7.38446C37.2475 6.13431 36.9925 4.87822 36.6803 3.63654C36.5265 3.02496 36.263 2.29485 35.4958 2.42356C34.7356 2.55111 34.8615 3.33806 34.874 3.91078C34.9405 6.94763 35.3021 9.96262 35.7153 12.9647C36.4737 18.4751 37.3688 23.9655 38.4723 29.4194C38.7945 31.0114 39.0694 32.6187 39.6855 34.132C39.847 34.5287 40.1093 34.9736 40.6469 34.8618C41.1934 34.7482 41.2036 34.2449 41.2187 33.804C41.2724 32.2347 41.128 30.6714 40.9138 29.1246C39.9148 21.9119 39.0124 14.6833 37.5261 7.38446ZM16.4519 33.7814C16.0987 33.7859 15.6706 33.6013 15.5218 34.1347C14.7828 36.7853 16.0008 39.6972 18.5194 40.5265C20.9396 41.3233 23.1356 39.3989 22.7176 36.882C22.6564 36.5132 22.5069 36.1562 22.4715 35.7868C22.3919 34.9548 21.9073 34.6316 21.1314 34.5234C19.62 34.3126 18.1157 34.0516 16.4519 33.7814ZM3.41888 28.3945C3.51829 29.1038 3.5911 29.8182 3.72676 30.5205C3.81276 30.9657 4.04551 31.4128 4.58413 31.3241C5.06893 31.2443 5.28341 30.8401 5.24685 30.338C5.23329 30.1517 5.22161 29.9642 5.19108 29.7803C4.77768 27.2898 4.35901 24.8003 3.94668 22.3097C3.83266 21.621 3.72533 20.7276 2.85243 20.872C1.93373 21.0239 2.33366 21.9436 2.41878 22.5284C2.69662 24.4375 3.04998 26.3356 3.41888 28.3945Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M16.1391 16.5096C20.0533 14.0813 23.9098 11.6896 27.7618 9.29078C28.1061 9.07637 28.4094 8.79637 28.7529 8.58032C29.3393 8.2114 29.9532 8.09651 30.4188 8.73559C30.9053 9.40335 30.6795 10.0057 30.0305 10.4143C28.0439 11.6651 26.036 12.8819 24.042 14.1211C19.6026 16.8798 15.1643 19.6402 10.7314 22.4093C9.84039 22.9659 9.24357 22.9755 8.84365 22.3765C8.43903 21.7704 8.7053 21.1095 9.61226 20.5452C11.7648 19.2061 13.9237 17.8773 16.1391 16.5096Z"
+                    fill="currentColor"
+                  />
                 </svg>
                 Poly Problems
               </div>
               <p class="ft-tagline">
-                A smarter system for collecting, organizing, and resolving campus
-                concerns at scale.
+                A smarter system for collecting, organizing, and resolving
+                campus concerns at scale.
               </p>
             </div>
             <div class="ft-links">
-              <a href="https://github.com/codebox-calpoly/PolyProblems/blob/main/SUPPORT.md">Contact</a>
+              <a
+                href="https://github.com/codebox-calpoly/PolyProblems/blob/main/SUPPORT.md"
+                >Contact</a
+              >
             </div>
           </div>
           <div class="ft-bottom">
             <div class="ft-cb">
-              <img class="cb-icon" src="/landing/codebox.png" alt="" style="width: 15px; height: 15px;">
+              <img
+                class="cb-icon"
+                src="/landing/codebox.png"
+                alt=""
+                style="width: 15px; height: 15px"
+              />
               Developed by CodeBox
             </div>
           </div>
@@ -1228,20 +1517,20 @@
       const totalSteps = 3;
 
       const stepScreenshots = {
-        1: '/landing/step-1.png',
-        2: '/landing/step-2.png',
-        3: '/landing/step-3.png',
+        1: "/landing/step-1.png",
+        2: "/landing/step-2.png",
+        3: "/landing/step-3.png",
       };
 
       function setStep(n) {
         currentStep = n;
-        document.querySelectorAll('.step').forEach((s, i) => {
-          s.classList.toggle('active', i + 1 === n);
+        document.querySelectorAll(".step").forEach((s, i) => {
+          s.classList.toggle("active", i + 1 === n);
         });
-        document.querySelectorAll('.how-dot').forEach((d, i) => {
-          d.classList.toggle('active', i + 1 === n);
+        document.querySelectorAll(".how-dot").forEach((d, i) => {
+          d.classList.toggle("active", i + 1 === n);
         });
-        document.getElementById('how-screenshot').src = stepScreenshots[n];
+        document.getElementById("how-screenshot").src = stepScreenshots[n];
       }
 
       function changeStep(dir) {
@@ -1251,21 +1540,24 @@
         setStep(next);
       }
 
-      const fadeObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      }, { threshold: 0.15 });
+      const fadeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
 
-      document.querySelectorAll('.fade-in').forEach((el) => {
+      document.querySelectorAll(".fade-in").forEach((el) => {
         fadeObserver.observe(el);
       });
 
-      const heroMountains = document.querySelector('.hero-mountains');
+      const heroMountains = document.querySelector(".hero-mountains");
       if (heroMountains && heroMountains.complete) {
-        heroMountains.classList.add('loaded');
+        heroMountains.classList.add("loaded");
       }
     </script>
   </body>

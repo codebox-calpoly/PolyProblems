@@ -12,6 +12,7 @@ import {
   Dimensions,
   Modal,
   Platform,
+  TextInput,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,7 +22,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Colors, Fonts } from "@/constants/theme";
 import LocationPreview from "@/components/Location";
 import { LocationCoords } from "@/components/LocationTagging";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const { width } = Dimensions.get("window");
 
@@ -32,6 +33,7 @@ const imageWidth = isWeb ? displayWidth - 80 : width - 40;
 
 export default function ReportDetailsScreen() {
   const { id } = useLocalSearchParams();
+  const reportId = Array.isArray(id) ? id[0] : id;
   const router = useRouter();
   const scheme = useColorScheme();
   const theme = scheme === "dark" ? Colors.dark : Colors.light;
@@ -39,24 +41,28 @@ export default function ReportDetailsScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const modalScrollRef = useRef<ScrollView>(null);
   const styles = reportStyles(theme);
   const mainScrollRef = useRef<ScrollView>(null);
+  const queryClient = useQueryClient();
 
   const {
     data,
     isLoading: loading,
     isError,
   } = useQuery({
-    queryKey: ["report", id],
-    enabled: !!id,
-    staleTime: 1000 * 60 * 5,
+    queryKey: ["report", reportId],
+    enabled: !!reportId,
+    staleTime: 0,
+    refetchOnMount: "always",
     queryFn: async () => {
       const { data: report, error } = await supabase
         .from("reports")
         .select("*")
-        .eq("id", id)
+        .eq("id", reportId)
         .single();
 
       // Just throw the error here
@@ -77,11 +83,131 @@ export default function ReportDetailsScreen() {
           }
         : null;
 
+      let userVote = 0;
+      if (user) {
+        const { data: voteData } = await supabase
+          .from("votes")
+          .select("vote_type")
+          .eq("report_id", reportId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        userVote = voteData?.vote_type || 0;
+      }
+
       return {
         report,
         imageUrls: urls,
         location: coords,
+        userVote,
       };
+    },
+  });
+
+  const { data: user } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+
+  const voteMutation = useMutation({
+    mutationFn: async (type: 1 | -1) => {
+      const { error } = await supabase.rpc("handle_vote", {
+        target_report_id: reportId,
+        new_vote_type: type,
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(["report", reportId], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        const newVote = oldData.userVote === variables ? 0 : variables;
+        const scoreAdjustment = newVote - (oldData.userVote || 0);
+
+        return {
+          ...oldData,
+          userVote: newVote,
+          report: {
+            ...oldData.report,
+            total_score: (oldData.report?.total_score || 0) + scoreAdjustment,
+          },
+        };
+      });
+    },
+  });
+
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+    queryKey: ["is-admin", user?.id], // Dependent on user ID
+    enabled: !!user?.id, // Only run once user is found
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const { data: roleData, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user?.id)
+        .single();
+      if (error) throw error;
+      return roleData?.role === "admin";
+    },
+  });
+
+  const showMessage = (title: string, message?: string) => {
+    if (Platform.OS === "web") {
+      window.alert(message ? `${title}\n\n${message}` : title);
+      return;
+    }
+
+    Alert.alert(title, message);
+  };
+
+  const updateReportStatus = useMutation({
+    mutationFn: async ({
+      status,
+      reason,
+    }: {
+      status: "unresolved" | "rejected" | "resolved";
+      reason: string | null;
+    }) => {
+      const { error } = await supabase
+        .from("reports")
+        .update({
+          status,
+          rejection_reason: reason,
+        })
+        .eq("id", reportId);
+
+      if (error) throw error;
+    },
+    onSuccess: async (_data, variables) => {
+      queryClient.setQueryData(["report", reportId], (oldData: any) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          report: {
+            ...oldData.report,
+            status: variables.status,
+            rejection_reason: variables.reason,
+          },
+        };
+      });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["report", reportId] }),
+        queryClient.invalidateQueries({ queryKey: ["reports"] }),
+        queryClient.invalidateQueries({ queryKey: ["user-reports"] }),
+      ]);
+    },
+    onError: (error: any) => {
+      showMessage(
+        "Update Failed",
+        error?.message || "Unable to update the report right now.",
+      );
     },
   });
 
@@ -102,6 +228,21 @@ export default function ReportDetailsScreen() {
   const report = data?.report;
   const imageUrls = data?.imageUrls || [];
   const location: LocationCoords | null = data?.location ?? null;
+  const statusConfig = {
+    unresolved: { label: "Unresolved", color: "#2D7A53" },
+    pending: { label: "Pending Approval", color: "#C9922F" },
+    rejected: { label: "Rejected", color: "#C95C4B" },
+    resolved: { label: "Resolved", color: "#2E86C1" },
+  } as const;
+  const normalizedStatus = (report?.status || "pending").toLowerCase();
+  const statusBadge =
+    statusConfig[normalizedStatus as keyof typeof statusConfig] ||
+    statusConfig.pending;
+  const isResolved = normalizedStatus === "resolved";
+  const isApproved = normalizedStatus === "unresolved";
+  const isRejected = normalizedStatus === "rejected";
+  const isOwner = user?.id === report?.user_id;
+  const showUserResolveButton = isOwner && !(isRejected || isResolved);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -118,6 +259,53 @@ export default function ReportDetailsScreen() {
   const openViewer = (index: number) => {
     setViewerIndex(index);
     setIsModalVisible(true);
+  };
+
+  const handleApprove = async (isUserAction: boolean = false) => {
+    // If the user/owner clicks it, it ALWAYS goes to resolved (from pending or unresolved)
+    // If the admin clicks it, it toggles between unresolved and resolved
+    let nextStatus: "resolved" | "unresolved" = "resolved";
+
+    if (!isUserAction) {
+      nextStatus = isApproved ? "resolved" : "unresolved";
+    }
+
+    await updateReportStatus.mutateAsync({
+      status: nextStatus,
+      reason: null,
+    });
+
+    // Dynamic success message
+    let successMsg = "";
+    if (isUserAction) {
+      successMsg = "You have marked your report as resolved.";
+    } else {
+      successMsg = isApproved
+        ? "The report has been marked as resolved."
+        : "The report has been approved and is now unresolved.";
+    }
+
+    showMessage("Status Updated", successMsg);
+  };
+
+  const handleReject = async () => {
+    const trimmedReason = rejectionReason.trim();
+
+    if (!trimmedReason) {
+      showMessage(
+        "Rejection Reason Required",
+        "Please enter a rejection reason.",
+      );
+      return;
+    }
+
+    await updateReportStatus.mutateAsync({
+      status: "rejected",
+      reason: trimmedReason,
+    });
+    setIsRejectModalVisible(false);
+    setRejectionReason("");
+    showMessage("Report Rejected", "The rejection reason was saved.");
   };
 
   const scrollToIndex = (index: number) => {
@@ -161,11 +349,18 @@ export default function ReportDetailsScreen() {
         >
           {/* Status Badge */}
           <View
-            style={[styles.statusBadge, { backgroundColor: theme.tint + "15" }]}
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusBadge.color + "15" },
+            ]}
           >
-            <View style={[styles.dot, { backgroundColor: theme.tint }]} />
-            <ThemedText style={[styles.statusText, { color: theme.tint }]}>
-              {report?.status?.toUpperCase() || "PENDING"}
+            <View
+              style={[styles.dot, { backgroundColor: statusBadge.color }]}
+            />
+            <ThemedText
+              style={[styles.statusText, { color: statusBadge.color }]}
+            >
+              {statusBadge.label.toUpperCase()}
             </ThemedText>
           </View>
 
@@ -178,6 +373,75 @@ export default function ReportDetailsScreen() {
               ? new Date(report.created_at).toLocaleDateString()
               : "..."}
           </ThemedText>
+
+          {isAdmin && !isAdminLoading && (
+            <View style={styles.adminActions}>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  isRejected || isResolved
+                    ? styles.inactiveActionButton
+                    : styles.approveButton,
+                  isApproved && styles.activeApproveButton,
+                  updateReportStatus.isPending && styles.actionButtonDisabled,
+                ]}
+                onPress={() => handleApprove(false)}
+                disabled={
+                  updateReportStatus.isPending || isResolved || isRejected
+                }
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  {updateReportStatus.isPending
+                    ? "Updating..."
+                    : isApproved
+                      ? "Mark as Resolved"
+                      : isResolved
+                        ? "Resolved"
+                        : "Approve"}
+                </ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  isApproved
+                    ? styles.inactiveActionButton
+                    : styles.rejectButton,
+                  isRejected && styles.activeRejectButton,
+                  updateReportStatus.isPending && styles.actionButtonDisabled,
+                ]}
+                onPress={() => {
+                  setRejectionReason(report?.rejection_reason || "");
+                  setIsRejectModalVisible(true);
+                }}
+                disabled={updateReportStatus.isPending}
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  {isRejected ? "Rejected" : "Reject"}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* User-Owner Action: Resolve Button */}
+          {showUserResolveButton && (
+            <View style={styles.adminActions}>
+              <TouchableOpacity
+                style={[
+                  styles.actionButton,
+                  styles.approveButton,
+                  updateReportStatus.isPending && styles.actionButtonDisabled,
+                ]}
+                onPress={() => handleApprove(true)}
+                disabled={updateReportStatus.isPending}
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  {updateReportStatus.isPending
+                    ? "Updating..."
+                    : "Mark as Resolved"}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Details Card with Location Restored */}
           <View style={[styles.card, { borderColor: theme.icon + "20" }]}>
@@ -206,7 +470,58 @@ export default function ReportDetailsScreen() {
                 </ThemedText>
               </View>
             )}
+            <View style={styles.divider} />
+            {/* Voting Bar */}
+            <View
+              style={[
+                styles.voteContainer,
+                { backgroundColor: theme.icon + "15" },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.voteButton}
+                onPress={() => voteMutation.mutate(1)}
+              >
+                <Ionicons
+                  name="arrow-up"
+                  size={22}
+                  color={data?.userVote === 1 ? theme.tint : theme.icon}
+                />
+              </TouchableOpacity>
+
+              <ThemedText style={styles.voteScore}>
+                {report?.total_score ?? 0}
+              </ThemedText>
+
+              <TouchableOpacity
+                style={styles.voteButton}
+                onPress={() => voteMutation.mutate(-1)}
+              >
+                <Ionicons
+                  name="arrow-down"
+                  size={22}
+                  color={data?.userVote === -1 ? "#FF4500" : theme.icon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          {!!report?.rejection_reason && (
+            <View
+              style={[
+                styles.rejectionCard,
+                {
+                  borderColor: theme.icon + "20",
+                  backgroundColor: "#C95C4B12",
+                },
+              ]}
+            >
+              <ThemedText style={styles.label}>Rejection Reason</ThemedText>
+              <ThemedText style={styles.rejectionText}>
+                {report.rejection_reason}
+              </ThemedText>
+            </View>
+          )}
 
           {/* Main Gallery */}
           <View style={styles.imageSection}>
@@ -380,6 +695,69 @@ export default function ReportDetailsScreen() {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={isRejectModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsRejectModalVisible(false)}
+      >
+        <View style={styles.rejectModalBackdrop}>
+          <View
+            style={[
+              styles.rejectModalCard,
+              {
+                backgroundColor: theme.background,
+                borderColor: theme.icon + "20",
+              },
+            ]}
+          >
+            <ThemedText style={styles.rejectModalTitle}>
+              Reject Report
+            </ThemedText>
+            <ThemedText style={styles.rejectModalSubtitle}>
+              Add a reason that will be saved to the report.
+            </ThemedText>
+            <TextInput
+              value={rejectionReason}
+              onChangeText={setRejectionReason}
+              placeholder="Enter rejection reason"
+              placeholderTextColor={theme.icon}
+              multiline
+              style={[
+                styles.rejectInput,
+                {
+                  color: theme.text,
+                  borderColor: theme.icon + "30",
+                },
+              ]}
+              textAlignVertical="top"
+            />
+            <View style={styles.rejectModalActions}>
+              <TouchableOpacity
+                style={[styles.modalActionButton, styles.cancelButton]}
+                onPress={() => setIsRejectModalVisible(false)}
+                disabled={updateReportStatus.isPending}
+              >
+                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.modalActionButton,
+                  styles.confirmRejectButton,
+                  updateReportStatus.isPending && styles.actionButtonDisabled,
+                ]}
+                onPress={handleReject}
+                disabled={updateReportStatus.isPending}
+              >
+                <ThemedText style={styles.actionButtonText}>
+                  {updateReportStatus.isPending ? "Saving..." : "Reject"}
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -446,6 +824,45 @@ const reportStyles = (theme: { background: string }) =>
       opacity: 0.5,
       marginBottom: 25,
     },
+    adminActions: {
+      flexDirection: "row",
+      gap: 12,
+      marginBottom: 20,
+    },
+    actionButton: {
+      flex: 1,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    approveButton: {
+      backgroundColor: "#2D7A53",
+    },
+    rejectButton: {
+      backgroundColor: "#C95C4B",
+    },
+    activeApproveButton: {
+      backgroundColor: "#1F6A46",
+      borderWidth: 2,
+      borderColor: "#174F35",
+    },
+    activeRejectButton: {
+      backgroundColor: "#B44636",
+      borderWidth: 2,
+      borderColor: "#8F3428",
+    },
+    inactiveActionButton: {
+      backgroundColor: "#B8B8B8",
+    },
+    actionButtonText: {
+      color: "#FFFFFF",
+      fontFamily: Fonts.heading,
+      fontSize: 16,
+    },
+    actionButtonDisabled: {
+      opacity: 0.6,
+    },
     card: {
       padding: 20,
       borderRadius: 24,
@@ -505,6 +922,16 @@ const reportStyles = (theme: { background: string }) =>
     imageSection: {
       marginTop: 30,
       marginBottom: 40,
+    },
+    rejectionCard: {
+      marginTop: 20,
+      padding: 20,
+      borderRadius: 24,
+      borderWidth: 1,
+    },
+    rejectionText: {
+      fontSize: 15,
+      lineHeight: 22,
     },
     galleryContainer: {
       position: "relative",
@@ -611,5 +1038,73 @@ const reportStyles = (theme: { background: string }) =>
     },
     rightButton: {
       right: 20,
+    },
+    rejectModalBackdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.45)",
+      justifyContent: "center",
+      paddingHorizontal: 20,
+    },
+    rejectModalCard: {
+      borderRadius: 24,
+      borderWidth: 1,
+      padding: 20,
+    },
+    rejectModalTitle: {
+      fontSize: 22,
+      fontFamily: Fonts.heading,
+      marginBottom: 8,
+    },
+    rejectModalSubtitle: {
+      fontSize: 14,
+      opacity: 0.7,
+      marginBottom: 16,
+    },
+    rejectInput: {
+      minHeight: 120,
+      borderWidth: 1,
+      borderRadius: 18,
+      padding: 16,
+      fontSize: 15,
+      marginBottom: 16,
+    },
+    rejectModalActions: {
+      flexDirection: "row",
+      gap: 12,
+    },
+    modalActionButton: {
+      flex: 1,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
+    cancelButton: {
+      backgroundColor: "#E7E7E7",
+    },
+    cancelButtonText: {
+      color: "#222222",
+      fontFamily: Fonts.heading,
+      fontSize: 16,
+    },
+    confirmRejectButton: {
+      backgroundColor: "#C95C4B",
+    },
+    voteContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderRadius: 20,
+      paddingHorizontal: 6,
+      paddingVertical: 6,
+      alignSelf: "flex-start",
+    },
+    voteButton: {
+      paddingHorizontal: 10,
+    },
+    voteScore: {
+      fontSize: 16,
+      fontWeight: "700",
+      minWidth: 30,
+      textAlign: "center",
+      fontFamily: Fonts.heading,
     },
   });

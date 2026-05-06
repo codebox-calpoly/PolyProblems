@@ -19,14 +19,15 @@ const Settings = () => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // const handleEditProfile = () => {
   //   router.push("/(tabs)/profile");
   // };
 
-  const handleNotifications = () => {
-    router.push("/notifications");
-  };
+  // const handleNotifications = () => {
+  //   router.push("/notifications");
+  // };
 
   const confirmSignOut = () => {
     if (isSigningOut) return;
@@ -82,6 +83,85 @@ const Settings = () => {
     }
   };
 
+  // --- DELETE ACCOUNT LOGIC ---
+  const confirmDeleteAccount = () => {
+    if (isProcessing) return;
+
+    const title = "Delete Account";
+    const message =
+      "This action is permanent. All your reports, photos, and votes will be deleted forever.";
+
+    if (Platform.OS === "web") {
+      if (window.confirm(`${title}\n${message}`)) void handleDeleteAccount();
+    } else {
+      Alert.alert(title, message, [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete My Account",
+          style: "destructive",
+          onPress: () => void handleDeleteAccount(),
+        },
+      ]);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsProcessing(true);
+    try {
+      // 1. Get current user ID
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not found");
+
+      // List all files inside the user's specific folder
+      const { data: files, error: listError } = await supabase.storage
+        .from("report-photos") // Using your specific bucket name
+        .list(user.id);
+
+      if (listError) throw listError;
+
+      // Delete the files if they exist
+      if (files && files.length > 0) {
+        // We map the files to their full path within the bucket: "userId/fileName.jpg"
+        const pathsToDelete = files.map((f) => `${user.id}/${f.name}`);
+
+        const { error: storageError } = await supabase.storage
+          .from("report-photos")
+          .remove(pathsToDelete);
+
+        if (storageError) throw storageError;
+      }
+
+      /**
+       * IMPORTANT: By default, Supabase does not allow a user to delete themselves
+       * via the client SDK for security. You should call a Postgres function
+       * or an Edge Function here.
+       * * For now, we will call a custom RPC function named 'delete_user_data'
+       * which you should create in your Supabase dashboard.
+       */
+      const { error } = await supabase.rpc("delete_user_data");
+
+      if (error) throw error;
+
+      // 2. Sign the user out locally after successful deletion
+      await supabase.auth.signOut();
+      router.replace("/login");
+
+      Alert.alert(
+        "Account Deleted",
+        "Your data has been removed from our systems.",
+      );
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "Could not delete account.",
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header with decorative image */}
@@ -115,7 +195,7 @@ const Settings = () => {
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity> */}
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.optionButton,
             { backgroundColor: colors.settingsButton },
@@ -125,7 +205,7 @@ const Settings = () => {
         >
           <Text style={styles.optionText}>Notifications</Text>
           <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[
@@ -145,6 +225,18 @@ const Settings = () => {
             </>
           )}
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.deleteButton, isProcessing && styles.buttonDisabled]}
+          onPress={confirmDeleteAccount}
+          disabled={isProcessing}
+        >
+          <Text style={styles.deleteText}>Delete Account</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.legalDisclaimer}>
+          Deleting your account will permanently remove your photos and reports.
+        </Text>
       </View>
     </View>
   );
@@ -222,6 +314,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
     fontFamily: Fonts.body,
+  },
+  deleteButton: { paddingVertical: 12, alignItems: "center" },
+  buttonDisabled: { opacity: 0.6 },
+  deleteText: {
+    fontSize: 14,
+    color: "#C24E3D",
+    fontFamily: Fonts.heading,
+    textDecorationLine: "underline",
+  },
+  legalDisclaimer: {
+    fontSize: 12,
+    color: "#718096",
+    textAlign: "center",
+    marginTop: 8,
+    paddingHorizontal: 20,
   },
 });
 
