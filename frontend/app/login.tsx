@@ -232,7 +232,7 @@ export default function LoginScreen() {
               </Text>
               {screen === "otp" && (
                 <Text style={[styles.subtitle, { color: textColor }]}>
-                  We sent a 6-digit code to {email}
+                  We sent a 6-digit code to {email}. Don't see it? Check your spam or junk folder.
                 </Text>
               )}
               {error ? (
