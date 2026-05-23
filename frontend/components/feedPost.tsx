@@ -12,6 +12,7 @@ import {
   Platform,
   useWindowDimensions,
   Modal,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
@@ -503,13 +504,19 @@ export default function FeedPost({ reportId }: { reportId: string }) {
               (
                 _x: number,
                 _y: number,
-                width: number,
+                btnWidth: number,
                 height: number,
                 pageX: number,
                 pageY: number,
               ) => {
+                const dropdownWidth = 180;
+                const screenWidth = Dimensions.get("window").width;
+                const left = Math.min(
+                  pageX - dropdownWidth + btnWidth,
+                  screenWidth - dropdownWidth - 16,
+                );
                 setMenuTop(pageY + height + 4);
-                setMenuLeft(pageX - 120 + width); // align right edge of dropdown to button
+                setMenuLeft(Math.max(left, 16));
               },
             );
             setMenuVisible(true);
@@ -881,7 +888,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderWidth: 1,
     borderRadius: 8,
-    minWidth: 160,
+    minWidth: 180,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 8,
