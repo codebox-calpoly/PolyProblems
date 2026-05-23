@@ -13,6 +13,8 @@ import {
   Modal,
   Platform,
   TextInput,
+  Pressable,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,6 +25,7 @@ import { Colors, Fonts } from "@/constants/theme";
 import LocationPreview from "@/components/Location";
 import { LocationCoords } from "@/components/LocationTagging";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import CommentsSection from "@/components/commentsection";
 
 const { width } = Dimensions.get("window");
 
@@ -43,6 +46,18 @@ export default function ReportDetailsScreen() {
   const [viewerIndex, setViewerIndex] = useState(0);
   const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const menuButtonRef = React.useRef<any>(null);
+  const [menuTop, setMenuTop] = useState(0);
+  const [menuLeft, setMenuLeft] = useState(0);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportStep, setReportStep] = useState<"reason" | "thanks">("reason");
+  const [reportReason, setReportReason] = useState<string | null>(null);
+  const [reportTarget, setReportTarget] = useState<{
+    type: "post" | "comment";
+    id: string;
+  } | null>(null);
 
   const modalScrollRef = useRef<ScrollView>(null);
   const styles = reportStyles(theme);
@@ -140,6 +155,57 @@ export default function ReportDetailsScreen() {
       });
     },
   });
+
+  const reportMutation = useMutation({
+    mutationFn: async ({ reason }: { reason: string }) => {
+      if (!reportTarget) throw new Error("No target selected for reporting");
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not logged in");
+
+      // Determine target table and payload column names based on target type
+      const tableName =
+        reportTarget.type === "post" ? "post_reports" : "comment_reports";
+      const foreignKeyColumn =
+        reportTarget.type === "post" ? "report" : "comment";
+
+      const { error } = await supabase.from(tableName).insert({
+        [foreignKeyColumn]: reportTarget.id,
+        type: reason,
+        reporter: user.id,
+      });
+
+      if (error) throw error;
+    },
+  });
+
+  const handleReportPost = (postId: string) => {
+    setReportTarget({ type: "post", id: postId });
+    setMenuVisible(false);
+    setReportStep("reason");
+    setReportReason(null);
+    setReportModalVisible(true);
+  };
+
+  const handleReportComment = (commentId: string) => {
+    setReportTarget({ type: "comment", id: commentId });
+    setMenuVisible(false);
+    setReportStep("reason");
+    setReportReason(null);
+    setReportModalVisible(true);
+  };
+
+  const closeReportModal = () => {
+    setReportModalVisible(false);
+    // Reset the steps after the closing animation finishes
+    setTimeout(() => {
+      setReportStep("reason");
+      setReportReason(null);
+      setReportTarget(null);
+    }, 300);
+  };
 
   const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ["is-admin", user?.id], // Dependent on user ID
@@ -332,305 +398,358 @@ export default function ReportDetailsScreen() {
   return (
     <ThemedView style={[styles.safe, { backgroundColor: theme.background }]}>
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.headerIcon}
-          >
-            <Ionicons name="arrow-back" size={24} color={theme.text} />
-          </TouchableOpacity>
-          <ThemedText style={styles.headerTitle}>Report Details</ThemedText>
-          <View style={{ width: 44 }} />
-        </View>
-
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={"position"}
+          keyboardVerticalOffset={0}
         >
-          {/* Status Badge */}
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: statusBadge.color + "15" },
-            ]}
-          >
-            <View
-              style={[styles.dot, { backgroundColor: statusBadge.color }]}
-            />
-            <ThemedText
-              style={[styles.statusText, { color: statusBadge.color }]}
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={styles.headerIcon}
             >
-              {statusBadge.label.toUpperCase()}
-            </ThemedText>
+              <Ionicons name="arrow-back" size={24} color={theme.text} />
+            </TouchableOpacity>
+            <ThemedText style={styles.headerTitle}>Report Details</ThemedText>
+            <View style={{ width: 44 }} />
           </View>
 
-          <ThemedText type="title" style={styles.mainTitle}>
-            {report?.title || "Issue Report"}
-          </ThemedText>
-          <ThemedText style={styles.dateText}>
-            Reported on{" "}
-            {report?.created_at
-              ? new Date(report.created_at).toLocaleDateString()
-              : "..."}
-          </ThemedText>
-
-          {isAdmin && !isAdminLoading && (
-            <View style={styles.adminActions}>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  isRejected || isResolved
-                    ? styles.inactiveActionButton
-                    : styles.approveButton,
-                  isApproved && styles.activeApproveButton,
-                  updateReportStatus.isPending && styles.actionButtonDisabled,
-                ]}
-                onPress={() => handleApprove(false)}
-                disabled={
-                  updateReportStatus.isPending || isResolved || isRejected
-                }
+          <ScrollView
+            contentContainerStyle={[styles.scrollContent]}
+            showsVerticalScrollIndicator={false}
+            keyboardDismissMode="interactive"
+          >
+            {/* Status Badge */}
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: statusBadge.color + "15" },
+              ]}
+            >
+              <View
+                style={[styles.dot, { backgroundColor: statusBadge.color }]}
+              />
+              <ThemedText
+                style={[styles.statusText, { color: statusBadge.color }]}
               >
-                <ThemedText style={styles.actionButtonText}>
-                  {updateReportStatus.isPending
-                    ? "Updating..."
-                    : isApproved
-                      ? "Mark as Resolved"
-                      : isResolved
-                        ? "Resolved"
-                        : "Approve"}
-                </ThemedText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  isApproved
-                    ? styles.inactiveActionButton
-                    : styles.rejectButton,
-                  isRejected && styles.activeRejectButton,
-                  updateReportStatus.isPending && styles.actionButtonDisabled,
-                ]}
-                onPress={() => {
-                  setRejectionReason(report?.rejection_reason || "");
-                  setIsRejectModalVisible(true);
-                }}
-                disabled={updateReportStatus.isPending}
-              >
-                <ThemedText style={styles.actionButtonText}>
-                  {isRejected ? "Rejected" : "Reject"}
-                </ThemedText>
-              </TouchableOpacity>
+                {statusBadge.label.toUpperCase()}
+              </ThemedText>
             </View>
-          )}
 
-          {/* User-Owner Action: Resolve Button */}
-          {showUserResolveButton && (
-            <View style={styles.adminActions}>
-              <TouchableOpacity
-                style={[
-                  styles.actionButton,
-                  styles.approveButton,
-                  updateReportStatus.isPending && styles.actionButtonDisabled,
-                ]}
-                onPress={() => handleApprove(true)}
-                disabled={updateReportStatus.isPending}
-              >
-                <ThemedText style={styles.actionButtonText}>
-                  {updateReportStatus.isPending
-                    ? "Updating..."
-                    : "Mark as Resolved"}
-                </ThemedText>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Details Card with Location Restored */}
-          <View style={[styles.card, { borderColor: theme.icon + "20" }]}>
-            <ThemedText style={styles.label}>Description</ThemedText>
-            <ThemedText style={styles.description}>
-              {report?.description}
+            <ThemedText type="title" style={styles.mainTitle}>
+              {report?.title || "Issue Report"}
             </ThemedText>
-            <View style={styles.divider} />
-            <ThemedText style={styles.label}>Location Details</ThemedText>
-            {location ? (
-              <View style={styles.mapWrapper}>
-                {location && <LocationPreview value={location} />}
-              </View>
-            ) : (
-              <View style={styles.locationRow}>
-                <View
+            <ThemedText style={styles.dateText}>
+              Reported on{" "}
+              {report?.created_at
+                ? new Date(report.created_at).toLocaleDateString()
+                : "..."}
+            </ThemedText>
+
+            {isAdmin && !isAdminLoading && (
+              <View style={styles.adminActions}>
+                <TouchableOpacity
                   style={[
-                    styles.iconCircle,
-                    { backgroundColor: theme.tint + "20" },
+                    styles.actionButton,
+                    isRejected || isResolved
+                      ? styles.inactiveActionButton
+                      : styles.approveButton,
+                    isApproved && styles.activeApproveButton,
+                    updateReportStatus.isPending && styles.actionButtonDisabled,
                   ]}
+                  onPress={() => handleApprove(false)}
+                  disabled={
+                    updateReportStatus.isPending || isResolved || isRejected
+                  }
                 >
-                  <Ionicons name="navigate" size={18} color={theme.tint} />
-                </View>
-                <ThemedText style={styles.locationValue}>
-                  Location not shared.
-                </ThemedText>
+                  <ThemedText style={styles.actionButtonText}>
+                    {updateReportStatus.isPending
+                      ? "Updating..."
+                      : isApproved
+                        ? "Mark as Resolved"
+                        : isResolved
+                          ? "Resolved"
+                          : "Approve"}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    isApproved
+                      ? styles.inactiveActionButton
+                      : styles.rejectButton,
+                    isRejected && styles.activeRejectButton,
+                    updateReportStatus.isPending && styles.actionButtonDisabled,
+                  ]}
+                  onPress={() => {
+                    setRejectionReason(report?.rejection_reason || "");
+                    setIsRejectModalVisible(true);
+                  }}
+                  disabled={updateReportStatus.isPending}
+                >
+                  <ThemedText style={styles.actionButtonText}>
+                    {isRejected ? "Rejected" : "Reject"}
+                  </ThemedText>
+                </TouchableOpacity>
               </View>
             )}
-            <View style={styles.divider} />
-            {/* Voting Bar */}
-            <View
-              style={[
-                styles.voteContainer,
-                { backgroundColor: theme.icon + "15" },
-              ]}
-            >
-              <TouchableOpacity
-                style={styles.voteButton}
-                onPress={() => voteMutation.mutate(1)}
-              >
-                <Ionicons
-                  name="arrow-up"
-                  size={22}
-                  color={data?.userVote === 1 ? theme.tint : theme.icon}
-                />
-              </TouchableOpacity>
 
-              <ThemedText style={styles.voteScore}>
-                {report?.total_score ?? 0}
-              </ThemedText>
-
-              <TouchableOpacity
-                style={styles.voteButton}
-                onPress={() => voteMutation.mutate(-1)}
-              >
-                <Ionicons
-                  name="arrow-down"
-                  size={22}
-                  color={data?.userVote === -1 ? "#FF4500" : theme.icon}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {!!report?.rejection_reason && (
-            <View
-              style={[
-                styles.rejectionCard,
-                {
-                  borderColor: theme.icon + "20",
-                  backgroundColor: "#C95C4B12",
-                },
-              ]}
-            >
-              <ThemedText style={styles.label}>Rejection Reason</ThemedText>
-              <ThemedText style={styles.rejectionText}>
-                {report.rejection_reason}
-              </ThemedText>
-            </View>
-          )}
-
-          {/* Main Gallery */}
-          <View style={styles.imageSection}>
-            <View style={styles.sectionHeader}>
-              <ThemedText style={styles.label}>Attached Images</ThemedText>
-              {imageUrls.length > 1 && (
-                <ThemedText style={styles.imageCount}>
-                  {activeIndex + 1} of {imageUrls.length}
-                </ThemedText>
-              )}
-            </View>
-
-            <View style={styles.galleryContainer}>
-              {/* Left Arrow - Web Only */}
-              {isWeb && activeIndex > 0 && (
+            {/* User-Owner Action: Resolve Button */}
+            {showUserResolveButton && (
+              <View style={styles.adminActions}>
                 <TouchableOpacity
-                  style={[styles.webNavButton, styles.webLeftArrow]}
-                  onPress={() => {
-                    const prevIndex = activeIndex - 1;
-                    // 1. Move the scrollview
-                    mainScrollRef.current?.scrollTo({
-                      x: prevIndex * imageWidth,
-                      animated: true,
-                    });
-                    // 2. Update the dots/count immediately
-                    setActiveIndex(prevIndex);
-                  }}
+                  style={[
+                    styles.actionButton,
+                    styles.approveButton,
+                    updateReportStatus.isPending && styles.actionButtonDisabled,
+                  ]}
+                  onPress={() => handleApprove(true)}
+                  disabled={updateReportStatus.isPending}
                 >
-                  <Ionicons name="chevron-back" size={24} color={theme.text} />
+                  <ThemedText style={styles.actionButtonText}>
+                    {updateReportStatus.isPending
+                      ? "Updating..."
+                      : "Mark as Resolved"}
+                  </ThemedText>
                 </TouchableOpacity>
-              )}
+              </View>
+            )}
 
-              <ScrollView
-                ref={mainScrollRef} // Add a ref here
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                style={[{ width: imageWidth }]}
-                scrollEventThrottle={16}
-                onScroll={(e) => {
-                  const offset = e.nativeEvent.contentOffset.x;
-                  const newIndex = Math.round(offset / imageWidth);
-                  if (newIndex !== activeIndex) {
-                    setActiveIndex(newIndex);
-                  }
-                }}
-                onMomentumScrollEnd={(e) =>
-                  setActiveIndex(
-                    Math.round(e.nativeEvent.contentOffset.x / imageWidth),
-                  )
-                }
-              >
-                {imageUrls.map((url, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => openViewer(index)}
-                    style={styles.imageWrapper}
+            {/* Details Card with Location Restored */}
+            <View style={[styles.card, { borderColor: theme.icon + "20" }]}>
+              <ThemedText style={styles.label}>Description</ThemedText>
+              <ThemedText style={styles.description}>
+                {report?.description}
+              </ThemedText>
+              <View style={styles.divider} />
+              <ThemedText style={styles.label}>Location Details</ThemedText>
+              {location ? (
+                <View style={styles.mapWrapper}>
+                  {location && <LocationPreview value={location} />}
+                </View>
+              ) : (
+                <View style={styles.locationRow}>
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { backgroundColor: theme.tint + "20" },
+                    ]}
                   >
-                    <Image
-                      source={{ uri: url }}
-                      style={styles.evidenceImage}
-                      resizeMode="contain"
+                    <Ionicons name="navigate" size={18} color={theme.tint} />
+                  </View>
+                  <ThemedText style={styles.locationValue}>
+                    Location not shared.
+                  </ThemedText>
+                </View>
+              )}
+              <View style={styles.divider} />
+              {/* Voting Bar */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <View
+                  style={[
+                    styles.voteContainer,
+                    { backgroundColor: theme.icon + "15" },
+                  ]}
+                >
+                  <TouchableOpacity
+                    style={styles.voteButton}
+                    onPress={() => voteMutation.mutate(1)}
+                  >
+                    <Ionicons
+                      name="arrow-up"
+                      size={22}
+                      color={data?.userVote === 1 ? theme.tint : theme.icon}
                     />
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                  <ThemedText style={styles.voteScore}>
+                    {report?.total_score ?? 0}
+                  </ThemedText>
+                  <TouchableOpacity
+                    style={styles.voteButton}
+                    onPress={() => voteMutation.mutate(-1)}
+                  >
+                    <Ionicons
+                      name="arrow-down"
+                      size={22}
+                      color={data?.userVote === -1 ? "#FF4500" : theme.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
 
-              {/* Right Arrow - Web Only */}
-              {isWeb && activeIndex < imageUrls.length - 1 && (
                 <TouchableOpacity
-                  style={[styles.webNavButton, styles.webRightArrow]}
+                  ref={menuButtonRef}
                   onPress={() => {
-                    const nextIndex = activeIndex + 1;
-                    // 1. Move the scrollview
-                    mainScrollRef.current?.scrollTo({
-                      x: nextIndex * imageWidth,
-                      animated: true,
-                    });
-                    // 2. Update the dots/count immediately
-                    setActiveIndex(nextIndex);
+                    menuButtonRef.current?.measure(
+                      (
+                        _x: number,
+                        _y: number,
+                        btnWidth: number,
+                        height: number,
+                        pageX: number,
+                        pageY: number,
+                      ) => {
+                        const dropdownWidth = 180;
+                        const screenWidth = Dimensions.get("window").width;
+                        const left = Math.min(
+                          pageX - dropdownWidth + btnWidth,
+                          screenWidth - dropdownWidth - 16,
+                        );
+                        setMenuTop(pageY + height + 4);
+                        setMenuLeft(Math.max(left, 16));
+                      },
+                    );
+                    setMenuVisible(true);
                   }}
                 >
                   <Ionicons
-                    name="chevron-forward"
-                    size={24}
-                    color={theme.text}
+                    name="ellipsis-horizontal"
+                    size={20}
+                    color={theme.icon}
                   />
                 </TouchableOpacity>
-              )}
+              </View>
             </View>
 
-            {imageUrls.length > 1 && (
-              <View style={styles.paginationContainer}>
-                {imageUrls.map((_, i) => (
-                  <View
-                    key={i}
-                    style={[
-                      styles.paginationDot,
-                      {
-                        backgroundColor:
-                          i === activeIndex ? theme.tint : theme.icon + "30",
-                      },
-                    ]}
-                  />
-                ))}
+            {!!report?.rejection_reason && (
+              <View
+                style={[
+                  styles.rejectionCard,
+                  {
+                    borderColor: theme.icon + "20",
+                    backgroundColor: "#C95C4B12",
+                  },
+                ]}
+              >
+                <ThemedText style={styles.label}>Rejection Reason</ThemedText>
+                <ThemedText style={styles.rejectionText}>
+                  {report.rejection_reason}
+                </ThemedText>
               </View>
             )}
-          </View>
-        </ScrollView>
+
+            {/* Main Gallery */}
+            <View style={styles.imageSection}>
+              <View style={styles.sectionHeader}>
+                <ThemedText style={styles.label}>Attached Images</ThemedText>
+                {imageUrls.length > 1 && (
+                  <ThemedText style={styles.imageCount}>
+                    {activeIndex + 1} of {imageUrls.length}
+                  </ThemedText>
+                )}
+              </View>
+
+              <View style={styles.galleryContainer}>
+                {/* Left Arrow - Web Only */}
+                {isWeb && activeIndex > 0 && (
+                  <TouchableOpacity
+                    style={[styles.webNavButton, styles.webLeftArrow]}
+                    onPress={() => {
+                      const prevIndex = activeIndex - 1;
+                      // 1. Move the scrollview
+                      mainScrollRef.current?.scrollTo({
+                        x: prevIndex * imageWidth,
+                        animated: true,
+                      });
+                      // 2. Update the dots/count immediately
+                      setActiveIndex(prevIndex);
+                    }}
+                  >
+                    <Ionicons
+                      name="chevron-back"
+                      size={24}
+                      color={theme.text}
+                    />
+                  </TouchableOpacity>
+                )}
+
+                <ScrollView
+                  ref={mainScrollRef} // Add a ref here
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  pagingEnabled
+                  style={[{ width: imageWidth }]}
+                  scrollEventThrottle={16}
+                  onScroll={(e) => {
+                    const offset = e.nativeEvent.contentOffset.x;
+                    const newIndex = Math.round(offset / imageWidth);
+                    if (newIndex !== activeIndex) {
+                      setActiveIndex(newIndex);
+                    }
+                  }}
+                  onMomentumScrollEnd={(e) =>
+                    setActiveIndex(
+                      Math.round(e.nativeEvent.contentOffset.x / imageWidth),
+                    )
+                  }
+                >
+                  {imageUrls.map((url, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => openViewer(index)}
+                      style={styles.imageWrapper}
+                    >
+                      <Image
+                        source={{ uri: url }}
+                        style={styles.evidenceImage}
+                        resizeMode="contain"
+                      />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                {/* Right Arrow - Web Only */}
+                {isWeb && activeIndex < imageUrls.length - 1 && (
+                  <TouchableOpacity
+                    style={[styles.webNavButton, styles.webRightArrow]}
+                    onPress={() => {
+                      const nextIndex = activeIndex + 1;
+                      // 1. Move the scrollview
+                      mainScrollRef.current?.scrollTo({
+                        x: nextIndex * imageWidth,
+                        animated: true,
+                      });
+                      // 2. Update the dots/count immediately
+                      setActiveIndex(nextIndex);
+                    }}
+                  >
+                    <Ionicons
+                      name="chevron-forward"
+                      size={24}
+                      color={theme.text}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {imageUrls.length > 1 && (
+                <View style={styles.paginationContainer}>
+                  {imageUrls.map((_, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.paginationDot,
+                        {
+                          backgroundColor:
+                            i === activeIndex ? theme.tint : theme.icon + "30",
+                        },
+                      ]}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
+            <CommentsSection
+              reportId={reportId}
+              handleReportComment={handleReportComment}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
 
       {/* MODAL SECTION */}
@@ -757,6 +876,181 @@ export default function ReportDetailsScreen() {
             </View>
           </View>
         </View>
+      </Modal>
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="none"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable
+          style={[StyleSheet.absoluteFill, { cursor: "default" } as any]}
+          onPress={() => setMenuVisible(false)}
+        />
+        <View
+          style={[
+            styles.menuDropdown,
+            {
+              backgroundColor: theme.background,
+              borderColor: theme.icon + "20",
+              top: menuTop,
+              left: menuLeft,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              handleReportPost(reportId);
+            }}
+          >
+            <Ionicons name="flag-outline" size={16} color={theme.text} />
+            <ThemedText style={styles.menuItemText}>Report Post</ThemedText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={async () => {
+              handleReportPost(reportId);
+              try {
+                await reportMutation.mutateAsync({ reason: "Resolved" });
+              } catch (err: any) {
+                if (err?.code !== "23505") console.error(err);
+              } finally {
+                setReportStep("thanks");
+                setReportModalVisible(true);
+              }
+            }}
+          >
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={16}
+              color={theme.text}
+            />
+            <ThemedText style={styles.menuItemText}>
+              Report as Resolved
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={reportModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <Pressable
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: "rgba(0,0,0,0.5)" },
+          ]}
+          onPress={() => setReportModalVisible(false)}
+        />
+        <Pressable
+          style={[
+            styles.reportModal,
+            { backgroundColor: theme.background, cursor: "default" } as any,
+          ]}
+          onPress={(e) => e.stopPropagation()}
+        >
+          {reportStep === "reason" ? (
+            <>
+              <ThemedText style={styles.reportTitle}>
+                Report {reportTarget?.type === "post" ? "Post" : "Comment"}
+              </ThemedText>
+              <ThemedText style={styles.reportSubtitle}>
+                Reason for report
+              </ThemedText>
+              {(["Inappropriate", "Spam", "Misleading", "Other"] as const).map(
+                (reason) => (
+                  <TouchableOpacity
+                    key={reason}
+                    style={[
+                      styles.reportOption,
+                      { borderColor: theme.icon + "30" },
+                      reportReason === reason && {
+                        borderColor: theme.tint,
+                        backgroundColor: theme.tint + "18",
+                      },
+                    ]}
+                    onPress={() => setReportReason(reason)}
+                  >
+                    <Ionicons
+                      name={
+                        reportReason === reason
+                          ? "radio-button-on"
+                          : "radio-button-off"
+                      }
+                      size={18}
+                      color={reportReason === reason ? theme.tint : theme.icon}
+                    />
+                    <ThemedText style={styles.reportOptionText}>
+                      {reason}
+                    </ThemedText>
+                  </TouchableOpacity>
+                ),
+              )}
+              <TouchableOpacity
+                style={[
+                  styles.reportNextButton,
+                  {
+                    backgroundColor: reportReason
+                      ? theme.tint
+                      : theme.icon + "30",
+                  },
+                ]}
+                disabled={!reportReason || reportMutation.isPending}
+                onPress={async () => {
+                  if (!reportReason) return;
+                  try {
+                    await reportMutation.mutateAsync({
+                      reason: reportReason,
+                    });
+                    setReportStep("thanks");
+                  } catch (err: any) {
+                    if (err?.code === "23505") setReportStep("thanks");
+                    else console.error(err);
+                  }
+                }}
+              >
+                {reportMutation.isPending ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <ThemedText style={styles.reportNextText}>Next</ThemedText>
+                )}
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Ionicons
+                name="checkmark-circle"
+                size={48}
+                color={theme.tint}
+                style={{ alignSelf: "center", marginBottom: 12 }}
+              />
+              <ThemedText style={[styles.reportTitle, { textAlign: "center" }]}>
+                Thank You
+              </ThemedText>
+              <ThemedText
+                style={[
+                  styles.reportSubtitle,
+                  { textAlign: "center", marginBottom: 24 },
+                ]}
+              >
+                A moderator will review your report shortly.
+              </ThemedText>
+              <TouchableOpacity
+                style={[
+                  styles.reportNextButton,
+                  { backgroundColor: theme.tint },
+                ]}
+                onPress={() => closeReportModal()}
+              >
+                <ThemedText style={styles.reportNextText}>Done</ThemedText>
+              </TouchableOpacity>
+            </>
+          )}
+        </Pressable>
       </Modal>
     </ThemedView>
   );
@@ -1105,6 +1399,73 @@ const reportStyles = (theme: { background: string }) =>
       fontWeight: "700",
       minWidth: 30,
       textAlign: "center",
+      fontFamily: Fonts.heading,
+    },
+    menuDropdown: {
+      position: "absolute",
+      borderWidth: 1,
+      borderRadius: 8,
+      minWidth: 180,
+      shadowColor: "#000",
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 4 },
+      elevation: 5,
+    },
+    menuItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      cursor: "pointer",
+    } as any,
+    menuItemText: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+    },
+    reportModal: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      padding: 24,
+      paddingBottom: 40,
+    },
+    reportTitle: {
+      fontSize: 18,
+      fontFamily: Fonts.heading,
+      marginBottom: 4,
+    },
+    reportSubtitle: {
+      fontSize: 13,
+      opacity: 0.6,
+      marginBottom: 16,
+    },
+    reportOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      padding: 12,
+      borderRadius: 8,
+      borderWidth: 1,
+      marginBottom: 8,
+    },
+    reportOptionText: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+    },
+    reportNextButton: {
+      marginTop: 8,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    reportNextText: {
+      color: "white",
+      fontSize: 15,
       fontFamily: Fonts.heading,
     },
   });

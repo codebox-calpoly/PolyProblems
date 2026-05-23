@@ -12,6 +12,7 @@ import {
   Platform,
   useWindowDimensions,
   Modal,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
@@ -39,6 +40,14 @@ export default function FeedPost({ reportId }: { reportId: string }) {
   // Adjusted width calculation: screen width minus FeedPost/FeedScene padding
   const cardPadding = 48; // paddingHorizontal: 24 * 2
   const imageWidth = Math.min(windowWidth, 600) - cardPadding;
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const menuButtonRef = React.useRef<any>(null);
+  const [menuTop, setMenuTop] = useState(0);
+  const [menuLeft, setMenuLeft] = useState(0);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportStep, setReportStep] = useState<"reason" | "thanks">("reason");
+  const [reportReason, setReportReason] = useState<string | null>(null);
 
   // Add this helper inside FeedPost
   const handleNavigate = () => {
@@ -177,6 +186,23 @@ export default function FeedPost({ reportId }: { reportId: string }) {
           },
         };
       });
+    },
+  });
+
+  const postReportMutation = useMutation({
+    mutationFn: async ({ reason }: { reason: string }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not logged in");
+
+      const { error } = await supabase.from("post_reports").insert({
+        report: reportId,
+        type: reason,
+        reporter: user.id,
+      });
+
+      if (error) throw error;
     },
   });
 
@@ -471,10 +497,225 @@ export default function FeedPost({ reportId }: { reportId: string }) {
         </Modal>
 
         {/* More Menu */}
-        {/* <TouchableOpacity>
+        <TouchableOpacity
+          ref={menuButtonRef}
+          onPress={() => {
+            menuButtonRef.current?.measure(
+              (
+                _x: number,
+                _y: number,
+                btnWidth: number,
+                height: number,
+                pageX: number,
+                pageY: number,
+              ) => {
+                const dropdownWidth = 180;
+                const screenWidth = Dimensions.get("window").width;
+                const left = Math.min(
+                  pageX - dropdownWidth + btnWidth,
+                  screenWidth - dropdownWidth - 16,
+                );
+                setMenuTop(pageY + height + 4);
+                setMenuLeft(Math.max(left, 16));
+              },
+            );
+            setMenuVisible(true);
+          }}
+        >
           <Ionicons name="ellipsis-horizontal" size={20} color={theme.icon} />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="none"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <Pressable
+          style={[StyleSheet.absoluteFill, { cursor: "default" } as any]}
+          onPress={() => setMenuVisible(false)}
+        />
+        <View
+          style={[
+            styles.menuDropdown,
+            {
+              backgroundColor: theme.background,
+              borderColor: theme.line,
+              top: menuTop,
+              left: menuLeft,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              setMenuVisible(false);
+              setReportStep("reason");
+              setReportReason(null);
+              setReportModalVisible(true);
+            }}
+          >
+            <Ionicons name="flag-outline" size={16} color={theme.text} />
+            <Text style={[styles.menuItemText, { color: theme.text }]}>
+              Report Post
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={async () => {
+              setMenuVisible(false);
+              try {
+                await await postReportMutation.mutateAsync({
+                  reason: "Resolved",
+                });
+              } catch (err: any) {
+                if (err?.code !== "23505") console.error(err); // ignore duplicate
+              } finally {
+                setReportStep("thanks");
+                setReportModalVisible(true);
+              }
+            }}
+          >
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={16}
+              color={theme.text}
+            />
+            <Text style={[styles.menuItemText, { color: theme.text }]}>
+              Report as Resolved
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <Modal
+        visible={reportModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setReportModalVisible(false)}
+      >
+        <Pressable
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: "rgba(0,0,0,0.5)" },
+          ]}
+          onPress={() => setReportModalVisible(false)}
+        />
+        <Pressable
+          style={[
+            styles.reportModal,
+            { backgroundColor: theme.background, cursor: "default" } as any,
+          ]}
+          onPress={(e) => e.stopPropagation()}
+        >
+          {reportStep === "reason" ? (
+            <>
+              <Text style={[styles.reportTitle, { color: theme.text }]}>
+                Report Post
+              </Text>
+              <Text style={[styles.reportSubtitle, { color: theme.icon }]}>
+                Reason for report
+              </Text>
+              {(["Inappropriate", "Spam", "Misleading", "Other"] as const).map(
+                (reason) => (
+                  <TouchableOpacity
+                    key={reason}
+                    style={[
+                      styles.reportOption,
+                      { borderColor: theme.line },
+                      reportReason === reason && {
+                        borderColor: theme.tint,
+                        backgroundColor: theme.tint + "18",
+                      },
+                    ]}
+                    onPress={() => setReportReason(reason)}
+                  >
+                    <Ionicons
+                      name={
+                        reportReason === reason
+                          ? "radio-button-on"
+                          : "radio-button-off"
+                      }
+                      size={18}
+                      color={reportReason === reason ? theme.tint : theme.icon}
+                    />
+                    <Text
+                      style={[styles.reportOptionText, { color: theme.text }]}
+                    >
+                      {reason}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
+              <TouchableOpacity
+                style={[
+                  styles.reportNextButton,
+                  {
+                    backgroundColor: reportReason ? theme.tint : theme.line,
+                  },
+                ]}
+                disabled={!reportReason}
+                onPress={async () => {
+                  if (!reportReason) return;
+                  try {
+                    await postReportMutation.mutateAsync({
+                      reason: reportReason,
+                    });
+                    setReportStep("thanks");
+                  } catch (err: any) {
+                    // Handle duplicate report gracefully
+                    if (err?.code === "23505") {
+                      // unique constraint — already reported
+                      setReportStep("thanks"); // still show thank you
+                    } else {
+                      console.error("Report failed:", err);
+                    }
+                  }
+                }}
+              >
+                {postReportMutation.isPending ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text style={styles.reportNextText}>Next</Text>
+                )}
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Ionicons
+                name="checkmark-circle"
+                size={48}
+                color={theme.tint}
+                style={{ alignSelf: "center", marginBottom: 12 }}
+              />
+              <Text
+                style={[
+                  styles.reportTitle,
+                  { color: theme.text, textAlign: "center" },
+                ]}
+              >
+                Thank You
+              </Text>
+              <Text
+                style={[
+                  styles.reportSubtitle,
+                  { color: theme.icon, textAlign: "center", marginBottom: 24 },
+                ]}
+              >
+                A moderator will review your report shortly.
+              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.reportNextButton,
+                  { backgroundColor: theme.tint },
+                ]}
+                onPress={() => setReportModalVisible(false)}
+              >
+                <Text style={styles.reportNextText}>Done</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Pressable>
+      </Modal>
     </Pressable>
   );
 }
@@ -642,5 +883,72 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  menuDropdown: {
+    position: "absolute",
+    borderWidth: 1,
+    borderRadius: 8,
+    minWidth: 180,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    cursor: "pointer",
+  } as any,
+  menuItemText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+  },
+  reportModal: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  reportTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    marginBottom: 4,
+  },
+  reportSubtitle: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    marginBottom: 16,
+  },
+  reportOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  reportOptionText: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+  },
+  reportNextButton: {
+    marginTop: 8,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  reportNextText: {
+    color: "white",
+    fontSize: 15,
+    fontFamily: Fonts.heading,
   },
 });
