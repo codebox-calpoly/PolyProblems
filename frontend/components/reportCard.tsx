@@ -13,6 +13,7 @@ export type Report = {
   created_at: string;
   total_score: number;
   status?: string;
+  comment_count?: number;
 };
 
 interface ReportCardProps {
@@ -185,6 +186,12 @@ export const ReportCard = ({ report, onPress }: ReportCardProps) => {
               ]}
             >
               {report.total_score || 0}
+            </ThemedText>
+          </ThemedView>
+          <ThemedView style={styles.scoreBadge}>
+            <Ionicons name="chatbubble-outline" size={14} color={theme.icon} />
+            <ThemedText style={[styles.scoreText, { color: theme.icon }]}>
+              {report.comment_count ?? 0}
             </ThemedText>
           </ThemedView>
         </ThemedView>

@@ -362,7 +362,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       {/* Meta */}
       <View style={styles.metaRow}>
         <Text style={[styles.author, { color: theme.icon }]}>
-          By {report.username || "Anonymous"}
+          By {report.profiles?.username || "Anonymous"}
         </Text>
         <View style={[styles.tag, { backgroundColor: activeCategoryColor }]}>
           <Text style={styles.tagText}>{report.category}</Text>
@@ -410,35 +410,51 @@ export default function FeedPost({ reportId }: { reportId: string }) {
 
       {/* Footer */}
       <View style={styles.footer}>
-        {/* Voting Container */}
-        <View
-          style={[styles.voteContainer, { backgroundColor: theme.icon + "15" }]}
-        >
-          <TouchableOpacity
-            style={styles.voteButton}
-            onPress={() => voteMutation.mutate(1)}
+        <View style={styles.footerLeft}>
+          {/* Voting Container */}
+          <View
+            style={[
+              styles.voteContainer,
+              { backgroundColor: theme.icon + "15" },
+            ]}
           >
-            <Ionicons
-              name="arrow-up"
-              size={18}
-              color={userVote === 1 ? theme.tint : theme.icon}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.voteButton}
+              onPress={() => voteMutation.mutate(1)}
+            >
+              <Ionicons
+                name="arrow-up"
+                size={18}
+                color={userVote === 1 ? theme.tint : theme.icon}
+              />
+            </TouchableOpacity>
 
-          <Text style={[styles.voteScore, { color: theme.text }]}>
-            {report.total_score}
-          </Text>
+            <Text style={[styles.voteScore, { color: theme.text }]}>
+              {report.total_score}
+            </Text>
 
-          <TouchableOpacity
-            style={styles.voteButton}
-            onPress={() => voteMutation.mutate(-1)}
+            <TouchableOpacity
+              style={styles.voteButton}
+              onPress={() => voteMutation.mutate(-1)}
+            >
+              <Ionicons
+                name="arrow-down"
+                size={18}
+                color={userVote === -1 ? "#FF4500" : theme.icon}
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={[
+              styles.commentCount,
+              { backgroundColor: theme.icon + "15" },
+            ]}
           >
-            <Ionicons
-              name="arrow-down"
-              size={18}
-              color={userVote === -1 ? "#FF4500" : theme.icon}
-            />
-          </TouchableOpacity>
+            <Ionicons name="chatbubble-outline" size={25} color={theme.icon} />
+            <Text style={[styles.voteScore, { color: theme.icon }]}>
+              {report.comment_count ?? 0}
+            </Text>
+          </View>
         </View>
 
         <Modal
@@ -950,5 +966,18 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 15,
     fontFamily: Fonts.heading,
+  },
+  footerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  commentCount: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 0,
   },
 });
