@@ -10,31 +10,42 @@ import {
   ActivityIndicator,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
+  Pressable,
+  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TabView, TabBar } from "react-native-tab-view";
-
+import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts, feedTabs } from "@/constants/theme";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FeedPost from "@/components/feedPost";
 
-
-
-const FeedScene = ({ title, color }: { title: string; color: string }) => {
+const FeedScene = ({
+  title,
+  color,
+  sort,
+}: {
+  title: string;
+  color: string;
+  sort: "new" | "top";
+}) => {
   const {
     data: reports,
     isLoading,
     refetch,
     isRefetching,
   } = useQuery({
-    queryKey: ["reports", title],
+    queryKey: ["reports", title, sort],
     queryFn: async () => {
       let query = supabase
         .from("reports")
         .select("id")
         .eq("status", "unresolved")
-        .order("created_at", { ascending: false });
+        .order(sort === "new" ? "created_at" : "total_score", {
+          ascending: false,
+        });
 
       // Only filter by category when not on the "All" tab
       if (title !== "All") {
@@ -78,9 +89,7 @@ const FeedScene = ({ title, color }: { title: string; color: string }) => {
           {title === "All" ? "All Reports" : `${title} Feed`}
         </Text>
         <Text style={[styles.subText, { color }]}>
-          {title === "All"
-            ? "No reports yet."
-            : `No reports in ${title} yet.`}
+          {title === "All" ? "No reports yet." : `No reports in ${title} yet.`}
         </Text>
       </ScrollView>
     );
@@ -135,18 +144,42 @@ export default function FeedScreen() {
     { key: "Dining", title: "Dining" },
     { key: "Tech", title: "Tech" },
   ]);
+  const [sort, setSort] = useState<"new" | "top">("new");
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const sortButtonRef = React.useRef<typeof TouchableOpacity.prototype>(null);
+  const [dropdownTop, setDropdownTop] = useState(140);
 
+  const openDropdown = () => {
+    sortButtonRef.current?.measure(
+      (
+        _x: number,
+        _y: number,
+        _width: number,
+        height: number,
+        _pageX: number,
+        pageY: number,
+      ) => {
+        setDropdownTop(pageY + height + 4);
+      },
+    );
+    setDropdownVisible(true);
+  };
+
+  const dropdownScale = Math.min(layout.width / 390, 1.5); // 390 = base iPhone width
+  const dropdownFontSize = Math.round(13 * dropdownScale);
+  const dropdownIconSize = Math.round(14 * dropdownScale);
+
+  const TAB_MIN_WIDTH = 90;
+  const totalMinWidth = routes.length * TAB_MIN_WIDTH;
+  const tabWidth =
+    totalMinWidth <= layout.width
+      ? layout.width / routes.length // spread evenly
+      : TAB_MIN_WIDTH; // fixed, lets neighbors peek
   // Build color array matching routes order (All first)
   const colorRange = routes.map(
-    (route) => feedTabs[route.key] ?? ALL_TAB_COLOR
+    (route) => feedTabs[route.key] ?? ALL_TAB_COLOR,
   );
   const inputRange = routes.map((_, i) => i);
-
-  // Moved inside component so SceneMap has access to theme
-  const renderScene = ({ route }: { route: { key: string } }) => {
-    const color = feedTabs[route.key] ?? ALL_TAB_COLOR;
-    return <FeedScene title={route.key} color={color} />;
-  };
 
   const renderTabBar = (props: any) => {
     const activeColor = props.position.interpolate({
@@ -158,10 +191,26 @@ export default function FeedScreen() {
       <TabBar
         {...props}
         renderIndicator={(indicatorProps) => {
-          const width = layout.width / routes.length;
-          const translateX = indicatorProps.position.interpolate({
-            inputRange,
-            outputRange: inputRange.map((i) => i * width),
+          const { position, getTabWidth, navigationState } = indicatorProps;
+
+          const offsets = navigationState.routes.map((_: any, i: number) => {
+            let offset = 0;
+            for (let j = 0; j < i; j++) {
+              offset += getTabWidth(j);
+            }
+            return offset;
+          });
+
+          const translateX = position.interpolate({
+            inputRange: navigationState.routes.map((_: any, i: number) => i),
+            outputRange: offsets,
+          });
+
+          const scaleX = position.interpolate({
+            inputRange: navigationState.routes.map((_: any, i: number) => i),
+            outputRange: navigationState.routes.map((_: any, i: number) =>
+              getTabWidth(i),
+            ),
           });
 
           return (
@@ -169,8 +218,9 @@ export default function FeedScreen() {
               style={[
                 styles.indicator,
                 {
-                  width: width - 20,
-                  transform: [{ translateX: Animated.add(translateX, 10) }],
+                  width: 1, // base width of 1, scaleX does the rest
+                  transform: [{ translateX }, { scaleX }],
+                  transformOrigin: "left",
                   backgroundColor: activeColor,
                 },
               ]}
@@ -187,9 +237,10 @@ export default function FeedScreen() {
         }}
         activeColor={theme.text}
         inactiveColor={theme.text}
-        tabStyle={{ width: layout.width / routes.length }}
+        tabStyle={{ width: tabWidth, paddingHorizontal: 0 }}
+        labelStyle={{ fontSize: 12, marginHorizontal: 2, marginVertical: 6 }}
         pressColor="transparent"
-        scrollEnabled={false}
+        scrollEnabled={true}
       />
     );
   };
@@ -199,13 +250,116 @@ export default function FeedScreen() {
       style={[styles.safe, { backgroundColor: theme.background }]}
       edges={["top"]}
     >
+      <Modal
+        visible={dropdownVisible}
+        transparent
+        animationType="none"
+        onRequestClose={() => setDropdownVisible(false)}
+      >
+        <Pressable
+          style={[StyleSheet.absoluteFill, { cursor: "default" } as any]}
+          onPress={() => setDropdownVisible(false)}
+        />
+        <View
+          style={[
+            styles.dropdown,
+            {
+              backgroundColor: theme.background,
+              borderColor: theme.line,
+              top: dropdownTop,
+              width: Math.min(layout.width * 0.4, 200), // 40% of screen, max 200
+            },
+          ]}
+        >
+          {(["new", "top"] as const).map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                styles.dropdownItem,
+                sort === option && { backgroundColor: theme.line },
+                {
+                  paddingHorizontal: Math.round(14 * dropdownScale),
+                  paddingVertical: Math.round(10 * dropdownScale),
+                },
+              ]}
+              onPress={() => {
+                setSort(option);
+                setDropdownVisible(false);
+              }}
+            >
+              <Ionicons
+                name={option === "new" ? "time-outline" : "flame-outline"}
+                size={dropdownIconSize}
+                color={theme.text}
+              />
+              <Text
+                style={[
+                  styles.dropdownItemText,
+                  { color: theme.text, fontSize: dropdownFontSize },
+                ]}
+              >
+                {option === "new" ? "New" : "Top"}
+              </Text>
+              {sort === option && (
+                <Ionicons
+                  name="checkmark"
+                  size={dropdownIconSize + 4}
+                  color={ALL_TAB_COLOR}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </Modal>
       <TabView
         navigationState={{ index, routes }}
-        renderScene={renderScene}
+        renderScene={({ route }) => {
+          const color = feedTabs[route.key] ?? ALL_TAB_COLOR;
+          return <FeedScene title={route.key} color={color} sort={sort} />;
+        }}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
         swipeEnabled={Platform.OS !== "web"}
-        renderTabBar={renderTabBar}
+        renderTabBar={(props) => (
+          <>
+            {renderTabBar(props)}
+            <View
+              style={[
+                styles.sortRow,
+                {
+                  backgroundColor: theme.background,
+                  borderBottomColor: theme.line,
+                  paddingVertical: Math.round(8 * dropdownScale),
+                },
+              ]}
+            >
+              <TouchableOpacity
+                ref={sortButtonRef}
+                style={styles.sortButton}
+                onPress={openDropdown}
+              >
+                <Ionicons
+                  name={sort === "new" ? "time-outline" : "flame-outline"}
+                  size={dropdownIconSize}
+                  color={theme.text}
+                />
+                <Text
+                  style={[
+                    styles.sortButtonText,
+                    { color: theme.text, fontSize: dropdownFontSize },
+                  ]}
+                >
+                  {sort === "new" ? "New" : "Top"}
+                </Text>
+                <Ionicons
+                  name="chevron-down"
+                  size={Math.round(12 * dropdownScale)}
+                  color={theme.text}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       />
     </SafeAreaView>
   );
@@ -242,5 +396,50 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 4,
     borderRadius: 2,
+  },
+  sortRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    zIndex: 10,
+  },
+  sortButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 4,
+  },
+  sortButtonText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+  },
+  sortChevron: {
+    fontSize: 11,
+    fontFamily: Fonts.body,
+  },
+  dropdown: {
+    position: "absolute",
+    top: 140,
+    left: 16,
+    borderWidth: 1,
+    borderRadius: 8,
+    minWidth: 120,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    cursor: "pointer",
+  },
+  dropdownItemText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
   },
 });
