@@ -64,7 +64,7 @@ export default function FeedPost({ reportId }: { reportId: string }) {
       // 1. Fetch the report
       const { data: report, error: reportError } = await supabase
         .from("reports")
-        .select("*")
+        .select("*, profiles!reports_user_id_fkey(username)")
         .eq("id", reportId)
         .single();
 

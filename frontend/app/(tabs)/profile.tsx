@@ -33,11 +33,19 @@ export default function ProfileScreen() {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("username, created_at")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+
       return {
         id: user.id,
         email: user.email || "",
-        username: user.email?.split("@")[0] || "User",
-        memberSince: new Date(user.created_at).toLocaleDateString("en-US", {
+        username: profile.username,
+        memberSince: new Date(profile.created_at).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
         }),

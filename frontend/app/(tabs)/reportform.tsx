@@ -89,8 +89,13 @@ export default function ReportForm() {
       if (authError || !user)
         throw new Error("Please log in to submit a report.");
 
-      const username =
-        user.user_metadata?.username || user.email?.split("@")[0] || "user";
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      const username = profile?.username || user.email?.split("@")[0] || "user";
       let uploadedPaths: string[] = [];
 
       if (imageUris.length > 0) {
@@ -145,7 +150,6 @@ export default function ReportForm() {
       const { error: dbError } = await supabase.from("reports").insert([
         {
           user_id: user.id,
-          username: username,
           title: title.trim(),
           category: selectedCategory,
           description: notes,

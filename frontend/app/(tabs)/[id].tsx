@@ -76,7 +76,7 @@ export default function ReportDetailsScreen() {
     queryFn: async () => {
       const { data: report, error } = await supabase
         .from("reports")
-        .select("*")
+        .select("*, profiles!reports_user_id_fkey(username)")
         .eq("id", reportId)
         .single();
 
@@ -444,6 +444,9 @@ export default function ReportDetailsScreen() {
               {report?.created_at
                 ? new Date(report.created_at).toLocaleDateString()
                 : "..."}
+              {report?.profiles?.username
+                ? ` by ${report.profiles.username}`
+                : ""}
             </ThemedText>
 
             {isAdmin && !isAdminLoading && (
