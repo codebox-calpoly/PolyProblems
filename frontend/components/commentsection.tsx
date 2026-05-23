@@ -309,7 +309,7 @@ export default function CommentsSection({
         .from("comments")
         // Tell Supabase to reach into the profiles table via your user_id foreign key
         .select(
-          "id, created_at, content, report_id, parent_id, profiles!comments_user_id_fkey(username)",
+          "id, created_at, content, report_id, parent_id, user_id, profiles!comments_user_id_fkey(username)",
         )
         .eq("report_id", reportId)
         .order("created_at", { ascending: true });
