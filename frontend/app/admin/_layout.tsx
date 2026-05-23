@@ -19,7 +19,7 @@ export default function AdminLayout() {
         .single();
 
       if (data?.role !== "admin") {
-        router.replace("/");
+        router.replace("/login");
       } else {
         setLoading(false);
       }

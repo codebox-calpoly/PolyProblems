@@ -19,6 +19,8 @@ Short paragraph description
 - [Scott Eisenberg](https://www.linkedin.com/in/scott-eisenberg2/) - Developer
 - [Mason Lewis](https://www.linkedin.com/in/masonclewis/) - Developer
 - [Emi Okumoto](https://www.linkedin.com/in/emiokumoto/) - Developer
+- [Sai Deekshitha Ganji](www.linkedin.com/in/sai-deekshitha-ganji) - Developer
+
 
 ## Contributing
 
